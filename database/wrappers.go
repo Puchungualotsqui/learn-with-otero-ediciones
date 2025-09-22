@@ -66,6 +66,68 @@ func Get[T any](s *Store, bucket []byte, key string) (*T, error) {
 	return &out, nil
 }
 
+func GetWithPrefix[T any](s *Store, bucket []byte, prefix string) ([]T, error) {
+	var results []T
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		c := b.Cursor()
+		p := []byte(prefix)
+
+		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
+			var out T
+			if err := json.Unmarshal(v, &out); err != nil {
+				return err
+			}
+			results = append(results, out)
+		}
+
+		return nil
+	})
+
+	return results, err
+}
+
+func Exists(s *Store, bucket []byte, key string) bool {
+	var found bool
+	_ = s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+		v := b.Get([]byte(key))
+		found = v != nil
+		return nil
+	})
+	return found
+}
+
+func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
+	var found bool
+	_ = s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		c := b.Cursor()
+		for _, prefix := range prefixes {
+			p := []byte(prefix)
+			k, _ := c.Seek(p)
+			if k != nil && bytes.HasPrefix(k, p) {
+				found = true
+				return nil // stop early, no need to keep searching
+			}
+		}
+		return nil
+	})
+	return found
+}
+
 func List[T any](s *Store, bucketName []byte) ([]T, error) {
 	var out []T
 	err := s.db.View(func(tx *bbolt.Tx) error {

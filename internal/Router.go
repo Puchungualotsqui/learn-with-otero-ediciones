@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"fmt"
+	"frontend/auth"
+	"frontend/database"
+	"frontend/database/models"
 	"frontend/templates/body"
 	"frontend/templates/components/assignment"
 	"frontend/templates/components/class"
@@ -9,13 +13,59 @@ import (
 	"strings"
 )
 
-func Router(w http.ResponseWriter, r *http.Request) {
+func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
+	cookie, err := r.Cookie("session_user")
+	if parts[0] != "login" { // protect everything except /login
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		if !database.Exists(store, database.Buckets["users"], cookie.Value) {
+			// invalid cookie, force re-login
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+	}
+
 	switch parts[0] {
 	case "login":
-		RenderWithLayout(w, r, body.Auth())
+		switch r.Method {
+		case http.MethodGet:
+			RenderWithLayout(w, r, body.Auth())
+
+		case http.MethodPost:
+			username := r.FormValue("username")
+			password := r.FormValue("password")
+
+			user, err := database.Get[models.User](store, database.Buckets["users"], username)
+			if err != nil {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("Usuario no encontrado"))
+				return
+			}
+
+			if !auth.CheckPassword(user.PasswordHashed, password) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("Contraseña incorrecta"))
+				return
+			}
+
+			http.SetCookie(w, &http.Cookie{
+				Name:     "session_user",
+				Value:    username,
+				Path:     "/",
+				HttpOnly: true,
+				Secure:   false, // set true in production with HTTPS
+				SameSite: http.SameSiteLaxMode,
+			})
+			w.Header().Set("HX-Redirect", "/")
+
+		default:
+			http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		}
 
 	case "":
 		slotsInfo := []class.SlotInfo{
@@ -43,70 +93,14 @@ func Router(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadAssignments(subject string) []assignment.Assignment {
-	switch strings.ToLower(subject) {
-	case "matematicas":
-		return []assignment.Assignment{
-			{
-				ID:          1,
-				Title:       "Álgebra I",
-				Description: "Resolver los ejercicios de la página 42 del libro de texto. Entregar en hoja cuadriculada.",
-				SubjectID:   1,
-				DueDate:     "2024-09-25",
-			},
-			{
-				ID:          1,
-				Title:       "Álgebra I",
-				Description: "Resolver los ejercicios de la página 42 del libro de texto. Entregar en hoja cuadriculada.",
-				SubjectID:   1,
-				DueDate:     "2025-09-22",
-			},
-			{
-				ID:          2,
-				Title:       "Geometría básica",
-				Description: "Dibujar y calcular las áreas de triángulos equiláteros y rectángulos.",
-				SubjectID:   1,
-				DueDate:     "2025-09-30",
-			},
-		}
+func loadAssignments(store *database.Store, classID int) []assignment.Assignment {
+	var results []assignment.Assignment
 
-	case "historia":
-		return []assignment.Assignment{
-			{
-				ID:          3,
-				Title:       "Independencia de Bolivia",
-				Description: "Escribir un ensayo corto (1-2 páginas) sobre los líderes de la independencia.",
-				SubjectID:   2,
-				DueDate:     "2025-09-28",
-			},
-			{
-				ID:          4,
-				Title:       "Revolución Francesa",
-				Description: "Hacer un resumen de las causas y consecuencias principales de la Revolución Francesa.",
-				SubjectID:   2,
-				DueDate:     "2025-10-05",
-			},
-		}
-
-	case "ciencias":
-		return []assignment.Assignment{
-			{
-				ID:          5,
-				Title:       "Fotosíntesis",
-				Description: "Elaborar un esquema del proceso de fotosíntesis con dibujos y explicaciones.",
-				SubjectID:   3,
-				DueDate:     "2025-09-27",
-			},
-			{
-				ID:          6,
-				Title:       "Ecosistemas",
-				Description: "Investigar un ecosistema local y preparar una presentación corta.",
-				SubjectID:   3,
-				DueDate:     "2025-10-03",
-			},
-		}
-
-	default:
-		return []assignment.Assignment{}
+	prefix := fmt.Sprintf("%d:", classID) // keys look like "classID:assignmentID"
+	assignments, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], prefix)
+	if err == nil {
+		results = append(results, assignments...)
 	}
+
+	return results
 }

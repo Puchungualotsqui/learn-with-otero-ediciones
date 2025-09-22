@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"frontend/database/models"
 	"log"
 	"os"
@@ -56,8 +57,10 @@ func Init(path string) (*Store, error) {
 		log.Println("🌱 Seeding database with test data...")
 
 		// Create sample users
-		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor", []byte("my-secret-key-1234567890123456"))
-		_ = CreateUser(store, "student1", "password", "Bob", "Perez", "student", []byte("my-secret-key-1234567890123456"))
+		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor", []byte("my-secret-key-12"))
+		if err := CreateUser(store, "student1", "password", "Bob", "Perez", "student", []byte("my-secret-key-12")); err != nil {
+			fmt.Println(fmt.Errorf("Error creating User %w", err))
+		}
 
 		// Create a subject
 		subject := models.Subject{

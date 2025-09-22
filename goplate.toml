@@ -7,5 +7,6 @@ ignore_patterns = [
   "static/css/output.css",
   "**/*_templ.go",
   "bin/server",
-  "data/**"
+  "data/**",
+  ".git/**"
 ]
