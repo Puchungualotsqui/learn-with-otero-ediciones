@@ -1,0 +1,47 @@
+package body
+
+templ Auth() {
+	<!-- Background -->
+  <div class="absolute inset-0">
+    <img src="/static/assets/log-background.jpg" alt="Background"
+         class="w-full h-full object-cover">
+  </div>
+  <!-- Gradient overlay -->
+  <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></div>
+
+  <!-- Login container -->
+  <div class="relative z-10 w-full max-w-md px-6">
+    <div class="backdrop-blur-md bg-white/10 border border-white/20 shadow-xl rounded-3xl p-8">
+      <!-- Branding -->
+      <h1 class="text-3xl font-bold text-center text-white tracking-wide">
+        Aprendiendo con <span class="text-red-500">Otero Ediciones</span>
+      </h1>
+      <div class="w-16 h-1 bg-red-500 mx-auto mt-3 rounded-full"></div>
+      <p class="text-center text-gray-200 mt-4">Bienvenido, ingresa tus credenciales</p>
+
+      <!-- Form -->
+      <form hx-post="/login" hx-target="#login-msg" hx-swap="innerHTML" class="mt-8 space-y-5">
+        <!-- Username -->
+        <div>
+          <input type="text" name="username" placeholder="Usuario"
+                 class="w-full px-4 py-3 rounded-xl bg-white/80 border border-gray-200 focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-gray-500 caret-red-500" required>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <input type="password" name="password" placeholder="Contraseña"
+                 class="w-full px-4 py-3 rounded-xl bg-white/80 border border-gray-200 focus:ring-2 focus:ring-red-500 focus:outline-none placeholder-gray-500 caret-red-500" required>
+        </div>
+
+        <!-- Button -->
+        <button type="submit"
+                class="w-full py-3 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold shadow-lg hover:scale-105 transform transition duration-200 cursor-pointer">
+          Iniciar sesión
+        </button>
+      </form>
+
+      <!-- Message area -->
+      <div id="login-msg" class="text-center mt-4 text-sm text-red-300"></div>
+    </div>
+  </div>
+}

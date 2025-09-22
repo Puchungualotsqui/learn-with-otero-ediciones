@@ -1,0 +1,18 @@
+package views
+
+templ Layout(body templ.Component) {
+	<!DOCTYPE html>
+<html lang="en" x-data>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/htmx.org@2.0.7"></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  <link href="/static/css/output.css" rel="stylesheet">
+</head>
+<body class="h-screen w-screen flex items-center justify-center bg-black relative">
+	@body
+</body>
+</html>
+
+}

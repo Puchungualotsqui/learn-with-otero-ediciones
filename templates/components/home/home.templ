@@ -1,0 +1,16 @@
+package home
+
+import "frontend/templates/components/class"
+
+templ Home(slotsInfo []class.SlotInfo) {
+	<!-- Content -->
+	  <main class="flex-1 px-6 py-8">
+	    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+	      <!-- Class card -->
+	      for _, item := range slotsInfo {
+			@class.ClassSlot(item)
+     }
+	    </div>
+	  </main>
+}

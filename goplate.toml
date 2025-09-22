@@ -1,0 +1,11 @@
+project = ""
+module = ""
+tailwind = true
+daisyui = false
+
+ignore_patterns = [
+  "static/css/output.css",
+  "**/*_templ.go",
+  "bin/server",
+  "data/**"
+]
