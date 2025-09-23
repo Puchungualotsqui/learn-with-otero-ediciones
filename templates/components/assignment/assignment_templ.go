@@ -12,7 +12,7 @@ import (
 	"frontend/dto"
 )
 
-func AssignmentContent(subject string, assignments []dto.Assignment) templ.Component {
+func AssignmentContent(assignments []dto.Assignment) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -33,17 +33,43 @@ func AssignmentContent(subject string, assignments []dto.Assignment) templ.Compo
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex-1 px-6 py-8 flex gap-6\"><!-- Left: List of assignments --><aside class=\"w-1/3 bg-white border border-gray-200 shadow-sm rounded-lg p-4 overflow-y-auto\"><h2 class=\"text-md font-semibold text-gray-800 mb-3\">Asignaciones</h2><ul class=\"space-y-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col md:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-6 h-[calc(100vh-5rem)]\"><!-- Left: List of assignments --><aside class=\"md:w-1/3 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col min-h-0\"><h2 class=\"text-md font-semibold text-gray-800 mb-3 shrink-0\">Asignaciones</h2><ul class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 overflow-y-auto flex-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, a := range assignments {
-			templ_7745c5c3_Err = AssignmentSlot(a).Render(ctx, templ_7745c5c3_Buffer)
+		if len(assignments) == 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<li class=\"text-gray-500 text-sm italic col-span-full\">No hay asignaciones disponibles.</li>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			for _, a := range assignments {
+				templ_7745c5c3_Err = AssignmentSlot(a).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</ul></aside><!-- Right: Assignment details --><section id=\"assignment-detail\" class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0\"><div class=\"overflow-y-auto flex-1\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(assignments) == 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<p class=\"text-gray-500 text-center\">No hay detalles para mostrar.</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = AssignmentDetail(assignments[0]).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</ul></aside><!-- Right: Assignment details --><section class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Título de la asignación</h2><p class=\"text-gray-700 mb-4\">Aquí irá la descripción detallada de la asignación seleccionada.</p><!-- Upload placeholder (to be added later) --><div class=\"border border-dashed border-gray-300 rounded-md p-6 text-center text-gray-500\">Zona de entrega (se agregará funcionalidad más adelante)</div></section></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></section></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

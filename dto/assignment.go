@@ -3,7 +3,7 @@ package dto
 import "frontend/database/models"
 
 type Assignment struct {
-	ID          int
+	Id          int
 	Title       string
 	Description string
 	Content     []string
@@ -12,7 +12,7 @@ type Assignment struct {
 
 func AssignmentFromModel(a models.Assignment) Assignment {
 	return Assignment{
-		ID:          a.Id,
+		Id:          a.Id,
 		Title:       a.Title,
 		Description: a.Description,
 		Content:     a.Content,

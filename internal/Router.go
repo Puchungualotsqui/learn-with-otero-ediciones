@@ -63,36 +63,40 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 				SameSite: http.SameSiteLaxMode,
 			})
 			w.Header().Set("HX-Redirect", "/")
+			return
 
 		default:
 			http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+			return
 		}
 
 	case parts[0] == "":
 		classes, err := database.ListClassesForUser(store, cookie.Value)
 		if err != nil {
-			log.Printf("⚠️ fallback: user %s classes not loaded: %v", cookie.Value, err)
+			log.Printf("fallback: user %s classes not loaded: %v", cookie.Value, err)
 			classes = []models.Class{}
 		}
 		slotsInfo := dto.ClassSlotFromModels(classes)
 
 		RenderWithLayout(w, r, home.Home(slotsInfo), body.Home)
+		return
 
 	case isClassValid(store, cookie.Value, parts[0]):
 		if len(parts) > 1 {
 			switch parts[1] {
 			case "asignaciones":
-				subject := parts[0]
 				classId, _ := strconv.Atoi(parts[0])
 				assignments := database.ListAssignmentsOfClass(store, classId)
-				RenderWithLayout(w, r, assignment.AssignmentContent(subject, assignments), body.Home)
+				RenderWithLayout(w, r, assignment.AssignmentContent(assignments), body.Home)
 				return
 			}
 		}
 		http.NotFound(w, r)
+		return
 
 	default:
 		http.NotFound(w, r)
+		return
 	}
 }
 

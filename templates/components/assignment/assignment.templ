@@ -4,27 +4,32 @@ import (
 	"frontend/dto"
 )
 
-templ AssignmentContent(subject string, assignments []dto.Assignment) {
-	<main class="flex-1 px-6 py-8 flex gap-6">
-      <!-- Left: List of assignments -->
-      <aside class="w-1/3 bg-white border border-gray-200 shadow-sm rounded-lg p-4 overflow-y-auto">
-        <h2 class="text-md font-semibold text-gray-800 mb-3">Asignaciones</h2>
-        <ul class="space-y-2">
-          for _, a := range assignments {
-            @AssignmentSlot(a)
-          }
-        </ul>
-      </aside>
+templ AssignmentContent(assignments []dto.Assignment) {
+	<main class="flex flex-col md:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-6 h-[calc(100vh-5rem)]">
 
-      <!-- Right: Assignment details -->
-      <section class="flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">Título de la asignación</h2>
-        <p class="text-gray-700 mb-4">Aquí irá la descripción detallada de la asignación seleccionada.</p>
+		<!-- Left: List of assignments -->
+		<aside class="md:w-1/3 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col min-h-0">
+			<h2 class="text-md font-semibold text-gray-800 mb-3 shrink-0">Asignaciones</h2>
+			<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 overflow-y-auto flex-1">
+				if len(assignments) == 0 {
+					<li class="text-gray-500 text-sm italic col-span-full">No hay asignaciones disponibles.</li>
+				} else {
+					for _, a := range assignments {
+						@AssignmentSlot(a)
+					}
+				}
+			</ul>
+		</aside>
 
-        <!-- Upload placeholder (to be added later) -->
-        <div class="border border-dashed border-gray-300 rounded-md p-6 text-center text-gray-500">
-          Zona de entrega (se agregará funcionalidad más adelante)
-        </div>
-      </section>
-    </main>
+		<!-- Right: Assignment details -->
+		<section id="assignment-detail" class="flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0">
+			<div class="overflow-y-auto flex-1">
+				if len(assignments) == 0 {
+					<p class="text-gray-500 text-center">No hay detalles para mostrar.</p>
+				} else {
+					@AssignmentDetail(assignments[0]) // show first as default
+				}
+			</div>
+		</section>
+	</main>
 }

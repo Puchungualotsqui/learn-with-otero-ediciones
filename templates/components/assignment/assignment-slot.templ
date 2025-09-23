@@ -3,6 +3,7 @@ package assignment
 import (
 	"time"
 	"frontend/dto"
+	"strconv"
 )
 
 templ AssignmentSlot(a dto.Assignment) {
@@ -29,6 +30,9 @@ templ AssignmentSlot(a dto.Assignment) {
 
 	<li>
 		<button
+			hx-get={"/assignment/detail?id=" + strconv.Itoa(a.Id)}
+			hx-target="#assignment-detail"
+        	hx-swap="outerHTML"
 			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}>
 			<div class="flex justify-between items-center">
 				<span>{ a.Title }</span>
