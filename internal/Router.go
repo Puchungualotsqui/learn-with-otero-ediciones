@@ -78,12 +78,12 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 
 		RenderWithLayout(w, r, home.Home(slotsInfo), body.Home)
 
-	case isClassValid(store, cookie.Value, parts[1]):
+	case isClassValid(store, cookie.Value, parts[0]):
 		if len(parts) > 1 {
 			switch parts[1] {
 			case "asignaciones":
 				subject := parts[0]
-				classId, _ := strconv.Atoi(parts[1])
+				classId, _ := strconv.Atoi(parts[0])
 				assignments := database.ListAssignmentsOfClass(store, classId)
 				RenderWithLayout(w, r, assignment.AssignmentContent(subject, assignments), body.Home)
 				return

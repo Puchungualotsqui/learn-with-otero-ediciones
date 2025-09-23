@@ -11,6 +11,7 @@ type Class struct {
 }
 
 type ClassSlot struct {
+	Id       int
 	Title    string
 	SubTitle string
 }
@@ -33,6 +34,7 @@ func ClassFromModels(classes []models.Class) []Class {
 
 func ClassSlotFromModel(class models.Class) ClassSlot {
 	return ClassSlot{
+		Id:       class.Id,
 		Title:    class.Name,
 		SubTitle: class.Description,
 	}
