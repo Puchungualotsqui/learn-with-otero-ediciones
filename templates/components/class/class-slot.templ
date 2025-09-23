@@ -1,8 +1,11 @@
 package class
 
-import "strings"
+import (
+	"strings"
+	"frontend/dto"
+)
 
-templ ClassSlot (item SlotInfo) {
+templ ClassSlot (item dto.ClassSlot) {
 	<div class="bg-white border border-gray-200 shadow hover:shadow-md transition rounded-lg flex flex-col">
 	   <div class="p-5 flex-1">
 	     <h2 class="text-lg font-semibold text-gray-900">{ item.Title }</h2>

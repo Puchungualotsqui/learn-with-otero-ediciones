@@ -9,7 +9,7 @@ import (
 )
 
 // CreateSubmission stores a submission with unique (assignmentId, studentId).
-func CreateSubmission(s *Store, assignmentId, studentId int, content, submittedAt, grade string) (*models.Submission, error) {
+func CreateSubmission(s *Store, assignmentId, studentId int, content []string, submittedAt, grade string) (*models.Submission, error) {
 	var sub *models.Submission
 
 	err := s.db.Update(func(tx *bbolt.Tx) error {

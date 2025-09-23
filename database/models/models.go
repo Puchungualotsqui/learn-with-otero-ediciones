@@ -14,25 +14,27 @@ type Subject struct {
 }
 
 type Class struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	Subject    string `json:"subject"`
-	StudentIds []int  `json:"student_ids"`
-	TeacherIds []int  `json:"teacher_ids"`
+	Id          int      `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Subject     string   `json:"subject"`
+	Users       []string `json:"users"`
 }
 
 type Assignment struct {
-	Id          int    `json:"id"`
-	ClassId     int    `json:"class_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	DueDate     string `json:"due_date"` // formatted "2006-01-02"
+	Id          int      `json:"id"`
+	ClassId     int      `json:"class_id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Content     []string `json:"content"`  // url to some file
+	DueDate     string   `json:"due_date"` // formatted "2006-01-02"
 }
 
 type Submission struct {
-	Id          int    `json:"id"`
-	StudentId   int    `json:"student_id"`
-	Content     string `json:"content"`      // could be file path or text
-	SubmittedAt string `json:"submitted_at"` // timestamp
-	Grade       string `json:"grade,omitempty"`
+	Id          int      `json:"id"`
+	StudentId   int      `json:"student_id"`
+	Description string   `json:"description"`
+	Content     []string `json:"content"`      // could be file path or text
+	SubmittedAt string   `json:"submitted_at"` // timestamp
+	Grade       string   `json:"grade,omitempty"`
 }

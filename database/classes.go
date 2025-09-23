@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
+	"slices"
 
 	"go.etcd.io/bbolt"
 )
@@ -18,10 +19,9 @@ func CreateClass(s *Store, subject string) (*models.Class, error) {
 
 		id64, _ := b.NextSequence()
 		c = &models.Class{
-			Id:         int(id64),
-			Subject:    subject,
-			StudentIds: []int{},
-			TeacherIds: []int{},
+			Id:      int(id64),
+			Subject: subject,
+			Users:   []string{},
 		}
 
 		data, err := json.Marshal(c)
@@ -64,4 +64,29 @@ func updateClass(s *Store, classId int, updater func(*models.Class) error) error
 		data, _ := json.Marshal(c)
 		return b.Put(key, data)
 	})
+}
+
+func ListClassesForUser(s *Store, username string) ([]models.Class, error) {
+	var results []models.Class
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(Buckets["classes"])
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", Buckets["classes"])
+		}
+
+		return b.ForEach(func(k, v []byte) error {
+			var c models.Class
+			if err := json.Unmarshal(v, &c); err != nil {
+				return err
+			}
+
+			if slices.Contains(c.Users, username) {
+				results = append(results, c)
+			}
+			return nil
+		})
+	})
+
+	return results, err
 }

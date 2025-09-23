@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
+	"frontend/dto"
 
 	"go.etcd.io/bbolt"
 )
@@ -42,4 +43,20 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 		return nil, err
 	}
 	return a, nil
+}
+
+func ListAssignmentsOfClass(store *Store, classID int) []dto.Assignment {
+	prefix := fmt.Appendf(nil, "%d", classID)
+
+	assignments, err := GetWithPrefix[models.Assignment](
+		store,
+		Buckets["assignments"],
+		string(prefix),
+	)
+
+	if err != nil {
+		return []dto.Assignment{}
+	}
+
+	return dto.AssignmentFromModels(assignments)
 }

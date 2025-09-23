@@ -2,9 +2,10 @@ package assignment
 
 import (
 	"time"
+	"frontend/dto"
 )
 
-templ AssignmentSlot(a Assignment) {
+templ AssignmentSlot(a dto.Assignment) {
 	{{
 		// Bolivia timezone
 		loc, _ := time.LoadLocation("America/La_Paz")

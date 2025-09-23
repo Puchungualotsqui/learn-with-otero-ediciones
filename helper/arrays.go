@@ -8,8 +8,8 @@ func Contains[T comparable](slice []T, elem T) bool {
 	return slices.Contains(slice, elem)
 }
 
-func Remove(slice []int, id int) []int {
-	result := make([]int, 0, len(slice))
+func Remove[T comparable](slice []T, id T) []T {
+	result := make([]T, 0, len(slice))
 	for _, v := range slice {
 		if v != id {
 			result = append(result, v)

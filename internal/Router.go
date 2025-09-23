@@ -1,15 +1,16 @@
 package internal
 
 import (
-	"fmt"
 	"frontend/auth"
 	"frontend/database"
 	"frontend/database/models"
+	"frontend/dto"
 	"frontend/templates/body"
 	"frontend/templates/components/assignment"
-	"frontend/templates/components/class"
 	"frontend/templates/components/home"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -30,8 +31,8 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	switch parts[0] {
-	case "login":
+	switch {
+	case parts[0] == "login":
 		switch r.Method {
 		case http.MethodGet:
 			RenderWithLayout(w, r, body.Auth())
@@ -67,21 +68,23 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
 		}
 
-	case "":
-		slotsInfo := []class.SlotInfo{
-			{Title: "Matemáticas", SubTitle: "Nivel: Secundaria"},
-			{Title: "Historia", SubTitle: "Nivel: Secundaria"},
-			{Title: "Ciencias", SubTitle: "Nivel: Primaria"},
+	case parts[0] == "":
+		classes, err := database.ListClassesForUser(store, cookie.Value)
+		if err != nil {
+			log.Printf("⚠️ fallback: user %s classes not loaded: %v", cookie.Value, err)
+			classes = []models.Class{}
 		}
+		slotsInfo := dto.ClassSlotFromModels(classes)
 
 		RenderWithLayout(w, r, home.Home(slotsInfo), body.Home)
 
-	case "matematicas", "historia", "ciencias":
+	case isClassValid(store, cookie.Value, parts[1]):
 		if len(parts) > 1 {
 			switch parts[1] {
 			case "asignaciones":
 				subject := parts[0]
-				assignments := loadAssignments(subject)
+				classId, _ := strconv.Atoi(parts[1])
+				assignments := database.ListAssignmentsOfClass(store, classId)
 				RenderWithLayout(w, r, assignment.AssignmentContent(subject, assignments), body.Home)
 				return
 			}
@@ -93,14 +96,20 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadAssignments(store *database.Store, classID int) []assignment.Assignment {
-	var results []assignment.Assignment
-
-	prefix := fmt.Sprintf("%d:", classID) // keys look like "classID:assignmentID"
-	assignments, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], prefix)
-	if err == nil {
-		results = append(results, assignments...)
+func isClassValid(store *database.Store, username, classId string) bool {
+	classes, err := database.ListClassesForUser(store, username)
+	if err != nil {
+		return false
+	}
+	classIds, err := strconv.Atoi(classId)
+	if err != nil {
+		return false
 	}
 
-	return results
+	for _, class := range classes {
+		if class.Id == classIds {
+			return true
+		}
+	}
+	return false
 }

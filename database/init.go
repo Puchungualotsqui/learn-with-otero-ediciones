@@ -70,11 +70,10 @@ func Init(path string) (*Store, error) {
 
 		// Create a class
 		class := models.Class{
-			Id:         1,
-			Name:       "Literatura 4to A",
-			Subject:    "literatura",
-			TeacherIds: []int{1}, // professor ID
-			StudentIds: []int{2}, // student ID
+			Id:      1,
+			Name:    "Literatura 4to A",
+			Subject: "literatura",
+			Users:   []string{"prof1", "student1"}, // professor ID
 		}
 		_ = Save(store, Buckets["classes"], strconv.Itoa(class.Id), class)
 
@@ -82,7 +81,7 @@ func Init(path string) (*Store, error) {
 		a, _ := CreateAssignment(store, class.Id, "Álgebra I", "Resolver los ejercicios de la página 42", time.Now().AddDate(0, 0, 7).Format("2006-01-02"))
 
 		// Create a submission
-		_, _ = CreateSubmission(store, a.Id, 2, "solucion.pdf", time.Now().Format(time.RFC3339), "")
+		_, _ = CreateSubmission(store, a.Id, 2, []string{"solucion.pdf"}, time.Now().Format(time.RFC3339), "")
 	}
 
 	log.Println("✅ Database ready at", path)
