@@ -6,38 +6,26 @@ import (
 	"strconv"
 )
 
-templ AssignmentSlot(a dto.Assignment) {
-	{{
-		// Bolivia timezone
-		loc, _ := time.LoadLocation("America/La_Paz")
-
-		// Parse due date in Bolivia timezone
-		due, _ := time.ParseInLocation("2006-01-02", a.DueDate, loc)
-		now := time.Now().In(loc)
-
-		daysLeft := int(due.Sub(now).Hours() / 24)
-
-		var textColor string
-		switch {
-		case due.Before(now):
-			textColor = "text-red-600"
-		case daysLeft <= 1:
-			textColor = "text-yellow-600"
-		default:
-			textColor = "text-gray-700"
-		}
-	}}
-
+templ AssignmentSlotProfessor(a dto.Assignment) {
 	<li>
-		<button
-			hx-get={"/assignment/detail?id=" + strconv.Itoa(a.Id)}
-			hx-target="#assignment-detail"
-        	hx-swap="outerHTML"
-			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}>
-			<div class="flex justify-between items-center">
-				<span>{ a.Title }</span>
-				<span class="text-xs">{ a.DueDate }</span>
-			</div>
-		</button>
+		<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition">
+			<button
+				hx-get={"/assignment/detail?id=" + strconv.Itoa(a.ID)}
+				hx-target="#assignment-detail"
+				hx-swap="innerHTML"
+				class="flex-1 text-left">
+				<div class="flex justify-between items-center">
+					<span>{ a.Title }</span>
+					<span class="text-xs">{ a.DueDate }</span>
+				</div>
+			</button>
+			<button
+				hx-delete={"/assignment/delete?id=" + strconv.Itoa(a.ID)}
+				hx-target="closest li"
+				hx-swap="outerHTML"
+				class="ml-2 text-red-600 hover:text-red-800">
+				✕
+			</button>
+		</div>
 	</li>
 }
