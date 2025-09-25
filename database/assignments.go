@@ -22,7 +22,6 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 		id64, _ := b.NextSequence()
 		a = &models.Assignment{
 			Id:          int(id64),
-			ClassId:     classId,
 			Title:       title,
 			Description: description,
 			DueDate:     dueDate,
@@ -33,7 +32,7 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 			return err
 		}
 
-		// Key pattern: "classId:assignmentId"
+		// Key pattern: "schoolId:classId:assignmentId"
 		key := fmt.Sprintf("%d:%d", classId, a.Id)
 
 		return b.Put([]byte(key), data)
@@ -46,12 +45,12 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 }
 
 func ListAssignmentsOfClass(store *Store, classID int) []dto.Assignment {
-	prefix := fmt.Appendf(nil, "%d", classID)
+	key := fmt.Sprintf("%d", classID)
 
-	assignments, err := GetWithPrefix[models.Assignment](
+	assignments, err := ListByPrefix[models.Assignment](
 		store,
 		Buckets["assignments"],
-		string(prefix),
+		key,
 	)
 
 	if err != nil {

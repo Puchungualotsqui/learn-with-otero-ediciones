@@ -1,10 +1,12 @@
 package internal
 
 import (
+	"fmt"
 	"frontend/auth"
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/dto"
+	"frontend/internal/handlers"
 	"frontend/templates/body"
 	"frontend/templates/components/assignment"
 	"frontend/templates/components/home"
@@ -24,7 +26,12 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-		if !database.Exists(store, database.Buckets["users"], cookie.Value) {
+		exists, err := database.Exists(store, database.Buckets["users"], cookie.Value)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		if !exists {
 			// invalid cookie, force re-login
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
@@ -70,6 +77,23 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+	case parts[0] == "logout":
+		// Clear cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_user",
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			HttpOnly: true,
+			Secure:   false,
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		// HX-Redirect header makes HTMX go there
+		w.Header().Set("HX-Redirect", "/login")
+		w.WriteHeader(http.StatusOK)
+		return
+
 	case parts[0] == "":
 		classes, err := database.ListClassesForUser(store, cookie.Value)
 		if err != nil {
@@ -82,12 +106,39 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 		return
 
 	case isClassValid(store, cookie.Value, parts[0]):
+		fmt.Println("🔎 Router parts:", parts)
+
 		if len(parts) > 1 {
 			switch parts[1] {
 			case "asignaciones":
 				classId, _ := strconv.Atoi(parts[0])
 				assignments := database.ListAssignmentsOfClass(store, classId)
-				RenderWithLayout(w, r, assignment.AssignmentContent(assignments), body.Home)
+
+				user, err := database.Get[models.User](store, []byte("Users"), cookie.Value)
+				if err != nil {
+					http.NotFound(w, r)
+					return
+				}
+				professor := user.Role == "professor"
+
+				// Debug logs
+				fmt.Printf("👉 Checking assignments route: %+v\n", parts)
+
+				if len(parts) > 4 && parts[3] == "submissions" && parts[4] == "detail" {
+					fmt.Println("📌 Routed to HandleSubmissionDetail")
+					assignmentId, _ := strconv.Atoi(parts[2])
+					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId)
+					return
+				}
+
+				if len(parts) > 2 && parts[2] == "detail" {
+					fmt.Println("📌 Routed to HandleAssignmentDetail")
+					handlers.HandleAssignmentDetail(store, w, r, professor)
+					return
+				}
+
+				fmt.Println("📌 Routed to AssignmentContent")
+				RenderWithLayout(w, r, assignment.AssignmentContent(assignments, professor, classId), body.Home)
 				return
 			}
 		}

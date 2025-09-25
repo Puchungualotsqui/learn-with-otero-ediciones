@@ -8,8 +8,14 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-// CreateSubmission stores a submission with unique (assignmentId, studentId).
-func CreateSubmission(s *Store, assignmentId, studentId int, content []string, submittedAt, grade string) (*models.Submission, error) {
+// CreateSubmission stores a submission with unique (classId, assignmentId, username).
+func CreateSubmission(
+	s *Store,
+	classId, assignmentId int,
+	username, description string,
+	content []string,
+	submittedAt, grade string,
+) (*models.Submission, error) {
 	var sub *models.Submission
 
 	err := s.db.Update(func(tx *bbolt.Tx) error {
@@ -18,15 +24,22 @@ func CreateSubmission(s *Store, assignmentId, studentId int, content []string, s
 			return err
 		}
 
-		// Unique key = "assignmentId:studentId"
-		key := fmt.Sprintf("%d:%d", assignmentId, studentId)
+		// Composite key: schoolId:classId:assignmentId:username
+		key := fmt.Sprintf("%d:%d:%s", classId, assignmentId, username)
 
-		// Generate auto id
+		// Ensure uniqueness: one submission per assignment/user
+		if b.Get([]byte(key)) != nil {
+			return fmt.Errorf("submission already exists for class %d, assignment %d and user %s",
+				classId, assignmentId, username)
+		}
+
+		// Auto ID (unique across all submissions)
 		id64, _ := b.NextSequence()
 
 		sub = &models.Submission{
 			Id:          int(id64),
-			StudentId:   studentId,
+			Username:    username,
+			Description: description,
 			Content:     content,
 			SubmittedAt: submittedAt,
 			Grade:       grade,
@@ -47,20 +60,14 @@ func CreateSubmission(s *Store, assignmentId, studentId int, content []string, s
 }
 
 // GetSubmission retrieves submission by assignmentId + studentId
-func GetSubmission(s *Store, assignmentId, studentId int) (*models.Submission, error) {
-	key := fmt.Sprintf("%d:%d", assignmentId, studentId)
+func GetSubmission(s *Store, assignmentId int, username string) (*models.Submission, error) {
+	key := fmt.Sprintf("%d:%s", assignmentId, username)
 	return Get[models.Submission](s, Buckets["submissions"], key)
-}
-
-// ListSubmissionsByAssignment → uses prefix scan
-func ListSubmissionsByAssignment(s *Store, assignmentId int) ([]models.Submission, error) {
-	prefix := fmt.Sprintf("%d:", assignmentId)
-	return ListByPrefix[models.Submission](s, Buckets["submissions"], prefix)
 }
 
 // ListSubmissionsByStudent → scans all submissions, filters by StudentId
 // (optional: add a second index "studentId:assignmentId" if needed)
-func ListSubmissionsByStudent(s *Store, studentId int) ([]models.Submission, error) {
+func ListSubmissionsByStudent(s *Store, username string) ([]models.Submission, error) {
 	all, err := ListByPrefix[models.Submission](s, Buckets["submissions"], "") // "" → all keys
 	if err != nil {
 		return nil, err
@@ -68,7 +75,7 @@ func ListSubmissionsByStudent(s *Store, studentId int) ([]models.Submission, err
 
 	var results []models.Submission
 	for _, sub := range all {
-		if sub.StudentId == studentId {
+		if sub.Username == username {
 			results = append(results, sub)
 		}
 	}
@@ -76,8 +83,8 @@ func ListSubmissionsByStudent(s *Store, studentId int) ([]models.Submission, err
 }
 
 // GradeSubmission → updates the Grade field
-func GradeSubmission(s *Store, assignmentId, studentId int, grade string) error {
-	key := fmt.Sprintf("%d:%d", assignmentId, studentId)
+func GradeSubmission(s *Store, assignmentId int, username string, grade string) error {
+	key := fmt.Sprintf("%d:%s", assignmentId, username)
 
 	sub, err := Get[models.Submission](s, Buckets["submissions"], key)
 	if err != nil {

@@ -2,14 +2,15 @@ package assignment
 
 import (
 	"frontend/dto"
+	"strconv"
 )
 
-templ StudentSubmissionSlot(s dto.Submission) {
+templ StudentSubmissionSlot(classId int, assignmentId int, s dto.Submission) {
 	<div class="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-		hx-get={"/submission/detail?id=" + strconv.Itoa(s.Id)}
+		hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username}
 		hx-target="#submission-detail"
 		hx-swap="innerHTML">
-		<p class="font-medium truncate">Estudiante #{ s.StudentId }</p>
+		<p class="font-medium truncate text-gray-900">{ s.Username }</p>
 		<p class="text-xs text-gray-500">{ s.SubmittedAt }</p>
 	</div>
 }

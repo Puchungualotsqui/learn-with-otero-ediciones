@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"go.etcd.io/bbolt"
@@ -18,6 +17,7 @@ var Buckets = map[string][]byte{
 	"classes":     []byte("Classes"),
 	"assignments": []byte("Assignments"),
 	"submissions": []byte("Submissions"),
+	"schools":     []byte("Schools"),
 }
 
 // Init opens (or creates) the DB and seeds test data if new
@@ -59,29 +59,26 @@ func Init(path string) (*Store, error) {
 		// Create sample users
 		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor", []byte("my-secret-key-12"))
 		if err := CreateUser(store, "student1", "password", "Bob", "Perez", "student", []byte("my-secret-key-12")); err != nil {
-			fmt.Println(fmt.Errorf("Error creating User %w", err))
+			fmt.Printf("Error creating User: %v\n", err)
 		}
 
 		// Create a subject
 		subject := models.Subject{
-			Name: "literatura",
+			InternalName: "matematicas",
+			Name:         "Matemáticas",
 		}
-		_ = Save(store, Buckets["subjects"], subject.Name, subject)
+		_ = CreateSubject(store, subject.InternalName, subject.Name)
 
-		// Create a class
-		class := models.Class{
-			Id:      1,
-			Name:    "Literatura 4to A",
-			Subject: "literatura",
-			Users:   []string{"prof1", "student1"}, // professor ID
-		}
-		_ = Save(store, Buckets["classes"], strconv.Itoa(class.Id), class)
+		class, _ := CreateClass(store, "Matemáticas", "Clase con el profe Hugo", "matematicas")
+
+		AddUserToClass(store, class.Id, "prof1")
+		AddUserToClass(store, class.Id, "student1")
 
 		// Create an assignment
-		a, _ := CreateAssignment(store, class.Id, "Álgebra I", "Resolver los ejercicios de la página 42", time.Now().AddDate(0, 0, 7).Format("2006-01-02"))
+		a, _ := CreateAssignment(store, class.Id, "Álgebra I", "Resolver los ejercicios de la página 42", time.Now().AddDate(0, 0, 7).Format("02/01/2006"))
 
 		// Create a submission
-		_, _ = CreateSubmission(store, a.Id, 2, []string{"solucion.pdf"}, time.Now().Format(time.RFC3339), "")
+		_, _ = CreateSubmission(store, class.Id, a.Id, "student1", "that's my submission content", []string{"solucion.pdf"}, time.Now().Format(time.RFC3339), "")
 	}
 
 	log.Println("✅ Database ready at", path)

@@ -10,7 +10,8 @@ type User struct {
 }
 
 type Subject struct {
-	Name string `json:"name"`
+	InternalName string `json:"internal_name"`
+	Name         string `json:"name"`
 }
 
 type Class struct {
@@ -23,7 +24,6 @@ type Class struct {
 
 type Assignment struct {
 	Id          int      `json:"id"`
-	ClassId     int      `json:"class_id"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Content     []string `json:"content"`  // url to some file
@@ -32,7 +32,7 @@ type Assignment struct {
 
 type Submission struct {
 	Id          int      `json:"id"`
-	StudentId   int      `json:"student_id"`
+	Username    string   `json:"username"`
 	Description string   `json:"description"`
 	Content     []string `json:"content"`      // could be file path or text
 	SubmittedAt string   `json:"submitted_at"` // timestamp

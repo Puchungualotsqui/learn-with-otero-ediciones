@@ -9,7 +9,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func CreateClass(s *Store, subject string) (*models.Class, error) {
+func CreateClass(s *Store, name, description, subject string) (*models.Class, error) {
 	var c *models.Class
 	err := s.db.Update(func(tx *bbolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(Buckets["classes"])
@@ -17,11 +17,17 @@ func CreateClass(s *Store, subject string) (*models.Class, error) {
 			return err
 		}
 
-		id64, _ := b.NextSequence()
+		id64, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+
 		c = &models.Class{
-			Id:      int(id64),
-			Subject: subject,
-			Users:   []string{},
+			Id:          int(id64),
+			Name:        name,
+			Description: description,
+			Subject:     subject,
+			Users:       []string{},
 		}
 
 		data, err := json.Marshal(c)
@@ -29,8 +35,8 @@ func CreateClass(s *Store, subject string) (*models.Class, error) {
 			return err
 		}
 
-		key := fmt.Appendf(nil, "%d", c.Id)
-		return b.Put(key, data)
+		key := fmt.Sprintf("%d", c.Id)
+		return b.Put([]byte(key), data)
 	})
 	if err != nil {
 		return nil, err
@@ -45,7 +51,7 @@ func updateClass(s *Store, classId int, updater func(*models.Class) error) error
 			return fmt.Errorf("bucket %s not found", Buckets["classes"])
 		}
 
-		key := fmt.Appendf(nil, "%d", classId)
+		key := []byte(fmt.Appendf(nil, "%d", classId))
 		v := b.Get(key)
 		if v == nil {
 			return fmt.Errorf("class %d not found", classId)
@@ -75,17 +81,18 @@ func ListClassesForUser(s *Store, username string) ([]models.Class, error) {
 			return fmt.Errorf("bucket %s not found", Buckets["classes"])
 		}
 
-		return b.ForEach(func(k, v []byte) error {
-			var c models.Class
-			if err := json.Unmarshal(v, &c); err != nil {
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var class models.Class
+			if err := json.Unmarshal(v, &class); err != nil {
 				return err
 			}
 
-			if slices.Contains(c.Users, username) {
-				results = append(results, c)
+			if slices.Contains(class.Users, username) {
+				results = append(results, class)
 			}
-			return nil
-		})
+		}
+		return nil
 	})
 
 	return results, err

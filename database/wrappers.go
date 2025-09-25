@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"go.etcd.io/bbolt"
 )
@@ -66,8 +67,8 @@ func Get[T any](s *Store, bucket []byte, key string) (*T, error) {
 	return &out, nil
 }
 
-func GetWithPrefix[T any](s *Store, bucket []byte, prefix string) ([]T, error) {
-	var results []T
+func GetWithPrefix[T any](s *Store, bucket []byte, id string, prefixes ...string) (*T, error) {
+	var result *T
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucket)
@@ -75,26 +76,29 @@ func GetWithPrefix[T any](s *Store, bucket []byte, prefix string) ([]T, error) {
 			return fmt.Errorf("bucket %s not found", bucket)
 		}
 
-		c := b.Cursor()
-		p := []byte(prefix)
+		// build key: prefix1:prefix2:...:id
+		parts := append(prefixes, id)
+		key := []byte(strings.Join(parts, ":"))
 
-		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
-			var out T
-			if err := json.Unmarshal(v, &out); err != nil {
-				return err
-			}
-			results = append(results, out)
+		v := b.Get(key)
+		if v == nil {
+			return fmt.Errorf("record not found for key %s", key)
 		}
 
+		var out T
+		if err := json.Unmarshal(v, &out); err != nil {
+			return err
+		}
+		result = &out
 		return nil
 	})
 
-	return results, err
+	return result, err
 }
 
-func Exists(s *Store, bucket []byte, key string) bool {
+func Exists(s *Store, bucket []byte, key string) (bool, error) {
 	var found bool
-	_ = s.db.View(func(tx *bbolt.Tx) error {
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucket)
 		if b == nil {
 			return fmt.Errorf("bucket %s not found", bucket)
@@ -103,7 +107,7 @@ func Exists(s *Store, bucket []byte, key string) bool {
 		found = v != nil
 		return nil
 	})
-	return found
+	return found, err
 }
 
 func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
@@ -113,15 +117,14 @@ func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 		if b == nil {
 			return fmt.Errorf("bucket %s not found", bucket)
 		}
-
 		c := b.Cursor()
-		for _, prefix := range prefixes {
-			p := []byte(prefix)
-			k, _ := c.Seek(p)
-			if k != nil && bytes.HasPrefix(k, p) {
-				found = true
-				return nil // stop early, no need to keep searching
-			}
+
+		prefix := strings.Join(prefixes, ":") + ":"
+		p := []byte(prefix)
+
+		k, _ := c.Seek(p)
+		if k != nil && bytes.HasPrefix(k, p) {
+			found = true
 		}
 		return nil
 	})
@@ -155,18 +158,19 @@ func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]T, erro
 		if b == nil {
 			return fmt.Errorf("bucket %s not found", bucket)
 		}
+
 		c := b.Cursor()
 
-		for _, prefix := range prefixes {
-			p := []byte(prefix)
+		// join prefixes into one composite prefix
+		prefix := strings.Join(prefixes, ":") + ":"
+		p := []byte(prefix)
 
-			for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
-				var out T
-				if err := json.Unmarshal(v, &out); err != nil {
-					return err
-				}
-				results = append(results, out)
+		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
+			var out T
+			if err := json.Unmarshal(v, &out); err != nil {
+				return err
 			}
+			results = append(results, out)
 		}
 		return nil
 	})

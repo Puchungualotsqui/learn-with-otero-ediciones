@@ -4,13 +4,14 @@ import (
 	"frontend/dto"
 )
 
-templ AssignmentList(assignments []dto.Assignment, professor bool) {
-	<aside class="md:w-1/3 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col min-h-0">
-		<div class="flex items-center justify-between mb-3 shrink-0">
-			<h2 class="text-md font-semibold text-gray-800">Asignaciones</h2>
+templ AssignmentList(classId int, assignments []dto.Assignment, professor bool) {
+	<aside class="md:w-1/3 bg-white border border-gray-300 shadow rounded-lg p-4 flex flex-col min-h-0">
+		<!-- Header -->
+		<div class="flex items-center justify-between mb-4">
+			<h2 class="text-lg font-bold text-gray-900">Asignaciones</h2>
 			if professor {
 				<button
-					class="btn btn-xs btn-primary"
+					class="px-3 py-1 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition"
 					hx-get="/assignment/new"
 					hx-target="#assignment-detail"
 					hx-swap="innerHTML">
@@ -18,15 +19,17 @@ templ AssignmentList(assignments []dto.Assignment, professor bool) {
 				</button>
 			}
 		</div>
-		<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 overflow-y-auto flex-1">
+
+		<!-- List -->
+		<ul class="space-y-2 overflow-y-auto flex-1 pr-1">
 			if len(assignments) == 0 {
-				<li class="text-gray-500 text-sm italic col-span-full">No hay asignaciones.</li>
+				<li class="text-gray-500 text-sm italic">No hay asignaciones.</li>
 			} else {
 				for _, a := range assignments {
 					if professor {
-						@AssignmentSlotProfessor(a)
+						@AssignmentSlotProfessor(classId, a)
 					} else {
-						@AssignmentSlot(a)
+						@AssignmentSlot(classId, a)
 					}
 				}
 			}

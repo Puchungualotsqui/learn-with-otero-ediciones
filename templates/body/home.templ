@@ -23,9 +23,13 @@ templ Home(content templ.Component) {
 		    <button class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer">
 		      Asignaciones
 		    </button>
-		    <button class="px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer">
-		      Cerrar sesión
-		    </button>
+		    <button
+				class="px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer"
+				hx-get="/logout"
+				hx-redirect="/login">
+				Cerrar sesión
+			</button>
+
 		  </div>
 		</header>
 
