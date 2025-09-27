@@ -9,9 +9,26 @@ templ Layout(body templ.Component) {
   <script src="https://unpkg.com/htmx.org@2.0.7"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <link href="/static/css/output.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 </head>
 <body class="h-screen w-screen flex items-center justify-center bg-black relative">
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 	@body
+	<script>
+ function initFlatpickr() {
+   flatpickr("#due-date", {
+     dateFormat: "Y-m-d",     // format you save to DB
+     altInput: true,          // pretty UI
+     altFormat: "d/m/Y",      // user sees this format
+     defaultDate: document.querySelector("#due-date")?.value || null,
+     locale: "es",            // Spanish
+   });
+ }
+
+ document.addEventListener("DOMContentLoaded", initFlatpickr);
+ document.addEventListener("htmx:afterSwap", initFlatpickr);
+</script>
 </body>
 </html>
 

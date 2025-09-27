@@ -1,0 +1,30 @@
+package assignmentSlotProfessor
+
+import (
+	"frontend/dto"
+	"strconv"
+)
+
+templ AssignmentSlotProfessor(classId int, a dto.Assignment) {
+	<li>
+		<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer">
+			<button
+				hx-get={"/" + strconv.Itoa(classId) + "/assignment/detail?id=" + strconv.Itoa(a.Id)}
+				hx-target="#assignment-detail"
+				hx-swap="innerHTML"
+				class="flex-1 text-left cursor-pointer">
+				<div class="flex justify-between items-center">
+					<span>{ a.Title }</span>
+					<span class="text-xs">{ a.DueDate }</span>
+				</div>
+			</button>
+			<button
+				hx-delete={"/assignment/delete?id=" + strconv.Itoa(a.Id)}
+				hx-target="closest li"
+				hx-swap="outerHTML"
+				class="ml-2 text-red-600 hover:text-red-800 text-gray-700 cursor-pointer">
+				✕
+			</button>
+		</div>
+	</li>
+}

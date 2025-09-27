@@ -2,7 +2,7 @@ package main
 
 import (
 	"frontend/database"
-	"frontend/internal"
+	"frontend/internal/router"
 	"log"
 	"net/http"
 )
@@ -15,7 +15,7 @@ func main() {
 	defer store.Close()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		internal.Router(store, w, r)
+		router.Router(store, w, r)
 	})
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

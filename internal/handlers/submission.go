@@ -5,7 +5,7 @@ import (
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/dto"
-	"frontend/templates/components/assignment"
+	"frontend/templates/components/assignment/submissionDetail"
 	"net/http"
 	"strconv"
 )
@@ -32,5 +32,5 @@ func HandleSubmissionDetail(store *database.Store, w http.ResponseWriter, r *htt
 
 	s := dto.SubmissionFromModel(*submissionModel)
 	fmt.Println("  ✓ Submission loaded")
-	assignment.SubmissionDetail(s).Render(r.Context(), w)
+	submissionDetail.SubmissionDetail(s).Render(r.Context(), w)
 }

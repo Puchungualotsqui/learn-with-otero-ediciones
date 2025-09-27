@@ -27,7 +27,7 @@ type Assignment struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Content     []string `json:"content"`  // url to some file
-	DueDate     string   `json:"due_date"` // formatted "2006-01-02"
+	DueDate     string   `json:"due_date"` // formatted "30/09/2025"
 }
 
 type Submission struct {

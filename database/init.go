@@ -18,6 +18,7 @@ var Buckets = map[string][]byte{
 	"assignments": []byte("Assignments"),
 	"submissions": []byte("Submissions"),
 	"schools":     []byte("Schools"),
+	"sessions":    []byte("Sessions"),
 }
 
 // Init opens (or creates) the DB and seeds test data if new

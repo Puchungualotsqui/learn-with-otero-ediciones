@@ -29,7 +29,7 @@ func Layout(body templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" x-data><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org@2.0.7\"></script><script src=\"https://unpkg.com/alpinejs\" defer></script><link href=\"/static/css/output.css\" rel=\"stylesheet\"></head><body class=\"h-screen w-screen flex items-center justify-center bg-black relative\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" x-data><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org@2.0.7\"></script><script src=\"https://unpkg.com/alpinejs\" defer></script><link href=\"/static/css/output.css\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css\"><script src=\"https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js\"></script></head><body class=\"h-screen w-screen flex items-center justify-center bg-black relative\"><script src=\"https://cdn.jsdelivr.net/npm/flatpickr\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -37,7 +37,7 @@ func Layout(body templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>\n function initFlatpickr() {\n   flatpickr(\"#due-date\", {\n     dateFormat: \"Y-m-d\",     // format you save to DB\n     altInput: true,          // pretty UI\n     altFormat: \"d/m/Y\",      // user sees this format\n     defaultDate: document.querySelector(\"#due-date\")?.value || null,\n     locale: \"es\",            // Spanish\n   });\n }\n\n document.addEventListener(\"DOMContentLoaded\", initFlatpickr);\n document.addEventListener(\"htmx:afterSwap\", initFlatpickr);\n</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

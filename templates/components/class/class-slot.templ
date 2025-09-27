@@ -5,23 +5,41 @@ import (
 	"frontend/dto"
 )
 
-templ ClassSlot (item dto.ClassSlot) {
+templ ClassSlot(item dto.ClassSlot, professor bool) {
 	<div class="bg-white border border-gray-200 shadow hover:shadow-md transition rounded-lg flex flex-col">
-	   <div class="p-5 flex-1">
-	     <h2 class="text-lg font-semibold text-gray-900">{ item.Title }</h2>
-	     <p class="text-gray-600 text-sm mt-1">{ item.SubTitle }</p>
-	   </div>
-	   <div class="flex divide-x divide-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
-	     <button
-	       hx-get={"/" + strconv.Itoa(item.Id) + "/asignaciones"}
-	       hx-target="#content"
-			hx-push-url="true"
-	       class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
-	       Asignaciones
-	     </button>
-	     <button class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
-	       Recursos
-	     </button>
-	   </div>
+		<div class="p-5 flex-1">
+			<h2 class="text-lg font-semibold text-gray-900">{ item.Title }</h2>
+			<p class="text-gray-600 text-sm mt-1">{ item.SubTitle }</p>
+		</div>
+		<div class="flex divide-x divide-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
+			<!-- Asignaciones -->
+			<button
+				hx-get={"/" + strconv.Itoa(item.Id) + "/asignaciones"}
+				hx-target="#content"
+				hx-push-url="true"
+				class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
+				Asignaciones
+			</button>
+
+			<!-- Recursos -->
+			<button
+				hx-get={"/" + strconv.Itoa(item.Id) + "/recursos"}
+				hx-target="#content"
+				hx-push-url="true"
+				class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
+				Recursos
+			</button>
+
+			<!-- Entregas (professors only) -->
+			if professor {
+				<button
+					hx-get={"/" + strconv.Itoa(item.Id) + "/entregas"}
+					hx-target="#content"
+					hx-push-url="true"
+					class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">
+					Entregas
+				</button>
+			}
+		</div>
 	</div>
 }
