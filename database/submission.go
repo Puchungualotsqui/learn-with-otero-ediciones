@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
+	"strconv"
+	"strings"
 
 	"go.etcd.io/bbolt"
 )
@@ -94,4 +96,15 @@ func GradeSubmission(s *Store, assignmentId int, username string, grade string) 
 	sub.Grade = grade
 
 	return Save(s, Buckets["submissions"], key, sub)
+}
+
+func GetSubmissionByAssignmentAndUser(s *Store, classId, assignmentId int, username string) (*models.Submission, error) {
+	keyParts := []string{
+		strconv.Itoa(classId),
+		strconv.Itoa(assignmentId),
+		username,
+	}
+	key := strings.Join(keyParts, ":")
+
+	return Get[models.Submission](s, []byte("Submissions"), key)
 }

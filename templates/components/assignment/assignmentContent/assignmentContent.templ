@@ -4,10 +4,10 @@ import (
 	"frontend/dto"
 	"strconv"
 	"frontend/templates/components/assignment/assignmentList"
-	"frontend/templates/components/assignment/assignmentDetailStudent"
+	"frontend/templates/components/assignment/submissionEditor"
 )
 
-templ AssignmentContent(assignments []dto.Assignment, professor bool, classId int) {
+templ AssignmentContent(assignments []dto.Assignment, professor bool, classId int, submission *dto.Submission) {
     <main class="flex flex-col lg:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-6 h-[calc(100vh-5rem)]">
 
         <!-- Left: List of assignments -->
@@ -46,8 +46,10 @@ templ AssignmentContent(assignments []dto.Assignment, professor bool, classId in
                 <div class="overflow-y-auto flex-1">
                     if len(assignments) == 0 {
                         <p class="text-gray-500 text-center">No hay detalles para mostrar.</p>
+                    } else if submission != nil {
+                        @submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id)
                     } else {
-                        @assignmentDetailStudent.AssignmentDetailStudent(assignments[0])
+                        <p class="text-gray-500 text-center">Aún no has hecho una entrega.</p>
                     }
                 </div>
             </section>

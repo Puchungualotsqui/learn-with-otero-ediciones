@@ -165,8 +165,18 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
+				var submissionDto dto.Submission
+
+				if len(assignments) > 0 {
+					submission, err := database.GetSubmissionByAssignmentAndUser(store, classId, assignments[0].Id, username)
+					if err == nil && submission != nil {
+						dtoVal := dto.SubmissionFromModel(*submission)
+						submissionDto = dtoVal
+					}
+				}
+
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId), body.Home)
+				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId, &submissionDto), body.Home)
 				return
 
 			case "entregas":
@@ -195,7 +205,7 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 				}
 
 				fmt.Println("📌 Routed to EntregasContent (assignments + submissions)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId), body.Home)
+				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId, nil), body.Home)
 				return
 			}
 		}
