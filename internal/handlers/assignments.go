@@ -5,10 +5,12 @@ import (
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/dto"
+	"frontend/storage"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentDetailStudent"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -83,7 +85,7 @@ func HandleAssignmentNew(store *database.Store, w http.ResponseWriter, r *http.R
 }
 
 // HandleAssignmentUpdate updates an assignment based on form data (HTMX-friendly)
-func HandleAssignmentUpdate(store *database.Store, w http.ResponseWriter, r *http.Request, classId int) {
+func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int) {
 	fmt.Println("📥 [HandleAssignmentUpdate] Request received")
 
 	if r.Method != http.MethodPost {
@@ -112,17 +114,56 @@ func HandleAssignmentUpdate(store *database.Store, w http.ResponseWriter, r *htt
 
 	uploads := r.MultipartForm.File["uploads"] // newly uploaded files
 
-	fmt.Println("👉 Parsed form values:")
-	fmt.Printf("  Title: %s\n", title)
-	fmt.Printf("  Description: %s\n", description)
-	fmt.Printf("  DueDate: %s\n", dueDate)
-	fmt.Printf("  Keep[]: %+v\n", keep)
-	fmt.Printf("  Uploads: %d file(s)\n", len(uploads))
-	for i, f := range uploads {
-		fmt.Printf("    [%d] name=%s size=%d\n", i, f.Filename, f.Size)
+	// 1. Load assignment
+	assignmentModel, err := database.GetWithPrefix[models.Assignment](
+		store,
+		database.Buckets["assignments"],
+		strconv.Itoa(classId),
+		idStr,
+	)
+	if err != nil || assignmentModel == nil {
+		http.Error(w, "Assignment not found", http.StatusNotFound)
+		return
 	}
 
-	// stop here just for debugging
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Printed form values on server (see logs)")
+	// 2. Build new Content
+	var newContent []string
+
+	// Keep URLs that the user left
+	newContent = append(newContent, keep...)
+
+	// Upload new files to B2
+	for _, f := range uploads {
+		file, err := f.Open()
+		if err != nil {
+			http.Error(w, "Failed to open uploaded file", http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		key := fmt.Sprintf("assignments/%d/%s", assignmentModel.Id, url.PathEscape(f.Filename))
+		url, err := storage.UploadFile(r.Context(), key, file)
+		if err != nil {
+			http.Error(w, "Failed to upload file", http.StatusInternalServerError)
+			return
+		}
+		newContent = append(newContent, url)
+	}
+
+	// 3. Update fields
+	assignmentModel.Title = title
+	assignmentModel.Description = description
+	assignmentModel.DueDate = dueDate
+	assignmentModel.Content = newContent
+
+	// 4. Save back
+	key := fmt.Sprintf("%d:%d", classId, assignmentModel.Id)
+	if err := database.Save(store, database.Buckets["assignments"], key, assignmentModel); err != nil {
+		http.Error(w, "Failed to save assignment", http.StatusInternalServerError)
+		return
+	}
+
+	// 5. Re-render editor
+	a := dto.AssignmentFromModel(*assignmentModel)
+	assignmentEditor.AssignmentEditor(a, classId).Render(r.Context(), w)
 }

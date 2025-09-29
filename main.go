@@ -1,13 +1,36 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"frontend/database"
 	"frontend/internal/router"
+	"frontend/storage"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+	keyId := os.Getenv("B2_KEY_ID")
+	appKey := os.Getenv("B2_APP_KEY")
+	bucketName := os.Getenv("B2_BUCKET")
+	baseUrl := os.Getenv("B2_BASE_URL")
+
+	if keyId == "" || appKey == "" || bucketName == "" {
+		log.Fatal("missing B2 env vars")
+	}
+
+	ctx := context.Background()
+	storage, err := storage.Init(ctx, keyId, appKey, bucketName, baseUrl)
+	if err != nil {
+		log.Fatalf("Error initializing storage: %v", err)
+	}
+	fmt.Println("B2 Storage ready:", storage.BaseUrl)
+
 	store, err := database.Init("data/school.db")
 	if err != nil {
 		log.Fatal("failed to init database:", err)

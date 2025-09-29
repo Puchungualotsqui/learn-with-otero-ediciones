@@ -9,11 +9,12 @@ import (
 )
 
 type B2Storage struct {
-	Client *b2.Client
-	Bucket *b2.Bucket
+	Client  *b2.Client
+	Bucket  *b2.Bucket
+	BaseUrl string
 }
 
-func Init(ctx context.Context, accountId, appKey, bucketName string) (*B2Storage, error) {
+func Init(ctx context.Context, accountId, appKey, bucketName, baseUrl string) (*B2Storage, error) {
 	client, err := b2.NewClient(ctx, accountId, appKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create b2 client: %w", err)
@@ -24,7 +25,7 @@ func Init(ctx context.Context, accountId, appKey, bucketName string) (*B2Storage
 		return nil, fmt.Errorf("failed to get bucket: %w", err)
 	}
 
-	return &B2Storage{Client: client, Bucket: bucket}, nil
+	return &B2Storage{Client: client, Bucket: bucket, BaseUrl: baseUrl}, nil
 }
 
 func (s *B2Storage) UploadFile(ctx context.Context, key string, r io.Reader) (string, error) {
@@ -38,7 +39,26 @@ func (s *B2Storage) UploadFile(ctx context.Context, key string, r io.Reader) (st
 		return "", fmt.Errorf("failed to close writer: %w", err)
 	}
 
-	return fmt.Sprintf("%s/file/%s/%s", s.Client.BaseURL(), s.Bucket.Name(), key), nil
+	return fmt.Sprintf("%s/%s", s.BaseUrl, key), nil
 }
 
-func (s *B2Storage) DownloadFile(ctx context.Context, key string, w io.Reader)
+func (s *B2Storage) DownloadFile(ctx context.Context, key string, w io.Writer) error {
+	obj := s.Bucket.Object(key)
+	r := obj.NewReader(ctx)
+	defer r.Close()
+
+	_, err := io.Copy(w, r)
+	if err != nil {
+		return fmt.Errorf("failed to read the object: %w", err)
+	}
+
+	return nil
+}
+
+func (s *B2Storage) DeleteFile(ctx context.Context, key string) error {
+	obj := s.Bucket.Object(key)
+	if err := obj.Delete(ctx); err != nil {
+		return fmt.Errorf("failed to delete object: %w", err)
+	}
+	return nil
+}
