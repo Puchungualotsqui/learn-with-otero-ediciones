@@ -39,7 +39,7 @@ func (s *B2Storage) UploadFile(ctx context.Context, key string, r io.Reader) (st
 		return "", fmt.Errorf("failed to close writer: %w", err)
 	}
 
-	return fmt.Sprintf("%s/%s", s.BaseUrl, key), nil
+	return fmt.Sprintf("https://%s/file/%s/%s", s.BaseUrl, s.Bucket.Name(), key), nil
 }
 
 func (s *B2Storage) DownloadFile(ctx context.Context, key string, w io.Writer) error {

@@ -14,7 +14,11 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load(".venv") // use ".env" if you renamed it
+	if err != nil {
+		log.Fatal("Error loading .venv file")
+	}
+
 	keyId := os.Getenv("B2_KEY_ID")
 	appKey := os.Getenv("B2_APP_KEY")
 	bucketName := os.Getenv("B2_BUCKET")
