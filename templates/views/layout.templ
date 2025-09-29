@@ -10,21 +10,23 @@ templ Layout(body templ.Component) {
   <script src="https://unpkg.com/alpinejs" defer></script>
   <link href="/static/css/output.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 </head>
 <body class="h-screen w-screen flex items-center justify-center bg-black relative">
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
 	@body
 	<script>
- function initFlatpickr() {
-   flatpickr("#due-date", {
-     dateFormat: "Y-m-d",     // format you save to DB
-     altInput: true,          // pretty UI
-     altFormat: "d/m/Y",      // user sees this format
-     defaultDate: document.querySelector("#due-date")?.value || null,
-     locale: "es",            // Spanish
-   });
- }
+	function initFlatpickr() {
+  flatpickr("#due-date", {
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d/m/Y",
+    defaultDate: document.querySelector("#due-date")?.value || null,
+    locale: flatpickr.l10ns.es,   // ✅ use the loaded Spanish locale
+  });
+}
+
 
  document.addEventListener("DOMContentLoaded", initFlatpickr);
  document.addEventListener("htmx:afterSwap", initFlatpickr);

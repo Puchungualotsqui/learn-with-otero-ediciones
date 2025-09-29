@@ -12,9 +12,10 @@ import (
 	"frontend/dto"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
 	"frontend/templates/components/assignment/assignmentSlotStudent"
+	"strconv"
 )
 
-func AssignmentList(classId int, assignments []dto.Assignment, professor bool) templ.Component {
+func AssignmentList(classId int, assignments []dto.Assignment, professor bool, subUrl string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -39,25 +40,38 @@ func AssignmentList(classId int, assignments []dto.Assignment, professor bool) t
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if professor {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<button class=\"px-3 py-1 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition cursor-pointer\" hx-get=\"/assignment/new\" hx-target=\"#assignment-detail\" hx-swap=\"innerHTML\">+ Nueva</button>")
+		if professor && subUrl == "detail" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<button class=\"px-3 py-1 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition cursor-pointer\" hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/new")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentList/assignmentList.templ`, Line: 18, Col: 63}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"innerHTML\">+ Nueva</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><!-- List --><ul class=\"space-y-2 overflow-y-auto flex-1 pr-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><!-- List --><ul id=\"assignments-list\" class=\"space-y-2 overflow-y-auto flex-1 pr-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(assignments) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"text-gray-500 text-sm italic\">No hay asignaciones.</li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<li class=\"text-gray-500 text-sm italic\">No hay asignaciones.</li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
 			for _, a := range assignments {
 				if professor {
-					templ_7745c5c3_Err = assignmentSlotProfessor.AssignmentSlotProfessor(classId, a).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, subUrl).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -69,7 +83,7 @@ func AssignmentList(classId int, assignments []dto.Assignment, professor bool) t
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</ul></aside>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</ul></aside>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

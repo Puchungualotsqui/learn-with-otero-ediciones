@@ -6,11 +6,11 @@ import (
 	"frontend/templates/components/assignment/assignmentEditor"
 )
 
-templ AssignmentContentProfessor(assignments []dto.Assignment, classId int) {
+templ AssignmentContentProfessor(assignments []dto.Assignment, classId int, subUrl string) {
 	<main class="flex flex-col lg:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 lg:gap-6 h-[calc(100vh-5rem)]">
 
 		<!-- Left: List of assignments -->
-			@assignmentList.AssignmentList(classId, assignments, true)
+			@assignmentList.AssignmentList(classId, assignments, true, subUrl)
 
 		<!-- Right: Assignment editor -->
 		<section id="assignment-detail"

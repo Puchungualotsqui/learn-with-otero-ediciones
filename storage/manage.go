@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/kurin/blazer/b2"
 )
@@ -55,10 +56,14 @@ func (s *B2Storage) DownloadFile(ctx context.Context, key string, w io.Writer) e
 	return nil
 }
 
-func (s *B2Storage) DeleteFile(ctx context.Context, key string) error {
+func (s *B2Storage) DeleteFile(ctx context.Context, path string) error {
+	// Convert friendly URL → key if needed
+	friendlyPrefix := fmt.Sprintf("https://%s/file/%s/", s.BaseUrl, s.Bucket.Name())
+	key := strings.ReplaceAll(path, friendlyPrefix, "")
+
 	obj := s.Bucket.Object(key)
 	if err := obj.Delete(ctx); err != nil {
-		return fmt.Errorf("failed to delete object: %w", err)
+		return fmt.Errorf("failed to delete object %q: %w", key, err)
 	}
 	return nil
 }

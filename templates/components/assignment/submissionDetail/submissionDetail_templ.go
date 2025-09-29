@@ -137,7 +137,7 @@ func SubmissionDetail(s dto.Submission) templ.Component {
 		if gradeValue == "" {
 			gradeValue = "90"
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!-- Footer (sticky bottom) --><div class=\"mt-4 shrink-0\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!-- Footer (sticky bottom) --><div class=\"mt-4 shrink-0\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,7 +150,7 @@ func SubmissionDetail(s dto.Submission) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\n\t\t\t\t\t[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none\" oninput=\"this.value=this.value.replace(/[^0-9]/g,''); if(this.value>100) this.value=100; if(this.value<0) this.value=0;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700\" onclick=\"this.previousElementSibling.stepUp()\">&gt;</button></div><div class=\"flex justify-center mt-4\"><button class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md rounded-full\">Guardar</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\n\t\t\t\t\t[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none\" oninput=\"this.value=this.value.replace(/[^0-9]/g,''); if(this.value>100) this.value=100; if(this.value<0) this.value=0;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.previousElementSibling.stepUp()\">&gt;</button></div><div class=\"flex justify-center mt-4\"><button class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md rounded-full\">Guardar</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

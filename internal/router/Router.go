@@ -142,6 +142,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				fmt.Printf("👉 Checking assignments route: %+v\n", parts)
 
 				// Here only keep routes related to assignments CRUD
+				if len(parts) > 2 && parts[2] == "submission" {
+					fmt.Println("📌 Routed to HandleAssignmentSubmission (student view)")
+					handlers.HandleAssignmentSubmission(store, w, r, professor)
+					return
+				}
+
 				if len(parts) > 2 && parts[2] == "detail" {
 					fmt.Println("📌 Routed to HandleAssignmentDetail (student view)")
 					handlers.HandleAssignmentDetail(store, w, r, professor)
@@ -157,12 +163,17 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					}
 					if len(parts) > 2 && parts[2] == "new" {
 						fmt.Println("📌 Routed to NewAssignment (professor)")
-						handlers.HandleAssignmentNew(store, w, r, classId)
+						handlers.HandleAssignmentNew(store, storage, w, r, classId)
+						return
+					}
+					if len(parts) > 2 && parts[2] == "delete" {
+						fmt.Println("📌 Routed to DeleteAssignment (professor)")
+						handlers.HandleAssignmentDelete(store, storage, w, r, classId)
 						return
 					}
 
 					fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
-					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(assignments, classId), body.Home)
+					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(assignments, classId, "detail"), body.Home)
 					return
 				}
 

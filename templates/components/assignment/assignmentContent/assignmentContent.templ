@@ -11,7 +11,7 @@ templ AssignmentContent(assignments []dto.Assignment, professor bool, classId in
     <main class="flex flex-col lg:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-6 h-[calc(100vh-5rem)]">
 
         <!-- Left: List of assignments -->
-        @assignmentList.AssignmentList(classId, assignments, professor)
+        @assignmentList.AssignmentList(classId, assignments, professor, "submission")
 
         if professor {
             <!-- Middle: Assignment details (with submissions list) -->
@@ -22,7 +22,7 @@ templ AssignmentContent(assignments []dto.Assignment, professor bool, classId in
                         <p class="text-gray-500 text-center">No hay detalles para mostrar.</p>
                     } else {
                         <div
-                          hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/detail?id=" + strconv.Itoa(assignments[0].Id)}
+                          hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/submission?id=" + strconv.Itoa(assignments[0].Id)}
                           hx-target="#assignment-detail"
                           hx-swap="innerHTML"
                           hx-trigger="load"
