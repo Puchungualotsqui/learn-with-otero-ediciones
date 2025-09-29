@@ -58,7 +58,7 @@ templ AssignmentEditor(a dto.Assignment, classId int) {
 			        <template x-if="typeof value === 'string'">
 			          <div class="flex-1 flex justify-between gap-2">
 			            <a :href="value" target="_blank" class="truncate text-red-600 hover:underline" x-text="name"></a>
-			            <input type="hidden" name="keep[]" :value="value">
+			            <input type="hidden" name="keep" :value="value">
 			          </div>
 			        </template>
 			        <template x-if="value instanceof File">

@@ -97,40 +97,32 @@ func HandleAssignmentUpdate(store *database.Store, w http.ResponseWriter, r *htt
 		return
 	}
 
-	// Parse form values (HTMX sends application/x-www-form-urlencoded)
+	// Need to parse multipart form because of file uploads
+	if err := r.ParseMultipartForm(32 << 20); err != nil { // 32 MB max memory
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
+	}
+
+	// Parse values
 	title := r.FormValue("title")
 	description := r.FormValue("description")
 	dueDate := r.FormValue("due_date")
 
-	// Handle multiple "content" inputs (files/URLs)
-	content := r.Form["content"]
+	keep := r.Form["keep[]"] // already uploaded files to keep
 
-	// Load existing assignment
-	assignmentModel, err := database.GetWithPrefix[models.Assignment](
-		store,
-		[]byte("Assignments"),
-		strconv.Itoa(classId),
-		idStr,
-	)
-	if err != nil || assignmentModel == nil {
-		http.Error(w, "Assignment not found", http.StatusNotFound)
-		return
+	uploads := r.MultipartForm.File["uploads"] // newly uploaded files
+
+	fmt.Println("👉 Parsed form values:")
+	fmt.Printf("  Title: %s\n", title)
+	fmt.Printf("  Description: %s\n", description)
+	fmt.Printf("  DueDate: %s\n", dueDate)
+	fmt.Printf("  Keep[]: %+v\n", keep)
+	fmt.Printf("  Uploads: %d file(s)\n", len(uploads))
+	for i, f := range uploads {
+		fmt.Printf("    [%d] name=%s size=%d\n", i, f.Filename, f.Size)
 	}
 
-	// Update fields
-	assignmentModel.Title = title
-	assignmentModel.Description = description
-	assignmentModel.Content = content
-	assignmentModel.DueDate = dueDate
-
-	// Save back
-	key := fmt.Sprintf("%d:%d", classId, assignmentModel.Id)
-	if err := database.Save(store, database.Buckets["assignments"], key, assignmentModel); err != nil {
-		http.Error(w, "Failed to save assignment", http.StatusInternalServerError)
-		return
-	}
-
-	// Render updated detail back to UI
-	a := dto.AssignmentFromModel(*assignmentModel)
-	assignmentEditor.AssignmentEditor(a, classId).Render(r.Context(), w)
+	// stop here just for debugging
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Printed form values on server (see logs)")
 }
