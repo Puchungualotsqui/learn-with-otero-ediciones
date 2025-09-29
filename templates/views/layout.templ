@@ -29,6 +29,42 @@ templ Layout(body templ.Component) {
  document.addEventListener("DOMContentLoaded", initFlatpickr);
  document.addEventListener("htmx:afterSwap", initFlatpickr);
 </script>
+<script>
+function fileManager() {
+  return {
+    files: {},
+
+    initExisting(urls) {
+      urls.forEach(url => {
+        const name = url.split('/').pop();
+        this.files[name] = url;
+      });
+      this.syncUploads();
+    },
+
+    addFiles(list) {
+      Array.from(list).forEach(f => {
+        this.files[f.name] = f;
+      });
+      this.syncUploads();
+    },
+
+    remove(name) {
+      delete this.files[name];
+      this.syncUploads();
+    },
+
+    syncUploads() {
+      const dt = new DataTransfer();
+      for (const value of Object.values(this.files)) {
+        if (value instanceof File) dt.items.add(value);
+      }
+      this.$refs.uploads.files = dt.files;
+    }
+  }
+}
+</script>
+
 </body>
 </html>
 

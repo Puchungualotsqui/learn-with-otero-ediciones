@@ -109,8 +109,8 @@ func HandleAssignmentUpdate(store *database.Store, w http.ResponseWriter, r *htt
 	assignmentModel, err := database.GetWithPrefix[models.Assignment](
 		store,
 		[]byte("Assignments"),
-		idStr,
 		strconv.Itoa(classId),
+		idStr,
 	)
 	if err != nil || assignmentModel == nil {
 		http.Error(w, "Assignment not found", http.StatusNotFound)
