@@ -38,7 +38,7 @@ func main() {
 	defer store.Close()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		router.Router(store, w, r)
+		router.Router(store, storage, w, r)
 	})
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

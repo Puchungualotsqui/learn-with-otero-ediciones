@@ -7,6 +7,7 @@ import (
 	"frontend/database/models"
 	"frontend/dto"
 	"frontend/internal/handlers"
+	"frontend/storage"
 	"frontend/templates/body"
 	"frontend/templates/components/assignment/assignmentContent"
 	"frontend/templates/components/assignment/assignmentContentProfessor"
@@ -17,7 +18,7 @@ import (
 	"strings"
 )
 
-func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
@@ -151,7 +152,7 @@ func Router(store *database.Store, w http.ResponseWriter, r *http.Request) {
 				if professor {
 					if len(parts) > 2 && parts[2] == "update" {
 						fmt.Println("📌 Routed to UpdateAssignment (professor)")
-						handlers.HandleAssignmentUpdate(store, w, r, classId)
+						handlers.HandleAssignmentUpdate(store, storage, w, r, classId)
 						return
 					}
 					if len(parts) > 2 && parts[2] == "new" {
