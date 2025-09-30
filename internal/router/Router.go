@@ -216,6 +216,13 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
+				if len(parts) > 5 && parts[3] == "submissions" && parts[5] == "grade" {
+					assignmentId, _ := strconv.Atoi(parts[2])
+					username := parts[4]
+					handlers.HandleSubmissionGrade(store, w, r, classId, assignmentId, username)
+					return
+				}
+
 				fmt.Println("📌 Routed to EntregasContent (assignments + submissions)")
 				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId, nil), body.Home)
 				return

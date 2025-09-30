@@ -1,15 +1,30 @@
 package studentSubmissionSlot
 
 import (
-	"frontend/dto"
 	"strconv"
+	"frontend/dto"
 )
 
 templ StudentSubmissionSlot(classId int, assignmentId int, s dto.Submission) {
-	<div class="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-		hx-get={"/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username}
-		hx-target="#submission-detail"
-		hx-swap="innerHTML">
-		<p class="font-medium truncate text-gray-900">{ s.Username }</p>
-	</div>
+	<a
+		id={"submission-slot-" + s.Username}
+	    hx-get={"/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username}
+	    hx-target="#submission-detail"
+	    hx-swap="innerHTML"
+	    class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:bg-gray-50 transition cursor-pointer"
+	>
+	    <!-- Student info -->
+	        <span class="text-gray-900">{ s.Username }</span>
+
+	    <!-- Grade badge -->
+	    if s.Grade != "" {
+		    <span class="text-base font-medium text-gray-900">
+		        { s.Grade }
+		    </span>
+		} else {
+		    <span class="text-base text-gray-500">
+		        —
+		    </span>
+		}
+	</a>
 }

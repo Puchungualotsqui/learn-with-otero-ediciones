@@ -85,8 +85,8 @@ func ListSubmissionsByStudent(s *Store, username string) ([]models.Submission, e
 }
 
 // GradeSubmission → updates the Grade field
-func GradeSubmission(s *Store, assignmentId int, username string, grade string) error {
-	key := fmt.Sprintf("%d:%s", assignmentId, username)
+func GradeSubmission(s *Store, classId, assignmentId int, username, grade string) error {
+	key := fmt.Sprintf("%d:%d:%s", classId, assignmentId, username)
 
 	sub, err := Get[models.Submission](s, Buckets["submissions"], key)
 	if err != nil {
