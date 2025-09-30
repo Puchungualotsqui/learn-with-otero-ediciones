@@ -11,6 +11,5 @@ templ StudentSubmissionSlot(classId int, assignmentId int, s dto.Submission) {
 		hx-target="#submission-detail"
 		hx-swap="innerHTML">
 		<p class="font-medium truncate text-gray-900">{ s.Username }</p>
-		<p class="text-xs text-gray-500">{ s.SubmittedAt }</p>
 	</div>
 }

@@ -34,7 +34,7 @@ func SubmissionDetail(s dto.Submission) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"submission-detail\" class=\"flex flex-col h-full min-h-0\"><!-- Header --><div class=\"mb-6 shrink-0\"><h3 class=\"text-xl font-semibold text-gray-900\">Entrega de ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col h-full min-h-0\"><!-- Header --><div class=\"mb-6 shrink-0\"><h3 class=\"text-xl font-semibold text-gray-900\">Entrega de ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,110 +47,93 @@ func SubmissionDetail(s dto.Submission) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h3><p class=\"text-sm text-gray-500 mt-1\">Entregado el ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(s.SubmittedAt)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 16, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><!-- Scrollable content --><div class=\"flex-1 overflow-y-auto pr-1\"><!-- Description -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h3></div><!-- Scrollable content --><div class=\"flex-1 overflow-y-auto min-h-0 pr-1\"><!-- Description -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if s.Description != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mb-6\"><p class=\"text-gray-700 whitespace-pre-line leading-relaxed\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"mb-6\"><p class=\"text-gray-700 whitespace-pre-line leading-relaxed\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(s.Description)
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(s.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 26, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 23, Col: 21}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Attachments -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Attachments -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(s.Content) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"mb-6\"><h4 class=\"text-sm font-medium text-gray-800 mb-2\">Archivos adjuntos</h4><ul class=\"space-y-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"mb-6\"><h4 class=\"text-sm font-medium text-gray-800 mb-2\">Archivos adjuntos</h4><ul class=\"space-y-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, c := range s.Content {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<li class=\"flex items-center justify-between bg-gray-50 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100\"><a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<li class=\"flex items-center justify-between bg-gray-50 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100\"><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var5 templ.SafeURL
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(c)
+				var templ_7745c5c3_Var4 templ.SafeURL
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(c)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 38, Col: 19}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 35, Col: 19}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" target=\"_blank\" class=\"truncate text-red-600 hover:underline flex-1\">📎 ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Split(c, "/")[len(strings.Split(c, "/"))-1])
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 36, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" target=\"_blank\" class=\"truncate text-red-600 hover:underline flex-1\">📎 ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Split(c, "/")[len(strings.Split(c, "/"))-1])
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 39, Col: 67}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</a></li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</a></li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</ul></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</ul></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
 		}
 		gradeValue := s.Grade
 		if gradeValue == "" {
 			gradeValue = "90"
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!-- Footer (sticky bottom) --><div class=\"mt-4 shrink-0 sticky bottom-0 bg-white border-t border-gray-200 pt-4 pb-2\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<!-- Footer --><div class=\"mt-4 shrink-0 bg-white border-t border-gray-200 pt-4 pb-2\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(gradeValue)
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(gradeValue)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 66, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 61, Col: 24}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\n\t\t\t\t\t[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none\" oninput=\"this.value=this.value.replace(/[^0-9]/g,''); if(this.value>100) this.value=100; if(this.value<0) this.value=0;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.previousElementSibling.stepUp()\">&gt;</button></div><div class=\"flex justify-center mt-4\"><button class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md rounded-full\">Guardar</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\n\t\t\t\t\t\t[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none\" oninput=\"this.value=this.value.replace(/[^0-9]/g,''); if(this.value>100) this.value=100; if(this.value<0) this.value=0;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.previousElementSibling.stepUp()\">&gt;</button></div><div class=\"flex justify-center mt-4\"><button class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md rounded-full\">Guardar</button></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
