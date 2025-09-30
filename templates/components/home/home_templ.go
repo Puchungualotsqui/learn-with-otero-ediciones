@@ -34,7 +34,7 @@ func Home(slotsInfo []dto.ClassSlot, professor bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Content --><main class=\"flex-1 px-6 py-8\"><div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6\"><!-- Class card -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Content --><div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6\"><!-- Class card -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -44,7 +44,7 @@ func Home(slotsInfo []dto.ClassSlot, professor bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

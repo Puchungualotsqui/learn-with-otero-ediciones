@@ -7,7 +7,6 @@ import (
 
 templ Home(slotsInfo []dto.ClassSlot, professor bool) {
 	<!-- Content -->
-	  <main class="flex-1 px-6 py-8">
 	    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
 	      <!-- Class card -->
@@ -15,5 +14,4 @@ templ Home(slotsInfo []dto.ClassSlot, professor bool) {
 			@class.ClassSlot(item, professor)
      }
 	    </div>
-	  </main>
 }

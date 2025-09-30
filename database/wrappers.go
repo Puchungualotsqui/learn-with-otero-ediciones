@@ -79,6 +79,7 @@ func GetWithPrefix[T any](s *Store, bucket []byte, id string, prefixes ...string
 		// build key: prefix1:prefix2:...:id
 		parts := append(prefixes, id)
 		key := []byte(strings.Join(parts, ":"))
+		fmt.Printf("🔑 [GetWithPrefix] looking for key=%q\n", key)
 
 		v := b.Get(key)
 		if v == nil {

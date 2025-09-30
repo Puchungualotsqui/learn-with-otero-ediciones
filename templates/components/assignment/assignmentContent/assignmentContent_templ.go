@@ -36,7 +36,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col lg:flex-row flex-1 px-2 md:px-6 py-4 md:py-8 gap-4 lg:gap-6\n             h-[calc(100vh-5rem)]\"><!-- Left: List of assignments (uses capped height + scroll on small screens) -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col lg:flex-row flex-1 h-[calc(100vh-5rem)]\"><!-- Left: List of assignments (uses capped height + scroll on small screens) -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,7 +62,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/submission?id=" + strconv.Itoa(assignments[0].Id))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentContent/assignmentContent.templ`, Line: 27, Col: 128}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentContent/assignmentContent.templ`, Line: 26, Col: 128}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -103,7 +103,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

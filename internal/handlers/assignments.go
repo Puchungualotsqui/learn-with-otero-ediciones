@@ -195,8 +195,8 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	assignmentModel, err := database.GetWithPrefix[models.Assignment](
 		store,
 		database.Buckets["assignments"],
-		strconv.Itoa(classId),
 		idStr,
+		strconv.Itoa(classId),
 	)
 	if err != nil || assignmentModel == nil {
 		fmt.Printf("❌ Assignment not found for key classId=%d id=%s: %v\n", classId, idStr, err)
