@@ -69,7 +69,7 @@ func AssignmentEditor(a dto.Assignment, classId int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"flex flex-col h-full overflow-y-scroll px-4\"><!-- Title --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Título</label> <input type=\"text\" name=\"title\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"flex flex-col flex-1 min-h-0 overflow-y-auto px-4\"><!-- Title --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Título</label> <input type=\"text\" name=\"title\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

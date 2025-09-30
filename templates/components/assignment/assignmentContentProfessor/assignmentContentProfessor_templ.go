@@ -35,7 +35,7 @@ func AssignmentContentProfessor(assignments []dto.Assignment, classId int, subUr
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col lg:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 lg:gap-6 h-[calc(100vh-5rem)]\"><!-- Left: List of assignments -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col lg:flex-row flex-1 min-h-0\n             px-2 md:px-6 py-4 md:py-8 gap-4 lg:gap-6\n             h-[calc(100vh-5rem)]\"><!-- Left: List of assignments -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -43,7 +43,7 @@ func AssignmentContentProfessor(assignments []dto.Assignment, classId int, subUr
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Right: Assignment editor --><section id=\"assignment-detail\" class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0\"><div class=\"overflow-y-auto flex-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Right: Assignment editor --><section id=\"assignment-detail\" class=\"flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg\n             p-4 flex flex-col min-h-0 lg:w-2/3 overflow-y-auto\"><div class=\"flex-1 overflow-y-auto min-h-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

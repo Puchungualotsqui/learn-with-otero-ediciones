@@ -137,7 +137,7 @@ func SubmissionDetail(s dto.Submission) templ.Component {
 		if gradeValue == "" {
 			gradeValue = "90"
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!-- Footer (sticky bottom) --><div class=\"mt-4 shrink-0\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!-- Footer (sticky bottom) --><div class=\"mt-4 shrink-0 sticky bottom-0 bg-white border-t border-gray-200 pt-4 pb-2\"><h4 class=\"text-sm font-medium text-gray-800 mb-2 text-center\">Calificación</h4><div class=\"flex justify-center items-center space-x-2\"><button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.nextElementSibling.stepDown()\">&lt;</button> <input type=\"number\" min=\"0\" max=\"100\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

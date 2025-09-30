@@ -36,7 +36,7 @@ func AssignmentList(classId int, assignments []dto.Assignment, professor bool, s
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside class=\"md:w-1/3 bg-white border border-gray-300 shadow rounded-lg p-4 flex flex-col min-h-0\"><!-- Header --><div class=\"flex items-center justify-between mb-4\"><h2 class=\"text-lg font-bold text-gray-900\">Asignaciones</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside class=\"bg-white border border-gray-300 shadow rounded-lg p-4\n              flex flex-col flex-1 min-h-0 lg:w-1/3\"><!-- Header --><div class=\"flex items-center justify-between mb-4 shrink-0\"><h2 class=\"text-lg font-bold text-gray-900\">Asignaciones</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +48,7 @@ func AssignmentList(classId int, assignments []dto.Assignment, professor bool, s
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/new")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentList/assignmentList.templ`, Line: 18, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentList/assignmentList.templ`, Line: 20, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -59,7 +59,7 @@ func AssignmentList(classId int, assignments []dto.Assignment, professor bool, s
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><!-- List --><ul id=\"assignments-list\" class=\"space-y-2 overflow-y-auto flex-1 pr-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><!-- List --><ul id=\"assignments-list\" class=\"space-y-2 flex-1 min-h-0 overflow-y-auto pr-1 h-5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

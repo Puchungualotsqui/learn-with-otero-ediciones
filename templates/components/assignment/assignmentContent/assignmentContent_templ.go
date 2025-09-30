@@ -36,7 +36,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col lg:flex-row flex-1 px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-6 h-[calc(100vh-5rem)]\"><!-- Left: List of assignments -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<main class=\"flex flex-col lg:flex-row flex-1 px-2 md:px-6 py-4 md:py-8 gap-4 lg:gap-6\n             h-[calc(100vh-5rem)]\"><!-- Left: List of assignments (uses capped height + scroll on small screens) -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -45,7 +45,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 			return templ_7745c5c3_Err
 		}
 		if professor {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Middle: Assignment details (with submissions list) --> <section id=\"assignment-detail\" class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3\"><div class=\"overflow-y-auto flex-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Middle: Assignment details --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3\"><div class=\"overflow-y-auto flex-1 min-h-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -62,7 +62,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/submission?id=" + strconv.Itoa(assignments[0].Id))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentContent/assignmentContent.templ`, Line: 25, Col: 128}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentContent/assignmentContent.templ`, Line: 27, Col: 128}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -73,12 +73,12 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></section><!-- Right: Submission detail --> <section id=\"submission-detail\" class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3\"><p class=\"text-gray-500 text-center\">Selecciona una entrega para ver detalles.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></section><!-- Right: Submission detail --> <section id=\"submission-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\"><p class=\"text-gray-500 text-center\">Selecciona una entrega para ver detalles.</p></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Student: Just 2-pane --> <section id=\"assignment-detail\" class=\"flex-1 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0\"><div class=\"overflow-y-auto flex-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Student: 2-pane (this takes all remaining height under the capped list) --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
