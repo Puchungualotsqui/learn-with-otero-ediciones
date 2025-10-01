@@ -10,8 +10,8 @@ type Assignment struct {
 	DueDate     string // Formatted as "2025-09-30"
 }
 
-func AssignmentFromModel(a models.Assignment) Assignment {
-	return Assignment{
+func AssignmentFromModel(a *models.Assignment) *Assignment {
+	return &Assignment{
 		Id:          a.Id,
 		Title:       a.Title,
 		Description: a.Description,
@@ -20,8 +20,8 @@ func AssignmentFromModel(a models.Assignment) Assignment {
 	}
 }
 
-func AssignmentFromModels(list []models.Assignment) []Assignment {
-	result := make([]Assignment, len(list))
+func AssignmentFromModels(list []*models.Assignment) []*Assignment {
+	result := make([]*Assignment, len(list))
 	for i, a := range list {
 		result[i] = AssignmentFromModel(a)
 	}

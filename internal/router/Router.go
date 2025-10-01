@@ -108,7 +108,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		classes, err := database.ListClassesForUser(store, username)
 		if err != nil {
 			log.Printf("fallback: user %s classes not loaded: %v", username, err)
-			classes = []models.Class{}
+			classes = []*models.Class{}
 		}
 		slotsInfo := dto.ClassSlotFromModels(classes)
 
@@ -173,22 +173,22 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					}
 
 					fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
-					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(assignments, classId, "detail"), body.Home)
+					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(dto.AssignmentFromModels(assignments), classId, "detail"), body.Home)
 					return
 				}
 
-				var submissionDto dto.Submission
+				var submissionDto []*dto.Submission
 
 				if len(assignments) > 0 {
 					submission, err := database.GetSubmissionByAssignmentAndUser(store, classId, assignments[0].Id, username)
 					if err == nil && submission != nil {
-						dtoVal := dto.SubmissionFromModel(*submission)
-						submissionDto = dtoVal
+						dtoVal := dto.SubmissionFromModel(submission)
+						submissionDto = append(submissionDto, dtoVal)
 					}
 				}
 
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId, &submissionDto), body.Home)
+				RenderWithLayout(w, r, assignmentContent.AssignmentContent(dto.AssignmentFromModels(assignments), professor, classId, submissionDto), body.Home)
 				return
 
 			case "entregas":
@@ -223,8 +223,13 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
+				submissions, err := database.GetSubmissionsByAssignment(store, classId, assignments[0].Id)
+				if err != nil {
+					fmt.Println("Error getting submissions")
+				}
+
 				fmt.Println("📌 Routed to EntregasContent (assignments + submissions)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(assignments, professor, classId, nil), body.Home)
+				RenderWithLayout(w, r, assignmentContent.AssignmentContent(dto.AssignmentFromModels(assignments), professor, classId, dto.SubmissionFromModels(submissions)), body.Home)
 				return
 			}
 		}

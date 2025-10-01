@@ -31,7 +31,7 @@ func HandleSubmissionDetail(store *database.Store, w http.ResponseWriter, r *htt
 		return
 	}
 
-	s := dto.SubmissionFromModel(*submissionModel)
+	s := dto.SubmissionFromModel(submissionModel)
 	fmt.Println("  ✓ Submission loaded")
 	submissionDetail.SubmissionDetail(s, strconv.Itoa(classId), strconv.Itoa(assignmentId)).Render(r.Context(), w)
 }
@@ -68,7 +68,7 @@ func HandleSubmissionGrade(store *database.Store, w http.ResponseWriter, r *http
 	}
 
 	// Convert model → dto
-	subDto := dto.SubmissionFromModel(*sub)
+	subDto := dto.SubmissionFromModel(sub)
 
 	// Write OOB wrapper manually, render slot inside
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

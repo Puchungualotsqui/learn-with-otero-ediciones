@@ -72,8 +72,8 @@ func updateClass(s *Store, classId int, updater func(*models.Class) error) error
 	})
 }
 
-func ListClassesForUser(s *Store, username string) ([]models.Class, error) {
-	var results []models.Class
+func ListClassesForUser(s *Store, username string) ([]*models.Class, error) {
+	var results []*models.Class
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(Buckets["classes"])
@@ -89,7 +89,8 @@ func ListClassesForUser(s *Store, username string) ([]models.Class, error) {
 			}
 
 			if slices.Contains(class.Users, username) {
-				results = append(results, class)
+				classCopy := class
+				results = append(results, &classCopy)
 			}
 		}
 		return nil

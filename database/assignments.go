@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
-	"frontend/dto"
 
 	"go.etcd.io/bbolt"
 )
@@ -54,7 +53,7 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 	return a, nil
 }
 
-func ListAssignmentsOfClass(store *Store, classID int) []dto.Assignment {
+func ListAssignmentsOfClass(store *Store, classID int) []*models.Assignment {
 	key := fmt.Sprintf("%d", classID)
 
 	assignments, err := ListByPrefix[models.Assignment](
@@ -64,8 +63,8 @@ func ListAssignmentsOfClass(store *Store, classID int) []dto.Assignment {
 	)
 
 	if err != nil {
-		return []dto.Assignment{}
+		return []*models.Assignment{}
 	}
 
-	return dto.AssignmentFromModels(assignments)
+	return assignments
 }

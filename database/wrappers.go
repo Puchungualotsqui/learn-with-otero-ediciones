@@ -132,8 +132,8 @@ func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 	return found
 }
 
-func List[T any](s *Store, bucketName []byte) ([]T, error) {
-	var out []T
+func List[T any](s *Store, bucketName []byte) ([]*T, error) {
+	var out []*T
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucketName)
 		if b == nil {
@@ -144,15 +144,16 @@ func List[T any](s *Store, bucketName []byte) ([]T, error) {
 			if err := json.Unmarshal(v, &u); err != nil {
 				return err
 			}
-			out = append(out, u)
+			uCopy := u
+			out = append(out, &uCopy)
 			return nil
 		})
 	})
 	return out, err
 }
 
-func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]T, error) {
-	var results []T
+func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]*T, error) {
+	var results []*T
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucket)
@@ -167,11 +168,13 @@ func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]T, erro
 		p := []byte(prefix)
 
 		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
-			var out T
-			if err := json.Unmarshal(v, &out); err != nil {
+			var u T
+			if err := json.Unmarshal(v, &u); err != nil {
 				return err
 			}
-			results = append(results, out)
+			// ensure a new pointer is appended each iteration
+			uCopy := u
+			results = append(results, &uCopy)
 		}
 		return nil
 	})

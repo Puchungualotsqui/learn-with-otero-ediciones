@@ -69,13 +69,13 @@ func GetSubmission(s *Store, assignmentId int, username string) (*models.Submiss
 
 // ListSubmissionsByStudent → scans all submissions, filters by StudentId
 // (optional: add a second index "studentId:assignmentId" if needed)
-func ListSubmissionsByStudent(s *Store, username string) ([]models.Submission, error) {
+func ListSubmissionsByStudent(s *Store, username string) ([]*models.Submission, error) {
 	all, err := ListByPrefix[models.Submission](s, Buckets["submissions"], "") // "" → all keys
 	if err != nil {
 		return nil, err
 	}
 
-	var results []models.Submission
+	var results []*models.Submission
 	for _, sub := range all {
 		if sub.Username == username {
 			results = append(results, sub)
@@ -107,4 +107,14 @@ func GetSubmissionByAssignmentAndUser(s *Store, classId, assignmentId int, usern
 	key := strings.Join(keyParts, ":")
 
 	return Get[models.Submission](s, []byte("Submissions"), key)
+}
+
+func GetSubmissionsByAssignment(s *Store, classId, assignmentId int) ([]*models.Submission, error) {
+	keyParts := []string{
+		strconv.Itoa(classId),
+		strconv.Itoa(assignmentId),
+	}
+	key := strings.Join(keyParts, ":")
+
+	return ListByPrefix[models.Submission](s, []byte("Submissions"), key)
 }

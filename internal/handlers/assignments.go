@@ -50,12 +50,12 @@ func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *htt
 
 	fmt.Printf("✅ Assignment loaded: %+v\n", assignmentModel)
 
-	a := dto.AssignmentFromModel(*assignmentModel)
+	a := dto.AssignmentFromModel(assignmentModel)
 
 	if professor {
 		// Render the editor directly (NO submissions here)
 		fmt.Println("→ Rendering professor editor")
-		assignmentEditor.AssignmentEditor(&a, classIdInt).Render(r.Context(), w)
+		assignmentEditor.AssignmentEditor(a, classIdInt).Render(r.Context(), w)
 		fmt.Println("✔ Render complete (professor editor)")
 		return
 	}
@@ -90,13 +90,13 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 	}
 	fmt.Printf("  ✓ Assignment loaded: %+v\n", assignmentModel)
 
-	a := dto.AssignmentFromModel(*assignmentModel)
+	a := dto.AssignmentFromModel(assignmentModel)
 
 	if professor {
 		submissionModels, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], classId, idStr)
 		if err != nil {
 			fmt.Println("  ! Error loading submissions:", err)
-			submissionModels = []models.Submission{}
+			submissionModels = []*models.Submission{}
 		}
 		fmt.Printf("  ✓ Submissions loaded: %d\n", len(submissionModels))
 
@@ -136,15 +136,15 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 	fmt.Printf("✅ Created new assignment: %+v\n", newAssignment)
 
 	// 2. Convert to DTO
-	a := dto.AssignmentFromModel(*newAssignment)
+	a := dto.AssignmentFromModel(newAssignment)
 
 	// 3. Render updated slot list
 	fmt.Fprintf(w, `<div hx-swap-oob="beforeend:#assignments-list">`)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, &a, "detail").Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "detail").Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	// 4. Render editor into #assignment-detail
-	assignmentEditor.AssignmentEditor(&a, classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(a, classId).Render(r.Context(), w)
 
 	fmt.Println("✔ New assignment created and rendered")
 }
@@ -292,15 +292,15 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	fmt.Println("✅ Assignment saved successfully")
 
 	// 5. Re-render editor
-	a := dto.AssignmentFromModel(*assignmentModel)
+	a := dto.AssignmentFromModel(assignmentModel)
 	fmt.Println("📤 Rendering updated AssignmentEditor...")
 
 	// First: editor in #assignment-detail (normal target)
-	assignmentEditor.AssignmentEditor(&a, classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(a, classId).Render(r.Context(), w)
 
 	// Then: slot, but out-of-band (update existing slot in sidebar)
 	fmt.Fprintf(w, `<div hx-swap-oob="outerHTML:#assignment-slot-%d">`, a.Id)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, &a, "detail").Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "detail").Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	fmt.Println("✔ Render complete")

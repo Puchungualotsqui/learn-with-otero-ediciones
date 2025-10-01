@@ -11,8 +11,8 @@ type Submission struct {
 	Grade       string
 }
 
-func SubmissionFromModel(submission models.Submission) Submission {
-	return Submission{
+func SubmissionFromModel(submission *models.Submission) *Submission {
+	return &Submission{
 		Id:          submission.Id,
 		Username:    submission.Username,
 		Description: submission.Description,
@@ -22,8 +22,8 @@ func SubmissionFromModel(submission models.Submission) Submission {
 	}
 }
 
-func SubmissionFromModels(submissions []models.Submission) []Submission {
-	result := make([]Submission, len(submissions))
+func SubmissionFromModels(submissions []*models.Submission) []*Submission {
+	result := make([]*Submission, len(submissions))
 	for i, submission := range submissions {
 		result[i] = SubmissionFromModel(submission)
 	}
