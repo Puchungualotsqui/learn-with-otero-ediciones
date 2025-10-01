@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-templ AssignmentSlotStudent(classId int, a dto.Assignment) {
+templ AssignmentSlotStudent(classId int, a *dto.Assignment) {
 	{{
 		// Bolivia timezone
 		loc, _ := time.LoadLocation("America/La_Paz")

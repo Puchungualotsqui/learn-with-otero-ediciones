@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-templ AssignmentEditor(a dto.Assignment, classId int) {
+templ AssignmentEditor(a *dto.Assignment, classId int) {
 	{{
 		// Marshal assignment content ([]string) to JSON
 		files := a.Content
@@ -17,7 +17,16 @@ templ AssignmentEditor(a dto.Assignment, classId int) {
 	    filesJSON := string(helper.Must(json.Marshal(files)))
 	}}
 
-		<form
+	<section id="assignment-detail"
+      class="flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg
+             flex flex-col min-h-0 lg:w-2/3 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto min-h-0">
+            if a == nil {
+                <p class="text-gray-500 text-center">
+                    Selecciona o crea una asignación para editar.
+                </p>
+            } else {
+          		<form
 		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/update?id=" + strconv.Itoa(a.Id)}
 		  hx-target="#assignment-detail"
 		  hx-swap="innerHTML"
@@ -107,4 +116,9 @@ templ AssignmentEditor(a dto.Assignment, classId int) {
 			    <button type="submit" class="btn bg-red-600 text-white">Guardar</button>
 			  </div>
 			</form>
+            }
+        </div>
+    </section>
+
+
 }

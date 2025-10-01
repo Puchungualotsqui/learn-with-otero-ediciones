@@ -5,7 +5,7 @@ import (
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 )
 
-templ AssignmentDetailProfessor(classId int, a dto.Assignment, submissions []dto.Submission) {
+templ AssignmentDetailProfessor(classId int, a *dto.Assignment, submissions []*dto.Submission) {
     <h2 class="text-xl font-semibold text-gray-900 mb-4">{ a.Title }</h2>
 
     <div class="grid grid-cols-2 md:grid-cols-1 gap-4 mb-4">

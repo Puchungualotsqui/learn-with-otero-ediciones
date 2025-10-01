@@ -5,7 +5,7 @@ import (
 	"frontend/dto"
 )
 
-templ StudentSubmissionSlot(classId int, assignmentId int, s dto.Submission) {
+templ StudentSubmissionSlot(classId int, assignmentId int, s *dto.Submission) {
 	<a
 		id={"submission-slot-" + s.Username}
 	    hx-get={"/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username}

@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-templ SubmissionEditor(s dto.Submission, classId int, assignmentId int, assignmentTitle string) {
+templ SubmissionEditor(s *dto.Submission, classId int, assignmentId int, assignmentTitle string) {
 	{{
 		// Marshal submission content ([]string) to JSON
 		files := s.Content

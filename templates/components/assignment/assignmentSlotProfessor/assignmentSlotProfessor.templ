@@ -5,29 +5,33 @@ import (
 	"strconv"
 )
 
-templ AssignmentSlotProfessor(classId int, a dto.Assignment, subUrl string) {
-	<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
-		<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer">
-			<button
-				hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + subUrl + "?id=" + strconv.Itoa(a.Id)}
-				hx-target="#assignment-detail"
-				hx-swap="innerHTML"
-				class="flex-1 text-left cursor-pointer">
-				<div class="flex justify-between items-center">
-					<span>{ a.Title }</span>
-					<span class="text-xs">{ a.DueDate }</span>
-				</div>
-			</button>
-			if subUrl == "detail" {
+templ AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) {
+	if a == nil {
+
+	} else {
+		<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
+			<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer">
 				<button
-				    hx-delete={"/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id)}
-				    hx-target="closest li"
-				    hx-swap="outerHTML"
-				    hx-confirm="¿Seguro que quieres eliminar esta asignación?"
-				    class="ml-2 text-red-600 hover:text-red-800 text-gray-700 cursor-pointer">
-				    ✕
+					hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + subUrl + "?id=" + strconv.Itoa(a.Id)}
+					hx-target="#assignment-detail"
+					hx-swap="innerHTML"
+					class="flex-1 text-left cursor-pointer">
+					<div class="flex justify-between items-center">
+						<span>{ a.Title }</span>
+						<span class="text-xs">{ a.DueDate }</span>
+					</div>
 				</button>
-			}
-		</div>
-	</li>
+				if subUrl == "detail" {
+					<button
+					    hx-delete={"/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id)}
+					    hx-target="closest li"
+					    hx-swap="outerHTML"
+					    hx-confirm="¿Seguro que quieres eliminar esta asignación?"
+					    class="ml-2 text-red-600 hover:text-red-800 text-gray-700 cursor-pointer">
+					    ✕
+					</button>
+				}
+			</div>
+		</li>
+	}
 }

@@ -10,12 +10,12 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"frontend/dto"
+	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/submissionEditor"
-	"strconv"
 )
 
-func AssignmentContent(assignments []dto.Assignment, professor bool, classId int, submission *dto.Submission) templ.Component {
+func AssignmentContent(assignments []*dto.Assignment, professor bool, classId int, submission []*dto.Submission) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -45,65 +45,52 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 			return templ_7745c5c3_Err
 		}
 		if professor {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Middle: Assignment details --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3\"><div class=\"overflow-y-auto flex-1 min-h-0\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Middle: Assignment details --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(assignments) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-gray-500 text-center\">No hay detalles para mostrar.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-gray-500 text-center\">No hay asignaciones disponibles.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div hx-get=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var2 string
-				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/submission?id=" + strconv.Itoa(assignments[0].Id))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentContent/assignmentContent.templ`, Line: 26, Col: 128}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#assignment-detail\" hx-swap=\"innerHTML\" hx-trigger=\"load\" class=\"text-gray-500\"><span class=\"htmx-indicator text-gray-500\">Cargando entregas...</span></div>")
+				templ_7745c5c3_Err = assignmentDetailProfessor.AssignmentDetailProfessor(classId, assignments[0], submission).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></section><!-- Right: Submission detail --> <section id=\"submission-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\"><p class=\"text-gray-500 text-center\">Selecciona una entrega para ver detalles.</p></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</section><!-- Right: Submission detail --> <section id=\"submission-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\"><p class=\"text-gray-500 text-center\">Selecciona una entrega para ver detalles.</p></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Student: 2-pane (this takes all remaining height under the capped list) --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Student: 2-pane (this takes all remaining height under the capped list) --> <section id=\"assignment-detail\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg\n                     p-4 flex flex-col lg:w-1/3\"><div class=\"flex-1 overflow-y-auto min-h-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(assignments) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"text-gray-500 text-center\">No hay detalles para mostrar.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<p class=\"text-gray-500 text-center\">No hay detalles para mostrar.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			} else if submission != nil {
-				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id, assignments[0].Title).Render(ctx, templ_7745c5c3_Buffer)
+			} else if submission != nil && len(submission) > 0 {
+				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(submission[0], classId, assignments[0].Id, assignments[0].Title).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"text-gray-500 text-center\">Aún no has hecho una entrega.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p class=\"text-gray-500 text-center\">Aún no has hecho una entrega.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

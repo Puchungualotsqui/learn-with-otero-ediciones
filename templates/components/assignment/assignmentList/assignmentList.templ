@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-templ AssignmentList(classId int, assignments []dto.Assignment, professor bool, subUrl string) {
+templ AssignmentList(classId int, assignments []*dto.Assignment, professor bool, subUrl string) {
 	<aside class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">
 
