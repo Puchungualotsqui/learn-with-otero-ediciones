@@ -30,7 +30,7 @@ templ AssignmentSlotStudent(classId int, a *dto.Assignment) {
 
 	<li>
 		<button
-			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/detail?id=" + strconv.Itoa(a.Id)}
+			hx-get={"/" + strconv.Itoa(classId) + "/entregas/detail?id=" + strconv.Itoa(a.Id)}
 			hx-target="#assignment-detail"
 			hx-swap="innerHTML"
 			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}>

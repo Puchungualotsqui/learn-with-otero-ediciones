@@ -24,3 +24,10 @@ func Must[T any](v T, err error) T {
 	}
 	return v
 }
+
+func First[T any](v []*T) *T {
+	if len(v) == 0 {
+		return nil
+	}
+	return v[0]
+}

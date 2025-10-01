@@ -59,10 +59,6 @@ func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *htt
 		fmt.Println("✔ Render complete (professor editor)")
 		return
 	}
-
-	// TODO: later handle student view (submission editor)
-	fmt.Println("⚠ Student view not implemented yet")
-	http.Error(w, "Student detail not implemented", http.StatusNotImplemented)
 }
 
 func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {

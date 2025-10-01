@@ -5,6 +5,7 @@ import (
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/submissionEditor"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
+	"frontend/templates/components/assignment/submissionDetail"
 )
 
 templ AssignmentContent(assignments []*dto.Assignment, professor bool, classId int, submission []*dto.Submission) {
@@ -15,40 +16,20 @@ templ AssignmentContent(assignments []*dto.Assignment, professor bool, classId i
         @assignmentList.AssignmentList(classId, assignments, professor, "submission")
 
         if professor {
-            <!-- Middle: Assignment details -->
-            <section id="assignment-detail"
-	            class="flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg p-6 flex flex-col min-h-0 lg:w-1/3">
 				if len(assignments) == 0 {
-					<p class="text-gray-500 text-center">No hay asignaciones disponibles.</p>
+					@assignmentDetailProfessor.AssignmentDetailProfessor(classId, nil, submission)
 				} else {
 					@assignmentDetailProfessor.AssignmentDetailProfessor(classId, assignments[0], submission)
 				}
-            </section>
 
-            <!-- Right: Submission detail -->
-            <section id="submission-detail"
-              class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg
-                     p-4 flex flex-col lg:w-1/3">
-              <div class="flex-1 overflow-y-auto min-h-0">
-                    <p class="text-gray-500 text-center">Selecciona una entrega para ver detalles.</p>
-                </div>
-            </section>
+				@submissionDetail.SubmissionDetail(nil, "", "")
 
         } else {
-            <!-- Student: 2-pane (this takes all remaining height under the capped list) -->
-            <section id="assignment-detail"
-              class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg
-                     p-4 flex flex-col lg:w-1/3">
-              <div class="flex-1 overflow-y-auto min-h-0">
-                    if len(assignments) == 0 {
-                        <p class="text-gray-500 text-center">No hay detalles para mostrar.</p>
-                    } else if submission != nil && len(submission) > 0 {
-                        @submissionEditor.SubmissionEditor(submission[0], classId, assignments[0].Id, assignments[0].Title)
-                    } else {
-                        <p class="text-gray-500 text-center">Aún no has hecho una entrega.</p>
-                    }
-                </div>
-            </section>
+	        if len(assignments) == 0 {
+          		@submissionEditor.SubmissionEditor(nil, 0, 0, "")
+	        } else {
+	            @submissionEditor.SubmissionEditor(submission[0], classId, assignments[0].Id, assignments[0].Title)
+	        }
         }
     </div>
 }

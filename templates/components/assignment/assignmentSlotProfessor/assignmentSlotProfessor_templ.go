@@ -62,7 +62,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"innerHTML\" class=\"flex-1 text-left cursor-pointer\"><div class=\"flex justify-between items-center\"><span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"outerHTML\" class=\"flex-1 text-left cursor-pointer\"><div class=\"flex justify-between items-center\"><span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

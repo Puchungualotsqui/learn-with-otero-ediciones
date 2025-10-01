@@ -11,6 +11,8 @@ import (
 	"frontend/templates/body"
 	"frontend/templates/components/assignment/assignmentContent"
 	"frontend/templates/components/assignment/assignmentContentProfessor"
+	"frontend/templates/components/assignment/assignmentEditor"
+	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/home"
 	"log"
 	"net/http"
@@ -173,7 +175,22 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					}
 
 					fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
-					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(dto.AssignmentFromModels(assignments), classId, "detail"), body.Home)
+					var firstAssingment *dto.Assignment
+					if len(assignments) == 0 {
+						firstAssingment = nil
+					} else {
+						firstAssingment = dto.AssignmentFromModel(assignments[0])
+					}
+					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(
+						assignmentList.AssignmentList(
+							classId,
+							dto.AssignmentFromModels(assignments),
+							true,
+							"detail"),
+						assignmentEditor.AssignmentEditor(
+							firstAssingment,
+							classId),
+					), body.Home)
 					return
 				}
 
@@ -206,13 +223,14 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				if len(parts) > 4 && parts[3] == "submissions" && parts[4] == "detail" {
 					fmt.Println("📌 Routed to HandleSubmissionDetail")
 					assignmentId, _ := strconv.Atoi(parts[2])
-					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId)
+					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId, professor)
 					return
 				}
 
 				if len(parts) > 2 && parts[2] == "detail" {
 					fmt.Println("📌 Routed to HandleAssignmentDetail (professor view)")
-					handlers.HandleAssignmentDetail(store, w, r, professor)
+					assignmentId, _ := strconv.Atoi(parts[2])
+					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId, professor)
 					return
 				}
 

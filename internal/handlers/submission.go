@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-func HandleSubmissionDetail(store *database.Store, w http.ResponseWriter, r *http.Request, classId, assignmentId int) {
+func HandleSubmissionDetail(store *database.Store, w http.ResponseWriter, r *http.Request, classId, assignmentId int, professor bool) {
 	idStr := r.URL.Query().Get("id")
 
 	fmt.Println("📥 [HandleSubmissionDetail] Request received")
@@ -31,9 +31,12 @@ func HandleSubmissionDetail(store *database.Store, w http.ResponseWriter, r *htt
 		return
 	}
 
-	s := dto.SubmissionFromModel(submissionModel)
-	fmt.Println("  ✓ Submission loaded")
-	submissionDetail.SubmissionDetail(s, strconv.Itoa(classId), strconv.Itoa(assignmentId)).Render(r.Context(), w)
+	if professor {
+		s := dto.SubmissionFromModel(submissionModel)
+		fmt.Println("  ✓ Submission loaded")
+		submissionDetail.SubmissionDetail(s, strconv.Itoa(classId), strconv.Itoa(assignmentId)).Render(r.Context(), w)
+	}
+
 }
 
 func HandleSubmissionGrade(store *database.Store, w http.ResponseWriter, r *http.Request, classId int, assignmentId int, username string) {

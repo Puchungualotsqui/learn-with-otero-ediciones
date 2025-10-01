@@ -10,7 +10,7 @@ templ StudentSubmissionSlot(classId int, assignmentId int, s *dto.Submission) {
 		id={"submission-slot-" + s.Username}
 	    hx-get={"/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username}
 	    hx-target="#submission-detail"
-	    hx-swap="innerHTML"
+	    hx-swap="outerHTML"
 	    class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm hover:bg-gray-50 transition cursor-pointer"
 	>
 	    <!-- Student info -->
