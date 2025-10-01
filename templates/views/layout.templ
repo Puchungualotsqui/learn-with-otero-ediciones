@@ -19,7 +19,7 @@ templ Layout(body templ.Component) {
 	<script>
 	function initFlatpickr() {
   flatpickr("#due-date", {
-    dateFormat: "Y-m-d",
+    dateFormat: "d/m/Y",
     altInput: true,
     altFormat: "d/m/Y",
     defaultDate: document.querySelector("#due-date")?.value || null,

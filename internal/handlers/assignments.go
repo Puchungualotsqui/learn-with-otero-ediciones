@@ -127,7 +127,7 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 		classId,
 		"Nuevo título",
 		"Agrega la descripción aquí...",
-		time.Now().AddDate(0, 0, 7).Format("02/01/2006"),
+		time.Now().Format("02/01/2006"),
 	)
 	if err != nil {
 		http.Error(w, "Failed to create assignment", http.StatusInternalServerError)
@@ -176,7 +176,19 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	// Parse values
 	title := r.FormValue("title")
 	description := r.FormValue("description")
-	dueDate := r.FormValue("due_date")
+	dueDateGross := r.FormValue("due_date")
+
+	var dueDate string
+
+	// Try parse as yyyy-mm-dd
+	if t, err := time.Parse("2006-01-02", dueDateGross); err == nil {
+		dueDate = t.Format("02/01/2006")
+	} else if t, err := time.Parse("02/01/2006", dueDateGross); err == nil {
+		dueDate = t.Format("02/01/2006")
+	} else {
+		// fallback → store raw string if cannot parse
+		dueDate = dueDateGross
+	}
 
 	keep := r.Form["keep[]"]                   // already uploaded files to keep
 	uploads := r.MultipartForm.File["uploads"] // newly uploaded files
@@ -288,7 +300,7 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 
 	// Then: slot, but out-of-band (update existing slot in sidebar)
 	fmt.Fprintf(w, `<div hx-swap-oob="outerHTML:#assignment-slot-%d">`, a.Id)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "details").Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "detail").Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	fmt.Println("✔ Render complete")

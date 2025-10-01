@@ -88,7 +88,7 @@ func AssignmentContent(assignments []dto.Assignment, professor bool, classId int
 					return templ_7745c5c3_Err
 				}
 			} else if submission != nil {
-				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id, assignments[0].Title).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

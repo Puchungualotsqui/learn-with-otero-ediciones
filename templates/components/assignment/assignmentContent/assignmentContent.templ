@@ -52,7 +52,7 @@ templ AssignmentContent(assignments []dto.Assignment, professor bool, classId in
                     if len(assignments) == 0 {
                         <p class="text-gray-500 text-center">No hay detalles para mostrar.</p>
                     } else if submission != nil {
-                        @submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id)
+                        @submissionEditor.SubmissionEditor(*submission, classId, assignments[0].Id, assignments[0].Title)
                     } else {
                         <p class="text-gray-500 text-center">Aún no has hecho una entrega.</p>
                     }
