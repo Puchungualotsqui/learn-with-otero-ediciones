@@ -20,8 +20,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/a-h/templ"
 )
 
 func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
@@ -211,14 +209,18 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
 
-				components := []templ.Component{
-					assignmentList.AssignmentList(classId, dto.AssignmentFromModels(assignments), professor, "submission"),
-					submissionEditor.SubmissionEditor(submissionDto, classId, assignmentId, assignmentTitle),
-				}
-				for i, c := range components {
-					fmt.Printf("Panels arg %d isNil=%v\n", i, c == nil)
-				}
-				RenderWithLayout(w, r, panelsContent.PanelsContent(components...), body.Home)
+				RenderWithLayout(w, r, panelsContent.PanelsContent(
+					assignmentList.AssignmentList(
+						classId,
+						dto.AssignmentFromModels(assignments),
+						professor,
+						"submission"),
+					submissionEditor.SubmissionEditor(
+						submissionDto,
+						classId,
+						assignmentId,
+						assignmentTitle),
+				), body.Home)
 
 				return
 
