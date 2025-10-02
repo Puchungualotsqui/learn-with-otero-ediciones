@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"fmt"
 	"frontend/dto"
 	"strconv"
 	"time"
@@ -37,10 +38,16 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment) templ.Component {
 		ctx = templ.ClearChildren(ctx)
 
 		// Bolivia timezone
-		loc, _ := time.LoadLocation("America/La_Paz")
+		loc, err := time.LoadLocation("America/La_Paz")
+		if err != nil {
+			fmt.Println("error loading time location")
+		}
 
 		// Parse due date in Bolivia timezone
-		due, _ := time.ParseInLocation("2006-01-02", a.DueDate, loc)
+		due, err := time.ParseInLocation("02/01/2006", a.DueDate, loc)
+		if err != nil {
+			fmt.Println("Error parsing in location")
+		}
 		now := time.Now().In(loc)
 
 		daysLeft := int(due.Sub(now).Hours() / 24)
@@ -70,7 +77,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/entregas/detail?id=" + strconv.Itoa(a.Id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 33, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 40, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -96,7 +103,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(a.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 38, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 45, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -109,7 +116,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(a.DueDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 39, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 46, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {

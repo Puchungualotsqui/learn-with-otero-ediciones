@@ -4,15 +4,22 @@ import (
 	"frontend/dto"
 	"time"
 	"strconv"
+	"fmt"
 )
 
 templ AssignmentSlotStudent(classId int, a *dto.Assignment) {
 	{{
 		// Bolivia timezone
-		loc, _ := time.LoadLocation("America/La_Paz")
+		loc, err := time.LoadLocation("America/La_Paz")
+		if err != nil {
+			fmt.Println("error loading time location")
+		}
 
 		// Parse due date in Bolivia timezone
-		due, _ := time.ParseInLocation("2006-01-02", a.DueDate, loc)
+		due, err := time.ParseInLocation("02/01/2006", a.DueDate, loc)
+		if err != nil {
+			fmt.Println("Error parsing in location")
+		}
 		now := time.Now().In(loc)
 
 		daysLeft := int(due.Sub(now).Hours() / 24)

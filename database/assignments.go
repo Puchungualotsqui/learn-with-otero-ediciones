@@ -63,6 +63,7 @@ func ListAssignmentsOfClass(store *Store, classID int) []*models.Assignment {
 	)
 
 	if err != nil {
+		fmt.Printf("Error listing assignments of class")
 		return []*models.Assignment{}
 	}
 

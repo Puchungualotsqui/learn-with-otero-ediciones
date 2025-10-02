@@ -9,11 +9,10 @@ import (
 	"frontend/internal/handlers"
 	"frontend/storage"
 	"frontend/templates/body"
-	"frontend/templates/components/assignment/assignmentContent"
-	"frontend/templates/components/assignment/assignmentContentProfessor"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentList"
+	"frontend/templates/components/assignment/panelsContent"
 	"frontend/templates/components/assignment/submissionDetail"
 	"frontend/templates/components/assignment/submissionEditor"
 	"frontend/templates/components/home"
@@ -21,6 +20,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/a-h/templ"
 )
 
 func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
@@ -185,7 +186,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					} else {
 						firstAssingment = dto.AssignmentFromModel(assignments[0])
 					}
-					RenderWithLayout(w, r, assignmentContentProfessor.AssignmentContentProfessor(
+					RenderWithLayout(w, r, panelsContent.PanelsContent(
 						assignmentList.AssignmentList(
 							classId,
 							dto.AssignmentFromModels(assignments),
@@ -209,17 +210,16 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				}
 
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
-				//dto.AssignmentFromModels(assignments), professor, classId, submissionDto
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(
-					assignmentList.AssignmentList(
-						classId,
-						dto.AssignmentFromModels(assignments), professor, "submission"),
-					submissionEditor.SubmissionEditor(
-						submissionDto,
-						classId,
-						assignmentId,
-						assignmentTitle,
-					)), body.Home)
+
+				components := []templ.Component{
+					assignmentList.AssignmentList(classId, dto.AssignmentFromModels(assignments), professor, "submission"),
+					submissionEditor.SubmissionEditor(submissionDto, classId, assignmentId, assignmentTitle),
+				}
+				for i, c := range components {
+					fmt.Printf("Panels arg %d isNil=%v\n", i, c == nil)
+				}
+				RenderWithLayout(w, r, panelsContent.PanelsContent(components...), body.Home)
+
 				return
 
 			case "entregas":
@@ -261,7 +261,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 					RenderWithLayout(
 						w, r,
-						assignmentContent.AssignmentContent(
+						panelsContent.PanelsContent(
 							assignmentList.AssignmentList(
 								classId,
 								dto.AssignmentFromModels(assignments),
