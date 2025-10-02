@@ -7,14 +7,14 @@ import (
 	"strconv"
 )
 
-templ AssignmentList(classId int, assignments []*dto.Assignment, professor bool, subUrl string) {
+templ AssignmentList(classId int, assignments []*dto.Assignment, professor, deleteButton bool, username string) {
 	<aside class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">
 
 		<!-- Header -->
 		<div class="flex items-center justify-between mb-4 shrink-0">
 			<h2 class="text-lg font-bold text-gray-900">Asignaciones</h2>
-			if professor && subUrl == "detail" {
+			if professor && deleteButton {
 				<button
 				  class="px-3 py-1 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition cursor-pointer"
 				  hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/new"}
@@ -33,9 +33,9 @@ templ AssignmentList(classId int, assignments []*dto.Assignment, professor bool,
 			} else {
 				for _, a := range assignments {
 					if professor {
-						@assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, subUrl)
+						@assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton)
 					} else {
-						@assignmentSlotStudent.AssignmentSlotStudent(classId, a)
+						@assignmentSlotStudent.AssignmentSlotStudent(classId, a, username)
 					}
 				}
 			}

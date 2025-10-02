@@ -6,20 +6,79 @@ import (
 	"frontend/database/models"
 	"frontend/dto"
 	"frontend/helper"
+	"frontend/internal/render"
 	"frontend/storage"
+	"frontend/templates/body"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentEditor"
+	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
+	"frontend/templates/components/assignment/panelsContent"
 	"frontend/templates/components/assignment/submissionDetail"
+	"frontend/templates/components/assignment/submissionEditor"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/a-h/templ"
 )
+
+func HandleAssignmentDefault(
+	w http.ResponseWriter,
+	r *http.Request,
+	assignments []*models.Assignment,
+	classId int,
+	professor bool,
+	username string,
+) {
+	// Convert models to DTO once
+	assignmentsDTO := dto.AssignmentFromModels(assignments)
+
+	// Grab the “first assignment” bits once
+	var (
+		firstDTO   *dto.Assignment
+		firstID    int
+		firstTitle string
+	)
+	if len(assignments) > 0 {
+		firstDTO = dto.AssignmentFromModel(assignments[0])
+		firstID = assignments[0].Id // keep using model ID if that’s your source of truth
+		firstTitle = firstDTO.Title // title from DTO is fine
+	}
+
+	// Right panel differs by role
+	var right templ.Component
+	if professor {
+		fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
+		right = assignmentEditor.AssignmentEditor(firstDTO, classId)
+	} else {
+		fmt.Println("📌 Routed to AssignmentContent (assignment management)")
+		// submissionDto is nil for fresh view (same behavior as before)
+		right = submissionEditor.SubmissionEditor(nil, classId, firstID, firstTitle)
+	}
+
+	// Render once
+	render.RenderWithLayout(
+		w, r,
+		panelsContent.PanelsContent(
+			assignmentList.AssignmentList(
+				classId,
+				assignmentsDTO,
+				professor,
+				professor,
+				username,
+			),
+			right,
+		),
+		body.Home,
+	)
+}
 
 func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
+	helper.PrintArray(parts)
 
 	submissions, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
 	if err != nil {
@@ -52,7 +111,7 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 	}
 }
 
-func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
+func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, username string, professor bool) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
@@ -82,50 +141,54 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 		fmt.Println("  ✔ Render complete")
 		return
 	}
+
+	if username == parts[4] {
+		fmt.Println("  → Rendering student detail")
+		assignment, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], parts[2], parts[0])
+		if err != nil {
+			fmt.Println("Error fetching assignment info: %w", err)
+			http.Error(w, "Server database error", http.StatusInternalServerError)
+			return
+		}
+
+		arguments, err := helper.StringsToInts(parts[0], parts[2])
+		if err != nil {
+			fmt.Println("Invalid arguments: %w", err)
+			http.Error(w, "Invalid arguments", http.StatusBadRequest)
+			return
+		}
+
+		submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title).Render(r.Context(), w)
+		fmt.Println("  ✔ Render complete")
+		return
+	}
 }
 
-func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
-	idStr := r.URL.Query().Get("id")
+func HandleAssignmentDetail(w http.ResponseWriter, r *http.Request, assignments []*models.Assignment, professor bool) {
+	fmt.Println("📥 [HandleAssignmentDetail] Request received")
+	var assignment *models.Assignment
+	if len(assignments) > 0 {
+		assignment = assignments[0]
+	}
 
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
-	classId := parts[0]
 
-	classIdInt, err := strconv.Atoi(classId)
+	if !professor {
+		fmt.Println("Not allowed")
+		http.Error(w, "Not allowed", http.StatusBadRequest)
+		return
+	}
+
+	classId, err := strconv.Atoi(parts[0])
 	if err != nil {
-		fmt.Println("❌ Invalid class Id:", classId)
-		http.Error(w, "Invalid class Id", http.StatusBadRequest)
+		fmt.Println("Invalid class")
+		http.Error(w, "Invalid class", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println("📥 [HandleAssignmentDetail] Request received")
-	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, idStr, professor)
-
-	// Load assignment
-	assignmentModel, err := database.GetWithPrefix[models.Assignment](
-		store,
-		database.Buckets["assignments"],
-		idStr,   // id (assignmentId)
-		classId, // prefixes...
-	)
-
-	if err != nil || assignmentModel == nil {
-		fmt.Println("❌ Assignment not found in DB")
-		http.Error(w, "Assignment not found", http.StatusNotFound)
-		return
-	}
-
-	fmt.Printf("✅ Assignment loaded: %+v\n", assignmentModel)
-
-	a := dto.AssignmentFromModel(assignmentModel)
-
-	if professor {
-		// Render the editor directly (NO submissions here)
-		fmt.Println("→ Rendering professor editor")
-		assignmentEditor.AssignmentEditor(a, classIdInt).Render(r.Context(), w)
-		fmt.Println("✔ Render complete (professor editor)")
-		return
-	}
+	assignmentEditor.AssignmentEditor(dto.AssignmentFromModel(assignment), classId).Render(r.Context(), w)
+	fmt.Println("  ✔ Render complete")
 }
 
 // HandleAssignmentNew creates a blank assignment for a class and renders the edit form
@@ -161,7 +224,7 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 
 	// 3. Render updated slot list
 	fmt.Fprintf(w, `<div hx-swap-oob="beforeend:#assignments-list">`)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "detail").Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, true).Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	// 4. Render editor into #assignment-detail
@@ -326,7 +389,7 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 
 	// Then: slot, but out-of-band (update existing slot in sidebar)
 	fmt.Fprintf(w, `<div hx-swap-oob="outerHTML:#assignment-slot-%d">`, a.Id)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, "detail").Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, true).Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	fmt.Println("✔ Render complete")

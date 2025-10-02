@@ -6,15 +6,11 @@ import (
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/dto"
+	"frontend/helper"
 	"frontend/internal/handlers"
+	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
-	"frontend/templates/components/assignment/assignmentDetailProfessor"
-	"frontend/templates/components/assignment/assignmentEditor"
-	"frontend/templates/components/assignment/assignmentList"
-	"frontend/templates/components/assignment/panelsContent"
-	"frontend/templates/components/assignment/submissionDetail"
-	"frontend/templates/components/assignment/submissionEditor"
 	"frontend/templates/components/home"
 	"log"
 	"net/http"
@@ -45,7 +41,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 	case parts[0] == "login":
 		switch r.Method {
 		case http.MethodGet:
-			RenderWithLayout(w, r, body.Auth())
+			render.RenderWithLayout(w, r, body.Auth())
 
 		case http.MethodPost:
 			username := r.FormValue("username")
@@ -122,7 +118,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			return
 		}
 
-		RenderWithLayout(w, r, home.Home(slotsInfo, professor), body.Home)
+		render.RenderWithLayout(w, r, home.Home(slotsInfo, professor), body.Home)
 		return
 
 	case isClassValid(store, username, parts[0]):
@@ -137,6 +133,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			case "asignaciones":
 
 				assignments := database.ListAssignmentsOfClass(store, classId)
+				helper.PrintArray(parts)
 
 				professor, err := isProfessor(store, username)
 				if err != nil {
@@ -145,18 +142,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				}
 
 				fmt.Printf("👉 Checking assignments route: %+v\n", parts)
-
-				if len(parts) > 2 && parts[3] == "submissions" {
-					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
-					handlers.HandleAssignmentSubmissions(store, w, r, professor)
-					return
-				}
-
-				if len(parts) > 4 && parts[3] == "submission" {
-					fmt.Println("📌 Routed to HandleAssignmentDetail")
-					handlers.HandleAssignmentSubmission(store, w, r, professor)
-					return
-				}
 
 				if len(parts) > 2 && parts[2] == "update" {
 					fmt.Println("📌 Routed to UpdateAssignment (professor)")
@@ -176,52 +161,27 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
-				if professor {
-					fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
-					var firstAssingment *dto.Assignment
-					if len(assignments) == 0 {
-						firstAssingment = nil
-					} else {
-						firstAssingment = dto.AssignmentFromModel(assignments[0])
-					}
-					RenderWithLayout(w, r, panelsContent.PanelsContent(
-						assignmentList.AssignmentList(
-							classId,
-							dto.AssignmentFromModels(assignments),
-							true,
-							"detail"),
-						assignmentEditor.AssignmentEditor(
-							firstAssingment,
-							classId),
-					), body.Home)
+				if len(parts) > 2 && parts[3] == "submissions" {
+					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
+					handlers.HandleAssignmentSubmissions(store, w, r, professor)
 					return
 				}
 
-				var submissionDto *dto.Submission = nil
-				var assignment *dto.Assignment = nil
-				var assignmentId int = 0
-				var assignmentTitle string = ""
-				if len(assignments) != 0 {
-					assignment = dto.AssignmentFromModel(assignments[0])
-					assignmentId = assignments[0].Id
-					assignmentTitle = assignment.Title
+				if len(parts) > 4 && parts[3] == "submission" {
+					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
+					handlers.HandleAssignmentSubmission(store, w, r, username, professor)
+					return
 				}
 
-				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
+				if len(parts) > 3 && parts[3] == "details" {
+					fmt.Println("📌 Routed to HandleAssignmentDetail")
+					handlers.HandleAssignmentDetail(w, r, assignments, professor)
+					return
+				}
 
-				RenderWithLayout(w, r, panelsContent.PanelsContent(
-					assignmentList.AssignmentList(
-						classId,
-						dto.AssignmentFromModels(assignments),
-						professor,
-						"submission"),
-					submissionEditor.SubmissionEditor(
-						submissionDto,
-						classId,
-						assignmentId,
-						assignmentTitle),
-				), body.Home)
+				fmt.Print("test starts")
 
+				handlers.HandleAssignmentDefault(w, r, assignments, classId, professor, username)
 				return
 
 			case "entregas":
@@ -244,46 +204,13 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				}
 
 				if len(parts) > 2 && parts[2] == "detail" {
-					fmt.Println("📌 Routed to HandleAssignmentDetail (professor view)")
+					fmt.Println("📌 Routed to HandleSubmissionDetail (professor view)")
 					assignmentId, _ := strconv.Atoi(parts[2])
 					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId, professor)
 					return
 				}
 
-				submissions, err := database.GetSubmissionsByAssignment(store, classId, assignments[0].Id)
-				if err != nil {
-					fmt.Println("Error getting submissions")
-				}
-
-				if professor {
-					var assignment *dto.Assignment = nil
-					if len(assignments) != 0 {
-						assignment = dto.AssignmentFromModel(assignments[0])
-					}
-
-					RenderWithLayout(
-						w, r,
-						panelsContent.PanelsContent(
-							assignmentList.AssignmentList(
-								classId,
-								dto.AssignmentFromModels(assignments),
-								professor,
-								"submission",
-							),
-							assignmentDetailProfessor.AssignmentDetailProfessor(
-								classId,
-								assignment,
-								dto.SubmissionFromModels(submissions),
-							),
-							submissionDetail.SubmissionDetail(
-								nil,
-								"",
-								""),
-						),
-						body.Home,
-					)
-					return
-				}
+				handlers.HandleSubmissionDefault(store, w, r, classId, assignments[0].Id, assignments, professor, username)
 
 				return
 			}

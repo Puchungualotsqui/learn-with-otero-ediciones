@@ -5,14 +5,20 @@ import (
 	"strconv"
 )
 
-templ AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) {
+templ AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) {
+	{{
+		subUrl := "/submissions"
+		if deleteButton {
+			subUrl = "/details"
+		}
+	}}
 	if a == nil {
 
 	} else {
 		<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
 			<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer">
 				<button
-					hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + subUrl + "/submissions"}
+					hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + subUrl}
 					hx-target="#assignment-detail"
 					hx-swap="outerHTML"
 					class="flex-1 text-left cursor-pointer">
@@ -21,7 +27,7 @@ templ AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) {
 						<span class="text-xs">{ a.DueDate }</span>
 					</div>
 				</button>
-				if subUrl == "detail" {
+				if deleteButton {
 					<button
 					    hx-delete={"/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id)}
 					    hx-target="closest li"

@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) templ.Component {
+func AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -34,6 +34,11 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+
+		subUrl := "/submissions"
+		if deleteButton {
+			subUrl = "/details"
+		}
 		if a == nil {
 		} else {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<li id=\"")
@@ -43,7 +48,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("assignment-slot-" + strconv.Itoa(a.Id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 12, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 18, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -54,9 +59,9 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + subUrl + "/submissions")
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + subUrl)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 15, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 21, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -69,7 +74,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(a.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 20, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 26, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -82,7 +87,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(a.DueDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 21, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 27, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -92,7 +97,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if subUrl == "detail" {
+			if deleteButton {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button hx-delete=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -100,7 +105,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, subUrl string) temp
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 26, Col: 97}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 32, Col: 97}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
