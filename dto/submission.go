@@ -13,7 +13,6 @@ type Submission struct {
 
 func SubmissionFromModel(submission *models.Submission) *Submission {
 	return &Submission{
-		Id:          submission.Id,
 		Username:    submission.Username,
 		Description: submission.Description,
 		Content:     submission.Content,

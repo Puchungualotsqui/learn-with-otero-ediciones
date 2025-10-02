@@ -8,14 +8,81 @@ import (
 	"frontend/helper"
 	"frontend/storage"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
-	"frontend/templates/components/assignment/assignmentDetailStudent"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
+	"frontend/templates/components/assignment/submissionDetail"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
+
+func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+
+	submissions, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
+	if err != nil {
+		fmt.Println("Error fetching submissions: %w", err)
+		http.Error(w, "Server database error", http.StatusInternalServerError)
+		return
+	}
+
+	if professor {
+		submissionsDto := dto.SubmissionFromModels(submissions)
+
+		classIdInt, err := strconv.Atoi(parts[0])
+		if err != nil {
+			fmt.Println("! Invalid class Id:", parts[0])
+			http.Error(w, "Invalid class Id", http.StatusBadRequest)
+			return
+		}
+
+		assignment, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], parts[2], parts[0])
+		if err != nil {
+			fmt.Println("Error fetching assignment: %w", err)
+			http.Error(w, "Server database error", http.StatusInternalServerError)
+		}
+		assignmentDto := dto.AssignmentFromModel(assignment)
+
+		fmt.Println("→ Rendering professor submissions list")
+		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignmentDto, submissionsDto).Render(r.Context(), w)
+		fmt.Println("✔ Render complete")
+		return
+	}
+}
+
+func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+
+	classIdInt, err := strconv.Atoi(parts[0])
+	if err != nil {
+		fmt.Println("! Invalid class Id:", parts[0])
+		http.Error(w, "Invalid class Id", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("📥 [HandleAssignmentDetail] Request received")
+	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, parts[0], professor)
+
+	submission, err := database.GetWithPrefix[models.Submission](store, database.Buckets["submissions"], parts[4], parts[0], parts[2])
+	if err != nil {
+		fmt.Println("Error fetching submission: %w", err)
+		http.Error(w, "Server database error", http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("  ✓ Assignment loaded: %+v\n", submission)
+
+	s := dto.SubmissionFromModel(submission)
+
+	if professor {
+		fmt.Println("  → Rendering professor detail")
+		submissionDetail.SubmissionDetail(s, parts[0], parts[2]).Render(r.Context(), w)
+		fmt.Println("  ✔ Render complete")
+		return
+	}
+}
 
 func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
 	idStr := r.URL.Query().Get("id")
@@ -61,56 +128,14 @@ func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *htt
 	}
 }
 
-func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
-	idStr := r.URL.Query().Get("id")
-
-	path := strings.Trim(r.URL.Path, "/")
-	parts := strings.Split(path, "/")
-	classId := parts[0]
-
-	classIdInt, err := strconv.Atoi(classId)
-	if err != nil {
-		fmt.Println("  ! Invalid class Id:", classId)
-		http.Error(w, "Invalid class Id", http.StatusBadRequest)
-		return
-	}
-
-	fmt.Println("📥 [HandleAssignmentDetail] Request received")
-	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, idStr, professor)
-
-	assignmentModel, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], idStr, classId)
-	if err != nil || assignmentModel == nil {
-		fmt.Println("  ! Assignment not found in DB")
-		http.Error(w, "Assignment not found", http.StatusNotFound)
-		return
-	}
-	fmt.Printf("  ✓ Assignment loaded: %+v\n", assignmentModel)
-
-	a := dto.AssignmentFromModel(assignmentModel)
-
-	if professor {
-		submissionModels, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], classId, idStr)
-		if err != nil {
-			fmt.Println("  ! Error loading submissions:", err)
-			submissionModels = []*models.Submission{}
-		}
-		fmt.Printf("  ✓ Submissions loaded: %d\n", len(submissionModels))
-
-		subsDTO := dto.SubmissionFromModels(submissionModels)
-		fmt.Println("  → Rendering professor detail")
-		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, a, subsDTO).Render(r.Context(), w)
-		fmt.Println("  ✔ Render complete")
-		return
-	}
-
-	fmt.Println("  → Rendering student detail")
-	assignmentDetailStudent.AssignmentDetailStudent(a).Render(r.Context(), w)
-	fmt.Println("  ✔ Render complete")
-}
-
 // HandleAssignmentNew creates a blank assignment for a class and renders the edit form
-func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int) {
+func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int, professor bool) {
 	fmt.Println("📥 [HandleAssignmentNew] Request received")
+
+	if !professor {
+		fmt.Println("Access denied")
+		http.Error(w, "Access denied", http.StatusNotAcceptable)
+	}
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -146,8 +171,13 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 }
 
 // HandleAssignmentUpdate updates an assignment based on form data (HTMX-friendly)
-func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int) {
+func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int, professor bool) {
 	fmt.Println("📥 [HandleAssignmentUpdate] Request received")
+
+	if !professor {
+		fmt.Println("Access denied")
+		http.Error(w, "Access denied", http.StatusNotAcceptable)
+	}
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -302,8 +332,13 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	fmt.Println("✔ Render complete")
 }
 
-func HandleAssignmentDelete(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int) {
+func HandleAssignmentDelete(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int, professor bool) {
 	fmt.Println("📥 [HandleAssignmentDelete] Request received")
+
+	if !professor {
+		fmt.Println("Access denied")
+		http.Error(w, "Access denied", http.StatusNotAcceptable)
+	}
 
 	if r.Method != http.MethodDelete {
 		fmt.Printf("Method not allowed")

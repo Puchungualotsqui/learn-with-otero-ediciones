@@ -1,6 +1,9 @@
 package helper
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
 
 // Contains returns true if elem is in slice.
 // This is just a thin wrapper around slices.Contains for clarity.
@@ -30,4 +33,11 @@ func First[T any](v []*T) *T {
 		return nil
 	}
 	return v[0]
+}
+
+// PrintArray prints all elements of any slice type.
+func PrintArray[T any](arr []T) {
+	for i, v := range arr {
+		fmt.Printf("Index %d: %v\n", i, v)
+	}
 }

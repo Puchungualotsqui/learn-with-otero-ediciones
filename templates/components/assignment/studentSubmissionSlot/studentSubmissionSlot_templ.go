@@ -52,9 +52,9 @@ func StudentSubmissionSlot(classId int, assignmentId int, s *dto.Submission) tem
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submissions/detail?id=" + s.Username)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/studentSubmissionSlot/studentSubmissionSlot.templ`, Line: 11, Col: 125}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/studentSubmissionSlot/studentSubmissionSlot.templ`, Line: 11, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

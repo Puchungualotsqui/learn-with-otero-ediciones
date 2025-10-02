@@ -133,6 +133,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			}
 			switch parts[1] {
 			case "asignaciones":
+
 				assignments := database.ListAssignmentsOfClass(store, classId)
 
 				professor, err := isProfessor(store, username)
@@ -143,37 +144,37 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 				fmt.Printf("👉 Checking assignments route: %+v\n", parts)
 
-				// Here only keep routes related to assignments CRUD
-				if len(parts) > 2 && parts[2] == "submission" {
-					fmt.Println("📌 Routed to HandleAssignmentSubmission (student view)")
+				if len(parts) > 2 && parts[3] == "submissions" {
+					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
+					handlers.HandleAssignmentSubmissions(store, w, r, professor)
+					return
+				}
+
+				if len(parts) > 4 && parts[3] == "submission" {
+					fmt.Println("📌 Routed to HandleAssignmentDetail")
 					handlers.HandleAssignmentSubmission(store, w, r, professor)
 					return
 				}
 
-				if len(parts) > 2 && parts[2] == "detail" {
-					fmt.Println("📌 Routed to HandleAssignmentDetail (student view)")
-					handlers.HandleAssignmentDetail(store, w, r, professor)
+				if len(parts) > 2 && parts[2] == "update" {
+					fmt.Println("📌 Routed to UpdateAssignment (professor)")
+					handlers.HandleAssignmentUpdate(store, storage, w, r, classId, professor)
 					return
 				}
 
-				// If professor wants to update/create assignment
-				if professor {
-					if len(parts) > 2 && parts[2] == "update" {
-						fmt.Println("📌 Routed to UpdateAssignment (professor)")
-						handlers.HandleAssignmentUpdate(store, storage, w, r, classId)
-						return
-					}
-					if len(parts) > 2 && parts[2] == "new" {
-						fmt.Println("📌 Routed to NewAssignment (professor)")
-						handlers.HandleAssignmentNew(store, storage, w, r, classId)
-						return
-					}
-					if len(parts) > 2 && parts[2] == "delete" {
-						fmt.Println("📌 Routed to DeleteAssignment (professor)")
-						handlers.HandleAssignmentDelete(store, storage, w, r, classId)
-						return
-					}
+				if len(parts) > 2 && parts[2] == "new" {
+					fmt.Println("📌 Routed to NewAssignment (professor)")
+					handlers.HandleAssignmentNew(store, storage, w, r, classId, professor)
+					return
+				}
 
+				if len(parts) > 2 && parts[2] == "delete" {
+					fmt.Println("📌 Routed to DeleteAssignment (professor)")
+					handlers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
+					return
+				}
+
+				if professor {
 					fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
 					var firstAssingment *dto.Assignment
 					if len(assignments) == 0 {
@@ -195,14 +196,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				}
 
 				var submissionDto []*dto.Submission
-
-				if len(assignments) > 0 {
-					submission, err := database.GetSubmissionByAssignmentAndUser(store, classId, assignments[0].Id, username)
-					if err == nil && submission != nil {
-						dtoVal := dto.SubmissionFromModel(submission)
-						submissionDto = append(submissionDto, dtoVal)
-					}
-				}
 
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
 				RenderWithLayout(w, r, assignmentContent.AssignmentContent(dto.AssignmentFromModels(assignments), professor, classId, submissionDto), body.Home)
@@ -231,13 +224,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					fmt.Println("📌 Routed to HandleAssignmentDetail (professor view)")
 					assignmentId, _ := strconv.Atoi(parts[2])
 					handlers.HandleSubmissionDetail(store, w, r, classId, assignmentId, professor)
-					return
-				}
-
-				if len(parts) > 5 && parts[3] == "submissions" && parts[5] == "grade" {
-					assignmentId, _ := strconv.Atoi(parts[2])
-					username := parts[4]
-					handlers.HandleSubmissionGrade(store, w, r, classId, assignmentId, username)
 					return
 				}
 

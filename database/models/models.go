@@ -31,7 +31,6 @@ type Assignment struct {
 }
 
 type Submission struct {
-	Id          int      `json:"id"`
 	Username    string   `json:"username"`
 	Description string   `json:"description"`
 	Content     []string `json:"content"`      // could be file path or text
