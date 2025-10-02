@@ -11,8 +11,11 @@ import (
 	"frontend/templates/body"
 	"frontend/templates/components/assignment/assignmentContent"
 	"frontend/templates/components/assignment/assignmentContentProfessor"
+	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentList"
+	"frontend/templates/components/assignment/submissionDetail"
+	"frontend/templates/components/assignment/submissionEditor"
 	"frontend/templates/components/home"
 	"log"
 	"net/http"
@@ -195,10 +198,28 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
-				var submissionDto []*dto.Submission
+				var submissionDto *dto.Submission = nil
+				var assignment *dto.Assignment = nil
+				var assignmentId int = 0
+				var assignmentTitle string = ""
+				if len(assignments) != 0 {
+					assignment = dto.AssignmentFromModel(assignments[0])
+					assignmentId = assignments[0].Id
+					assignmentTitle = assignment.Title
+				}
 
 				fmt.Println("📌 Routed to AssignmentContent (assignment management)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(dto.AssignmentFromModels(assignments), professor, classId, submissionDto), body.Home)
+				//dto.AssignmentFromModels(assignments), professor, classId, submissionDto
+				RenderWithLayout(w, r, assignmentContent.AssignmentContent(
+					assignmentList.AssignmentList(
+						classId,
+						dto.AssignmentFromModels(assignments), professor, "submission"),
+					submissionEditor.SubmissionEditor(
+						submissionDto,
+						classId,
+						assignmentId,
+						assignmentTitle,
+					)), body.Home)
 				return
 
 			case "entregas":
@@ -232,8 +253,36 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					fmt.Println("Error getting submissions")
 				}
 
-				fmt.Println("📌 Routed to EntregasContent (assignments + submissions)")
-				RenderWithLayout(w, r, assignmentContent.AssignmentContent(dto.AssignmentFromModels(assignments), professor, classId, dto.SubmissionFromModels(submissions)), body.Home)
+				if professor {
+					var assignment *dto.Assignment = nil
+					if len(assignments) != 0 {
+						assignment = dto.AssignmentFromModel(assignments[0])
+					}
+
+					RenderWithLayout(
+						w, r,
+						assignmentContent.AssignmentContent(
+							assignmentList.AssignmentList(
+								classId,
+								dto.AssignmentFromModels(assignments),
+								professor,
+								"submission",
+							),
+							assignmentDetailProfessor.AssignmentDetailProfessor(
+								classId,
+								assignment,
+								dto.SubmissionFromModels(submissions),
+							),
+							submissionDetail.SubmissionDetail(
+								nil,
+								"",
+								""),
+						),
+						body.Home,
+					)
+					return
+				}
+
 				return
 			}
 		}

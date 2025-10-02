@@ -8,15 +8,9 @@ package assignmentContent
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import (
-	"frontend/dto"
-	"frontend/templates/components/assignment/assignmentDetailProfessor"
-	"frontend/templates/components/assignment/assignmentList"
-	"frontend/templates/components/assignment/submissionDetail"
-	"frontend/templates/components/assignment/submissionEditor"
-)
+import ()
 
-func AssignmentContent(assignments []*dto.Assignment, professor bool, classId int, submission []*dto.Submission) templ.Component {
+func AssignmentContent(panels ...templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -37,48 +31,17 @@ func AssignmentContent(assignments []*dto.Assignment, professor bool, classId in
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col lg:flex-row flex-1 h-[calc(100vh-5rem)]\"><!-- Left: List of assignments (uses capped height + scroll on small screens) -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col lg:flex-row flex-1 h-[calc(100vh-5rem)]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = assignmentList.AssignmentList(classId, assignments, professor, "submission").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if professor {
-			if len(assignments) == 0 {
-				templ_7745c5c3_Err = assignmentDetailProfessor.AssignmentDetailProfessor(classId, nil, submission).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				templ_7745c5c3_Err = assignmentDetailProfessor.AssignmentDetailProfessor(classId, assignments[0], submission).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " ")
+		for _, panel := range panels {
+			templ_7745c5c3_Err = panel.Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = submissionDetail.SubmissionDetail(nil, "", "").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			if len(assignments) == 0 {
-				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(nil, 0, 0, "").Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				templ_7745c5c3_Err = submissionEditor.SubmissionEditor(submission[0], classId, assignments[0].Id, assignments[0].Title).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

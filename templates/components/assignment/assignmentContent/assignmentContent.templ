@@ -1,35 +1,14 @@
 package assignmentContent
 
 import (
-	"frontend/dto"
-	"frontend/templates/components/assignment/assignmentList"
-	"frontend/templates/components/assignment/submissionEditor"
-	"frontend/templates/components/assignment/assignmentDetailProfessor"
-	"frontend/templates/components/assignment/submissionDetail"
+
 )
 
-templ AssignmentContent(assignments []*dto.Assignment, professor bool, classId int, submission []*dto.Submission) {
+templ AssignmentContent(panels ...templ.Component) {
 	<div class="flex flex-col lg:flex-row flex-1 h-[calc(100vh-5rem)]">
 
-
-        <!-- Left: List of assignments (uses capped height + scroll on small screens) -->
-        @assignmentList.AssignmentList(classId, assignments, professor, "submission")
-
-        if professor {
-				if len(assignments) == 0 {
-					@assignmentDetailProfessor.AssignmentDetailProfessor(classId, nil, submission)
-				} else {
-					@assignmentDetailProfessor.AssignmentDetailProfessor(classId, assignments[0], submission)
-				}
-
-				@submissionDetail.SubmissionDetail(nil, "", "")
-
-        } else {
-	        if len(assignments) == 0 {
-          		@submissionEditor.SubmissionEditor(nil, 0, 0, "")
-	        } else {
-	            @submissionEditor.SubmissionEditor(submission[0], classId, assignments[0].Id, assignments[0].Title)
-	        }
-        }
+		for _, panel := range panels {
+			@panel
+		}
     </div>
 }
