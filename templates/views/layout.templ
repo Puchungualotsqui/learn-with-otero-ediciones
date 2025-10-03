@@ -37,6 +37,7 @@ function fileManager() {
     files: {},
 
     initExisting(urls) {
+      if (!urls) return;
       urls.forEach(url => {
         const name = url.split('/').pop();
         this.files[name] = url;

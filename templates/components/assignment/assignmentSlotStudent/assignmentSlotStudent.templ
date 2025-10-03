@@ -35,7 +35,7 @@ templ AssignmentSlotStudent(classId int, a *dto.Assignment, username string) {
 		}
 	}}
 
-	<li>
+	<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
 		<button
 			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/submission/" + username}
 			hx-target="#assignment-detail"

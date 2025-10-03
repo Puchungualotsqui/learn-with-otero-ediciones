@@ -10,6 +10,7 @@ import (
 
 func CreateAssignment(s *Store, classId int, title, description, dueDate string) (*models.Assignment, error) {
 	var a *models.Assignment
+	var id64 uint64
 
 	err := s.db.Update(func(tx *bbolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(Buckets["assignments"])
@@ -18,7 +19,7 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 		}
 
 		// Generate a unique ID
-		id64, _ := b.NextSequence()
+		id64, _ = b.NextSequence()
 		a = &models.Assignment{
 			Id:          int(id64),
 			Title:       title,
@@ -35,11 +36,6 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 		// Key format: classId:assignmentId
 		key := fmt.Sprintf("%d:%d", classId, a.Id)
 
-		// 🔎 Debug logs
-		fmt.Printf("🆕 [CreateAssignment] classId=%d assignmentId=%d\n", classId, a.Id)
-		fmt.Printf("🆕 [CreateAssignment] key=%q\n", key)
-		fmt.Printf("🆕 [CreateAssignment] value=%s\n", string(data))
-
 		// Save to DB
 		return b.Put([]byte(key), data)
 	})
@@ -50,6 +46,33 @@ func CreateAssignment(s *Store, classId int, title, description, dueDate string)
 	}
 
 	fmt.Printf("✅ [CreateAssignment] Stored assignment %+v\n", a)
+
+	class, err := GetWithPrefix[models.Class](s, Buckets["classes"], fmt.Sprintf("%d", classId))
+	if err != nil {
+		fmt.Printf("X Error getting class: %v\n", err)
+		return nil, err
+	}
+
+	for _, username := range class.Users {
+		user, err := Get[models.User](s, Buckets["users"], username)
+		if err != nil {
+			fmt.Printf("X Error getting user: %v\n", err)
+			err = nil
+			continue
+		}
+
+		if user.Role != "student" {
+			continue
+		}
+
+		_, err = CreateSubmission(s, classId, int(id64), username, "", []string{}, "", "")
+		if err != nil {
+			fmt.Printf("X Error creating user submission: %v\n", err)
+			err = nil
+			continue
+		}
+	}
+
 	return a, nil
 }
 

@@ -28,7 +28,7 @@ templ AssignmentEditor(a *dto.Assignment, classId int) {
                 </p>
             } else {
           		<form
-		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/update?id=" + strconv.Itoa(a.Id)}
+		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/update"}
 		  hx-target="#assignment-detail"
 		  hx-swap="innerHTML"
 		  enctype="multipart/form-data"

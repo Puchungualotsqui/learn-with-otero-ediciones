@@ -170,6 +170,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
+				if len(parts) == 5 && parts[3] == "submission" && parts[4] == "update" {
+					fmt.Println("📌 Routed to HandleAssignmentSubmissionsUpdate")
+					handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username)
+					return
+				}
+
 				if len(parts) == 5 && parts[3] == "submission" {
 					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
 					handlers.HandleAssignmentSubmission(store, w, r, username, professor)

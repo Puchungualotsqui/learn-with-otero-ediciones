@@ -25,9 +25,9 @@ templ SubmissionEditor(s *dto.Submission, classId, assignmentId int, assignmentT
 				<p class="text-gray-500 text-center">Selecciona una asignación.</p>
 			} else {
 				<form
-					hx-post={"/" + strconv.Itoa(classId) + "/entregas/" + strconv.Itoa(assignmentId) + "/submit?id=" + s.Username}
-					hx-target="#assignment-detail"
-					hx-swap="innerHTML"
+					hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/update"}
+					hx-target={"#assignment-slot-" + strconv.Itoa(assignmentId)}
+					hx-swap="outerHTML"
 					enctype="multipart/form-data"
 					x-data="fileManager()"
 					x-init={"initExisting(" + filesJSON + ")"}

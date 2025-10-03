@@ -68,7 +68,7 @@ func Init(path string) (*Store, error) {
 			InternalName: "matematicas",
 			Name:         "Matemáticas",
 		}
-		_ = CreateSubject(store, subject.InternalName, subject.Name)
+		CreateSubject(store, subject.InternalName, subject.Name)
 
 		class, _ := CreateClass(store, "Matemáticas", "Clase con el profe Hugo", "matematicas")
 
@@ -76,10 +76,7 @@ func Init(path string) (*Store, error) {
 		AddUserToClass(store, class.Id, "student1")
 
 		// Create an assignment
-		a, _ := CreateAssignment(store, class.Id, "Álgebra I", "Resolver los ejercicios de la página 42", time.Now().AddDate(0, 0, 7).Format("02/01/2006"))
-
-		// Create a submission
-		_, _ = CreateSubmission(store, class.Id, a.Id, "student1", "that's my submission content", []string{"solucion.pdf"}, time.Now().Format(time.RFC3339), "")
+		CreateAssignment(store, class.Id, "Álgebra I", "Resolver los ejercicios de la página 42", time.Now().AddDate(0, 0, 7).Format("02/01/2006"))
 	}
 
 	log.Println("✅ Database ready at", path)
