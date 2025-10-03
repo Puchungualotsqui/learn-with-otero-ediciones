@@ -18,7 +18,7 @@ templ SubmissionEditor(s *dto.Submission, classId, assignmentId int, assignmentT
 		}
 	}}
 
-	<section id="assignment-detail"
+	<section id="submission-detail"
 		class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col lg:w-1/3">
 		<div class="flex-1 overflow-y-auto min-h-0">
 			if s == nil {
@@ -26,9 +26,8 @@ templ SubmissionEditor(s *dto.Submission, classId, assignmentId int, assignmentT
 			} else {
 				<form
 					hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/update"}
-					hx-target={"#assignment-slot-" + strconv.Itoa(assignmentId)}
-					hx-swap="outerHTML"
 					enctype="multipart/form-data"
+					hx-swap="none"
 					x-data="fileManager()"
 					x-init={"initExisting(" + filesJSON + ")"}
 					class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"

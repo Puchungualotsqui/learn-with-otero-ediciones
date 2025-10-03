@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-templ AssignmentSlotStudent(classId int, a *dto.Assignment, username string) {
+templ AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade string) {
 	{{
 		// Bolivia timezone
 		loc, err := time.LoadLocation("America/La_Paz")
@@ -20,9 +20,11 @@ templ AssignmentSlotStudent(classId int, a *dto.Assignment, username string) {
 		if err != nil {
 			fmt.Println("Error parsing in location")
 		}
-		now := time.Now().In(loc)
 
+		now := time.Now().In(loc)
 		daysLeft := int(due.Sub(now).Hours() / 24)
+
+		past := now.After(due)
 
 		var textColor string
 		switch {
@@ -33,17 +35,42 @@ templ AssignmentSlotStudent(classId int, a *dto.Assignment, username string) {
 		default:
 			textColor = "text-gray-700"
 		}
+
+		// Grade badge color
+		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"
+		if grade != "" {
+			if g, err := strconv.Atoi(grade); err == nil {
+				switch {
+				case g >= 90:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+				case g >= 70:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+				case g >= 50:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+				default:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+				}
+			}
+		}
 	}}
 
 	<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
 		<button
 			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/submission/" + username}
-			hx-target="#assignment-detail"
+			hx-target="#submission-detail"
 			hx-swap="outerHTML"
 			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}>
 			<div class="flex justify-between items-center">
 				<span>{ a.Title }</span>
-				<span class="text-xs">{ a.DueDate }</span>
+				if past {
+					if grade == "" {
+						<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
+					} else {
+						<span class={gradeClass}>{ grade }</span>
+					}
+				} else {
+					<span class="text-xs">{ a.DueDate }</span>
+				}
 			</div>
 		</button>
 	</li>

@@ -15,7 +15,7 @@ import (
 	"strconv"
 )
 
-func AssignmentList(classId int, assignments []*dto.Assignment, professor, deleteButton bool, username string) templ.Component {
+func AssignmentList(classId int, assignments []*dto.Assignment, grades []string, professor, deleteButton bool, username string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -54,7 +54,7 @@ func AssignmentList(classId int, assignments []*dto.Assignment, professor, delet
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"innerHTML\">+ Nueva</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"outerHTML\">+ Nueva</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -69,14 +69,14 @@ func AssignmentList(classId int, assignments []*dto.Assignment, professor, delet
 				return templ_7745c5c3_Err
 			}
 		} else {
-			for _, a := range assignments {
+			for i, a := range assignments {
 				if professor {
 					templ_7745c5c3_Err = assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(classId, a, username).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(classId, a, username, grades[i]).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

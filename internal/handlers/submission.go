@@ -11,14 +11,17 @@ import (
 	"frontend/templates/body"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentList"
-	"frontend/templates/components/assignment/assignmentSlotStudent"
 	"frontend/templates/components/assignment/panelsContent"
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 	"frontend/templates/components/assignment/submissionDetail"
 	"frontend/templates/components/assignment/submissionEditor"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/a-h/templ"
 )
 
 func HandleSubmissionDefault(
@@ -54,6 +57,7 @@ func HandleSubmissionDefault(
 			assignmentList.AssignmentList(
 				classId,
 				dto.AssignmentFromModels(assignments),
+				[]string{},
 				professor,
 				false,
 				username,
@@ -66,7 +70,8 @@ func HandleSubmissionDefault(
 			submissionDetail.SubmissionDetail(
 				nil,
 				"",
-				""),
+				"",
+				professor),
 		),
 		body.Home,
 	)
@@ -134,7 +139,7 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 
 	if professor {
 		fmt.Println("  → Rendering professor detail")
-		submissionDetail.SubmissionDetail(s, parts[0], parts[2]).Render(r.Context(), w)
+		submissionDetail.SubmissionDetail(s, parts[0], parts[2], professor).Render(r.Context(), w)
 		fmt.Println("  ✔ Render complete")
 		return
 	}
@@ -155,7 +160,26 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 			return
 		}
 
-		submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title).Render(r.Context(), w)
+		loc, err := time.LoadLocation("America/La_Paz")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		deadline, err := time.ParseInLocation("02/01/2006", assignment.DueDate, loc)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		now := time.Now().In(loc)
+
+		var detailWindow templ.Component
+		if now.Before(deadline) || now.Equal(deadline) {
+			detailWindow = submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title)
+		} else {
+			detailWindow = submissionDetail.SubmissionDetail(s, parts[0], parts[2], false)
+		}
+
+		detailWindow.Render(r.Context(), w)
 		fmt.Println("  ✔ Render complete")
 		return
 	}
@@ -193,8 +217,13 @@ func HandleSubmissionGrade(store *database.Store, w http.ResponseWriter, r *http
 }
 
 // HandleSubmissionUpdate updates a submission based on form data (HTMX-friendly)
-func HandleSubmissionUpdate(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int, assignmentId, username string) {
+func HandleSubmissionUpdate(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request, classId int, assignmentId, username string, professor bool) {
 	fmt.Println("📥 [HandleSubmissionUpdate] Request received")
+
+	if professor {
+		http.Error(w, "Not allowed", http.StatusBadRequest)
+		return
+	}
 
 	assignmentIdInt, err := strconv.Atoi(assignmentId)
 	if err != nil {
@@ -306,9 +335,4 @@ func HandleSubmissionUpdate(store *database.Store, storage *storage.B2Storage, w
 		return
 	}
 	fmt.Println("✅ Submission saved successfully")
-
-	fmt.Println("→ Rendering Student Assignment Slot")
-	assignmentInfo, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], assignmentId, fmt.Sprintf("%d", classId))
-	assignmentSlotStudent.AssignmentSlotStudent(classId, dto.AssignmentFromModel(assignmentInfo), username).Render(r.Context(), w)
-	fmt.Println("✔ Render complete")
 }

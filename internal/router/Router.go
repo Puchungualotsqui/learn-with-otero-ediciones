@@ -140,12 +140,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
-				if len(parts) == 3 && parts[2] == "update" {
-					fmt.Println("📌 Routed to UpdateAssignment (professor)")
-					handlers.HandleAssignmentUpdate(store, storage, w, r, classId, professor)
-					return
-				}
-
 				if len(parts) == 3 && parts[2] == "new" {
 					fmt.Println("📌 Routed to NewAssignment (professor)")
 					handlers.HandleAssignmentNew(store, storage, w, r, classId, professor)
@@ -155,6 +149,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				if len(parts) == 3 && parts[2] == "delete" {
 					fmt.Println("📌 Routed to DeleteAssignment (professor)")
 					handlers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
+					return
+				}
+
+				if len(parts) == 4 && parts[3] == "update" {
+					fmt.Println("📌 Routed to UpdateAssignment (professor)")
+					handlers.HandleAssignmentUpdate(store, storage, w, r, classId, parts[2], professor)
 					return
 				}
 
@@ -172,7 +172,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 				if len(parts) == 5 && parts[3] == "submission" && parts[4] == "update" {
 					fmt.Println("📌 Routed to HandleAssignmentSubmissionsUpdate")
-					handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username)
+					handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username, professor)
 					return
 				}
 

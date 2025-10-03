@@ -19,8 +19,7 @@ templ AssignmentEditor(a *dto.Assignment, classId int) {
 	}}
 
 	<section id="assignment-detail"
-      class="flex-1 basis-0 bg-white border border-gray-200 shadow-sm rounded-lg
-             flex flex-col min-h-0 lg:w-2/3 overflow-y-auto">
+      class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col lg:w-1/3">
         <div class="flex-1 overflow-y-auto min-h-0">
             if a == nil {
                 <p class="text-gray-500 text-center">
@@ -28,8 +27,8 @@ templ AssignmentEditor(a *dto.Assignment, classId int) {
                 </p>
             } else {
           		<form
-		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/update"}
-		  hx-target="#assignment-detail"
+		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/update"}
+		  hx-target={"#assignment-slot-" + strconv.Itoa(a.Id)}
 		  hx-swap="innerHTML"
 		  enctype="multipart/form-data"
 		  x-data="fileManager()"
