@@ -9,9 +9,10 @@ import (
 
 templ AssignmentEditor(a *dto.Assignment, classId int) {
 	{{
-		// Marshal assignment content ([]string) to JSON
-		files := a.Content
-	    if files == nil {
+		var files []string
+	    if a != nil {
+	        files = a.Content
+	    } else {
 	        files = []string{}
 	    }
 	    filesJSON := string(helper.Must(json.Marshal(files)))

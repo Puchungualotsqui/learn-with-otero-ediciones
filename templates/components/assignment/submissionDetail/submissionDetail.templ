@@ -85,7 +85,7 @@ templ SubmissionDetail(s *dto.Submission, classId, assignmentId string) {
 
 
 							<form
-							    hx-post={"/" + classId + "/entregas/" + assignmentId + "/submissions/" + s.Username + "/grade"}
+							    hx-post={"/" + classId + "/asignaciones/" + assignmentId + "/submission/" + s.Username + "/grade"}
 							    hx-target={"#submission-slot-" + s.Username}
 							    hx-swap="outerHTML"
 							>

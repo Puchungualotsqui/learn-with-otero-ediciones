@@ -58,17 +58,25 @@ func GetSubmission(s *Store, classId, assignmentId int, username string) (*model
 }
 
 // GradeSubmission → updates the Grade field
-func GradeSubmission(s *Store, classId, assignmentId int, username, grade string) error {
+func GradeSubmission(s *Store, classId, assignmentId int, username, grade string) (*models.Submission, error) {
+	_, err := strconv.Atoi(grade)
+	if err != nil {
+		fmt.Println("Invalid grade: %w", err)
+		return nil, err
+	}
+
 	key := fmt.Sprintf("%d:%d:%s", classId, assignmentId, username)
 
 	sub, err := Get[models.Submission](s, Buckets["submissions"], key)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	sub.Grade = grade
 
-	return Save(s, Buckets["submissions"], key, sub)
+	err = Save(s, Buckets["submissions"], key, sub)
+
+	return sub, err
 }
 
 func GetSubmissionsByAssignment(s *Store, classId, assignmentId int) ([]*models.Submission, error) {

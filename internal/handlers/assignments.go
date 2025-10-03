@@ -9,12 +9,10 @@ import (
 	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
-	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
 	"frontend/templates/components/assignment/panelsContent"
-	"frontend/templates/components/assignment/submissionDetail"
 	"frontend/templates/components/assignment/submissionEditor"
 	"net/http"
 	"strconv"
@@ -25,13 +23,15 @@ import (
 )
 
 func HandleAssignmentDefault(
+	store *database.Store,
 	w http.ResponseWriter,
 	r *http.Request,
-	assignments []*models.Assignment,
 	classId int,
 	professor bool,
 	username string,
 ) {
+	assignments := database.ListAssignmentsOfClass(store, classId)
+
 	// Convert models to DTO once
 	assignmentsDTO := dto.AssignmentFromModels(assignments)
 
@@ -75,97 +75,10 @@ func HandleAssignmentDefault(
 	)
 }
 
-func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
-	path := strings.Trim(r.URL.Path, "/")
-	parts := strings.Split(path, "/")
-	helper.PrintArray(parts)
-
-	submissions, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
-	if err != nil {
-		fmt.Println("Error fetching submissions: %w", err)
-		http.Error(w, "Server database error", http.StatusInternalServerError)
-		return
-	}
-
-	if professor {
-		submissionsDto := dto.SubmissionFromModels(submissions)
-
-		classIdInt, err := strconv.Atoi(parts[0])
-		if err != nil {
-			fmt.Println("! Invalid class Id:", parts[0])
-			http.Error(w, "Invalid class Id", http.StatusBadRequest)
-			return
-		}
-
-		assignment, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], parts[2], parts[0])
-		if err != nil {
-			fmt.Println("Error fetching assignment: %w", err)
-			http.Error(w, "Server database error", http.StatusInternalServerError)
-		}
-		assignmentDto := dto.AssignmentFromModel(assignment)
-
-		fmt.Println("→ Rendering professor submissions list")
-		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignmentDto, submissionsDto).Render(r.Context(), w)
-		fmt.Println("✔ Render complete")
-		return
-	}
-}
-
-func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, username string, professor bool) {
-	path := strings.Trim(r.URL.Path, "/")
-	parts := strings.Split(path, "/")
-
-	classIdInt, err := strconv.Atoi(parts[0])
-	if err != nil {
-		fmt.Println("! Invalid class Id:", parts[0])
-		http.Error(w, "Invalid class Id", http.StatusBadRequest)
-		return
-	}
-
+func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *http.Request, classId int, professor bool) {
 	fmt.Println("📥 [HandleAssignmentDetail] Request received")
-	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, parts[0], professor)
+	assignments := database.ListAssignmentsOfClass(store, classId)
 
-	submission, err := database.GetWithPrefix[models.Submission](store, database.Buckets["submissions"], parts[4], parts[0], parts[2])
-	if err != nil {
-		fmt.Println("Error fetching submission: %w", err)
-		http.Error(w, "Server database error", http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("  ✓ Assignment loaded: %+v\n", submission)
-
-	s := dto.SubmissionFromModel(submission)
-
-	if professor {
-		fmt.Println("  → Rendering professor detail")
-		submissionDetail.SubmissionDetail(s, parts[0], parts[2]).Render(r.Context(), w)
-		fmt.Println("  ✔ Render complete")
-		return
-	}
-
-	if username == parts[4] {
-		fmt.Println("  → Rendering student detail")
-		assignment, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], parts[2], parts[0])
-		if err != nil {
-			fmt.Println("Error fetching assignment info: %w", err)
-			http.Error(w, "Server database error", http.StatusInternalServerError)
-			return
-		}
-
-		arguments, err := helper.StringsToInts(parts[0], parts[2])
-		if err != nil {
-			fmt.Println("Invalid arguments: %w", err)
-			http.Error(w, "Invalid arguments", http.StatusBadRequest)
-			return
-		}
-
-		submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title).Render(r.Context(), w)
-		fmt.Println("  ✔ Render complete")
-		return
-	}
-}
-
-func HandleAssignmentDetail(w http.ResponseWriter, r *http.Request, assignments []*models.Assignment, professor bool) {
-	fmt.Println("📥 [HandleAssignmentDetail] Request received")
 	var assignment *models.Assignment
 	if len(assignments) > 0 {
 		assignment = assignments[0]
