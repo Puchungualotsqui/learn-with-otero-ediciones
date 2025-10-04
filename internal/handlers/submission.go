@@ -9,6 +9,7 @@ import (
 	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
+	"frontend/templates/components/assignment/assignmentDetail"
 	"frontend/templates/components/assignment/assignmentDetailProfessor"
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/panelsContent"
@@ -40,17 +41,6 @@ func HandleSubmissionDefault(
 
 	assignments := database.ListAssignmentsOfClass(store, classId)
 
-	var assignment *dto.Assignment = nil
-	var submissions []*models.Submission = []*models.Submission{}
-	if len(assignments) != 0 {
-		var err error
-		submissions, err = database.GetSubmissionsByAssignment(store, classId, assignments[0].Id)
-		if err != nil {
-			fmt.Println("Error getting submissions")
-		}
-		assignment = dto.AssignmentFromModel(assignments[0])
-	}
-
 	render.RenderWithLayout(
 		w, r,
 		panelsContent.PanelsContent(
@@ -64,8 +54,8 @@ func HandleSubmissionDefault(
 			),
 			assignmentDetailProfessor.AssignmentDetailProfessor(
 				classId,
-				assignment,
-				dto.SubmissionFromModels(submissions),
+				nil,
+				nil,
 			),
 			submissionDetail.SubmissionDetail(
 				nil,
@@ -124,7 +114,7 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 		return
 	}
 
-	fmt.Println("📥 [HandleAssignmentDetail] Request received")
+	fmt.Println("📥 [HandleAssignmentSubmission] Request received")
 	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, parts[0], professor)
 
 	submission, err := database.GetWithPrefix[models.Submission](store, database.Buckets["submissions"], parts[4], parts[0], parts[2])
@@ -178,8 +168,10 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 		} else {
 			detailWindow = submissionDetail.SubmissionDetail(s, parts[0], parts[2], false)
 		}
+		assignmentDetailWindow := assignmentDetail.AssignmentDetail(dto.AssignmentFromModel(assignment), false)
 
 		detailWindow.Render(r.Context(), w)
+		assignmentDetailWindow.Render(r.Context(), w)
 		fmt.Println("  ✔ Render complete")
 		return
 	}

@@ -6,25 +6,41 @@ import (
 )
 
 templ StudentSubmissionSlot(classId int, assignmentId int, s *dto.Submission) {
-	<a
-		id={"submission-slot-" + s.Username}
-	    hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username}
-	    hx-target="#submission-detail"
-	    hx-swap="outerHTML"
-	    class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer"
-	>
-	    <!-- Student info -->
-	        <span class="text-gray-900">{ s.Username }</span>
-
-	    <!-- Grade badge -->
-	    if s.Grade != "" {
-		    <span class="text-base font-medium text-gray-900">
-		        { s.Grade }
-		    </span>
-		} else {
-		    <span class="text-base text-gray-500">
-		        —
-		    </span>
+	{{
+		// Grade badge color (same logic pattern)
+		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"
+		if s.Grade != "" {
+			if g, err := strconv.Atoi(s.Grade); err == nil {
+				switch {
+				case g >= 90:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+				case g >= 70:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+				case g >= 50:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+				default:
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+				}
+			}
 		}
-	</a>
+	}}
+
+	<li id={"submission-slot-" + s.Username} class="bg-gray-100 mb-2 rounded-md shadow-sm">
+		<button
+			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username}
+			hx-target="#submission-detail"
+			hx-swap="outerHTML"
+			class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-150 transition cursor-pointer"
+		>
+			<div class="flex justify-between items-center">
+				<span class="truncate text-gray-900">{ s.Username }</span>
+
+				if s.Grade == "" {
+					<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
+				} else {
+					<span class={gradeClass}>{ s.Grade }</span>
+				}
+			</div>
+		</button>
+	</li>
 }

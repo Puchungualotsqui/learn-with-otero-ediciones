@@ -39,8 +39,7 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) 
 		if deleteButton {
 			subUrl = "/details"
 		}
-		if a == nil {
-		} else {
+		if a != nil {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<li id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -48,52 +47,52 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) 
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("assignment-slot-" + strconv.Itoa(a.Id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 18, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 17, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><div class=\"flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer\"><button hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"bg-gray-100 mb-2 rounded-md shadow-sm hover:bg-gray-150 transition\"><div class=\"flex items-center justify-between px-3 py-2\"><!-- Main button (fills most of the card) --><button hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + subUrl)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 21, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 23, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"outerHTML\" class=\"flex-1 text-left cursor-pointer\"><div class=\"flex justify-between items-center\"><span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"#assignment-detail\" hx-swap=\"outerHTML\" class=\"flex-1 flex justify-between items-center text-left text-gray-900 text-sm font-medium cursor-pointer\"><span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(a.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 26, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 28, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs text-gray-600\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(a.DueDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 27, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 29, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></div></button> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></button><!-- Delete button -->")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -105,13 +104,13 @@ func AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) 
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 32, Col: 97}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotProfessor/assignmentSlotProfessor.templ`, Line: 35, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-target=\"closest li\" hx-swap=\"outerHTML\" hx-confirm=\"¿Seguro que quieres eliminar esta asignación?\" class=\"ml-2 text-red-600 hover:text-red-800 text-gray-700 cursor-pointer\">✕</button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-target=\"closest li\" hx-swap=\"outerHTML\" hx-confirm=\"¿Seguro que quieres eliminar esta asignación?\" class=\"ml-2 text-red-600 hover:text-red-800 text-sm font-medium\">✕</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

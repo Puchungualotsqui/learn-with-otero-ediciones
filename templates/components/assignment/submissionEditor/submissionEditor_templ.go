@@ -80,38 +80,25 @@ func SubmissionEditor(s *dto.Submission, classId, assignmentId int, assignmentTi
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"flex flex-col flex-1 min-h-0 overflow-y-auto px-4\"><!-- Assignment title --><div class=\"mb-6\"><h3 class=\"text-xl font-semibold text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"flex flex-col flex-1 min-h-0 overflow-y-auto px-4\"><!-- Assignment title --><div class=\"mb-6\"><h3 class=\"text-xl font-semibold text-gray-900\">Entrega</h3></div><!-- Description --><div class=\"flex-1 flex flex-col mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Descripción</label> <textarea name=\"description\" class=\"flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(assignmentTitle)
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(s.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionEditor/submissionEditor.templ`, Line: 38, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionEditor/submissionEditor.templ`, Line: 46, Col: 170}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3></div><!-- Description --><div class=\"flex-1 flex flex-col mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Descripción</label> <textarea name=\"description\" class=\"flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(s.Description)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionEditor/submissionEditor.templ`, Line: 46, Col: 170}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</textarea></div><!-- Files section --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Archivos o enlaces</label><ul class=\"space-y-2 mb-4\"><template x-for=\"(value, name) in files\" :key=\"name\"><li class=\"flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200\"><!-- Already uploaded (URL) --><template x-if=\"typeof value === 'string'\"><div class=\"flex-1 flex justify-between gap-2\"><a :href=\"value\" target=\"_blank\" class=\"truncate text-red-600 hover:underline\" x-text=\"name\"></a> <input type=\"hidden\" name=\"keep[]\" :value=\"value\"></div></template><!-- Pending upload (File) --><template x-if=\"value instanceof File\"><span class=\"truncate text-gray-800\" x-text=\"name\"></span></template><!-- Remove button --><button type=\"button\" @click=\"remove(name)\" class=\"ml-2 text-red-600 hover:text-red-800 cursor-pointer\">✕</button></li></template></ul></div><!-- Dropzone --><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.picker.click()\"><p>Arrastra archivos aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"picker\" multiple class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><div class=\"mt-auto pt-6 flex justify-end\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white px-6\">Guardar</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</textarea></div><!-- Files section --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Archivos o enlaces</label><ul class=\"space-y-2 mb-4\"><template x-for=\"(value, name) in files\" :key=\"name\"><li class=\"flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200\"><!-- Already uploaded (URL) --><template x-if=\"typeof value === 'string'\"><div class=\"flex-1 flex justify-between gap-2\"><a :href=\"value\" target=\"_blank\" class=\"truncate text-red-600 hover:underline\" x-text=\"name\"></a> <input type=\"hidden\" name=\"keep[]\" :value=\"value\"></div></template><!-- Pending upload (File) --><template x-if=\"value instanceof File\"><span class=\"truncate text-gray-800\" x-text=\"name\"></span></template><!-- Remove button --><button type=\"button\" @click=\"remove(name)\" class=\"ml-2 text-red-600 hover:text-red-800 cursor-pointer\">✕</button></li></template></ul></div><!-- Dropzone --><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.picker.click()\"><p>Arrastra archivos aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"picker\" multiple class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><div class=\"mt-auto pt-6 flex justify-end\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white px-6\">Guardar</button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

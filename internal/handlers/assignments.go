@@ -9,6 +9,7 @@ import (
 	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
+	"frontend/templates/components/assignment/assignmentDetail"
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
@@ -48,15 +49,15 @@ func HandleAssignmentDefault(
 	}
 
 	// Right panel differs by role
-	var right templ.Component
-	var left templ.Component
+	var panels []templ.Component
 	var grades []string = []string{}
 	if professor {
-		fmt.Println("📌 Routed to AssignmentContentProfessor (assignment management)")
-		right = assignmentEditor.AssignmentEditor(firstDTO, classId)
-		left = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels = make([]templ.Component, 2)
+		panels[0] = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels[1] = assignmentEditor.AssignmentEditor(firstDTO, classId)
+
 	} else {
-		fmt.Println("📌 Routed to AssignmentContent (assignment management)")
+		panels = make([]templ.Component, 3)
 		grades = make([]string, len(assignmentsDTO))
 		classIdString := strconv.Itoa(classId)
 
@@ -77,16 +78,17 @@ func HandleAssignmentDefault(
 			err = nil
 			fmt.Println("Grade: ", grades[i])
 		}
-		right = submissionEditor.SubmissionEditor(nil, classId, firstId, firstTitle)
-		left = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels[0] = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels[1] = assignmentDetail.AssignmentDetail(nil, true)
+		panels[2] = submissionEditor.SubmissionEditor(nil, classId, firstId, firstTitle)
+
 	}
 
 	// Render once
 	render.RenderWithLayout(
 		w, r,
 		panelsContent.PanelsContent(
-			left,
-			right,
+			panels...,
 		),
 		body.Home,
 	)

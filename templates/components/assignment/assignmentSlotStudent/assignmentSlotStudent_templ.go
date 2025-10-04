@@ -93,11 +93,11 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"bg-gray-100 mb-2 rounded-md shadow-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 = []any{textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}
+		var templ_7745c5c3_Var3 = []any{textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-150 transition cursor-pointer"}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var3...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

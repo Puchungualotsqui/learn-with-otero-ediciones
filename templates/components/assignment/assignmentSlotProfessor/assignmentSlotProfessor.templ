@@ -12,29 +12,33 @@ templ AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool)
 			subUrl = "/details"
 		}
 	}}
-	if a == nil {
-
-	} else {
-		<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
-			<div class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium bg-gray-50 hover:bg-gray-100 transition text-gray-700 cursor-pointer">
+	if a != nil {
+		<li
+			id={"assignment-slot-" + strconv.Itoa(a.Id)}
+			class="bg-gray-100 mb-2 rounded-md shadow-sm hover:bg-gray-150 transition"
+		>
+			<div class="flex items-center justify-between px-3 py-2">
+				<!-- Main button (fills most of the card) -->
 				<button
 					hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + subUrl}
 					hx-target="#assignment-detail"
 					hx-swap="outerHTML"
-					class="flex-1 text-left cursor-pointer">
-					<div class="flex justify-between items-center">
-						<span>{ a.Title }</span>
-						<span class="text-xs">{ a.DueDate }</span>
-					</div>
+					class="flex-1 flex justify-between items-center text-left text-gray-900 text-sm font-medium cursor-pointer"
+				>
+					<span>{ a.Title }</span>
+					<span class="text-xs text-gray-600">{ a.DueDate }</span>
 				</button>
+
+				<!-- Delete button -->
 				if deleteButton {
 					<button
-					    hx-delete={"/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id)}
-					    hx-target="closest li"
-					    hx-swap="outerHTML"
-					    hx-confirm="¿Seguro que quieres eliminar esta asignación?"
-					    class="ml-2 text-red-600 hover:text-red-800 text-gray-700 cursor-pointer">
-					    ✕
+						hx-delete={"/" + strconv.Itoa(classId) + "/asignaciones/delete?id=" + strconv.Itoa(a.Id)}
+						hx-target="closest li"
+						hx-swap="outerHTML"
+						hx-confirm="¿Seguro que quieres eliminar esta asignación?"
+						class="ml-2 text-red-600 hover:text-red-800 text-sm font-medium"
+					>
+						✕
 					</button>
 				}
 			</div>

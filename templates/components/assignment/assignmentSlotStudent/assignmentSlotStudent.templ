@@ -54,12 +54,12 @@ templ AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade stri
 		}
 	}}
 
-	<li id={"assignment-slot-" + strconv.Itoa(a.Id)}>
+	<li id={"assignment-slot-" + strconv.Itoa(a.Id)} class="bg-gray-100 mb-2 rounded-md shadow-sm">
 		<button
 			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/submission/" + username}
 			hx-target="#submission-detail"
 			hx-swap="outerHTML"
-			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition cursor-pointer"}>
+			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-150 transition cursor-pointer"}>
 			<div class="flex justify-between items-center">
 				<span>{ a.Title }</span>
 				if past {

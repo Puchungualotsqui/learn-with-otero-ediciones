@@ -1,0 +1,59 @@
+package assignmentDetail
+
+import (
+	"frontend/dto"
+	"strings"
+)
+
+templ AssignmentDetail(a *dto.Assignment, firstLoad bool) {
+	<section id="assignment-detail"
+		if !firstLoad {hx-swap-oob="true"}
+    class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg
+            p-4 flex flex-col lg:w-1/3">
+			if a == nil {
+				<p class="text-gray-500 text-center">Selecciona una asignación para ver detalles.</p>
+			} else {
+				<div class="flex flex-col h-full min-h-0">
+					<!-- Header -->
+					<div class="mb-6 shrink-0">
+						<h3 class="text-xl font-semibold text-gray-900">
+							{ a.Title }
+						</h3>
+					</div>
+
+					<!-- Scrollable content -->
+					<div class="flex-1 overflow-y-auto min-h-0 pr-1">
+						if a.Description == "" && len(a.Content) == 0 {
+							<p class="text-gray-500 text-center">No se han proveido detalles.</p>
+						} else {
+						<!-- Description -->
+						if a.Description != "" {
+							<div class="mb-6">
+								<p class="text-gray-700 whitespace-pre-line leading-relaxed">
+									{ a.Description }
+								</p>
+							</div>
+						}
+
+						<!-- Attachments -->
+						if len(a.Content) > 0 {
+							<div class="mb-6">
+								<h4 class="text-sm font-medium text-gray-800 mb-2">Archivos adjuntos</h4>
+								<ul class="space-y-2">
+									for _, c := range a.Content {
+										<li class="flex items-center justify-between bg-gray-50 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100">
+											<a href={ c } target="_blank" class="truncate text-red-600 hover:underline flex-1">
+												📎 { strings.Split(c, "/")[len(strings.Split(c, "/"))-1] }
+											</a>
+										</li>
+									}
+								</ul>
+							</div>
+						}
+						}
+					</div>
+
+			</div>
+			}
+ </section>
+}

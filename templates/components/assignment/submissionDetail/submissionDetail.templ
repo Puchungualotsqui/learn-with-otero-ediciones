@@ -16,7 +16,12 @@ templ SubmissionDetail(s *dto.Submission, classId, assignmentId string, grading 
 					<!-- Header -->
 					<div class="mb-6 shrink-0">
 						<h3 class="text-xl font-semibold text-gray-900">
-							Entrega de { s.Username }
+							if grading {
+								Entrega de { s.Username }
+							} else {
+								Entrega
+							}
+
 						</h3>
 					</div>
 
