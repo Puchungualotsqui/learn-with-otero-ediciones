@@ -2,12 +2,12 @@ package submissionEditor
 
 import (
 	"encoding/json"
-	"frontend/dto"
+	"frontend/database/models"
 	"frontend/helper"
 	"strconv"
 )
 
-templ SubmissionEditor(s *dto.Submission, classId, assignmentId int, assignmentTitle string) {
+templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignmentTitle string) {
 	{{
 		// Build filesJSON safely (works even if s == nil)
 		var filesJSON string

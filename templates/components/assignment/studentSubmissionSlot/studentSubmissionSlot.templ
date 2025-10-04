@@ -2,10 +2,10 @@ package studentSubmissionSlot
 
 import (
 	"strconv"
-	"frontend/dto"
+	"frontend/database/models"
 )
 
-templ StudentSubmissionSlot(classId int, assignmentId int, s *dto.Submission) {
+templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission) {
 	{{
 		// Grade badge color (same logic pattern)
 		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"

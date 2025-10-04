@@ -2,10 +2,10 @@ package home
 
 import (
 	"frontend/templates/components/class"
-	"frontend/dto"
+	"frontend/database/models"
 )
 
-templ Home(slotsInfo []*dto.ClassSlot, professor bool) {
+templ Home(slotsInfo []*models.Class, professor bool) {
 	<!-- Content -->
 	    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 

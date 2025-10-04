@@ -1,11 +1,11 @@
 package assignmentSlotProfessor
 
 import (
-	"frontend/dto"
+	"frontend/database/models"
 	"strconv"
 )
 
-templ AssignmentSlotProfessor(classId int, a *dto.Assignment, deleteButton bool) {
+templ AssignmentSlotProfessor(classId int, a *models.Assignment, deleteButton bool) {
 	{{
 		subUrl := "/submissions"
 		if deleteButton {

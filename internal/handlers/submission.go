@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"frontend/database"
 	"frontend/database/models"
-	"frontend/dto"
 	"frontend/helper"
 	"frontend/internal/render"
 	"frontend/storage"
@@ -16,11 +15,9 @@ import (
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 	"frontend/templates/components/assignment/submissionDetail"
 	"frontend/templates/components/assignment/submissionEditor"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/a-h/templ"
 )
@@ -46,7 +43,7 @@ func HandleSubmissionDefault(
 		panelsContent.PanelsContent(
 			assignmentList.AssignmentList(
 				classId,
-				dto.AssignmentFromModels(assignments),
+				assignments,
 				[]string{},
 				professor,
 				false,
@@ -81,8 +78,6 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 	}
 
 	if professor {
-		submissionsDto := dto.SubmissionFromModels(submissions)
-
 		classIdInt, err := strconv.Atoi(parts[0])
 		if err != nil {
 			fmt.Println("! Invalid class Id:", parts[0])
@@ -95,10 +90,9 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 			fmt.Println("Error fetching assignment: %w", err)
 			http.Error(w, "Server database error", http.StatusInternalServerError)
 		}
-		assignmentDto := dto.AssignmentFromModel(assignment)
 
 		fmt.Println("→ Rendering professor submissions list")
-		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignmentDto, submissionsDto).Render(r.Context(), w)
+		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignment, submissions).Render(r.Context(), w)
 		submissionDetail.SubmissionDetail(nil, "", "", false, false).Render(r.Context(), w)
 		fmt.Println("✔ Render complete")
 		return
@@ -127,11 +121,9 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 	}
 	fmt.Printf("  ✓ Assignment loaded: %+v\n", submission)
 
-	s := dto.SubmissionFromModel(submission)
-
 	if professor {
 		fmt.Println("  → Rendering professor detail")
-		submissionDetail.SubmissionDetail(s, parts[0], parts[2], professor, false).Render(r.Context(), w)
+		submissionDetail.SubmissionDetail(submission, parts[0], parts[2], professor, false).Render(r.Context(), w)
 		fmt.Println("  ✔ Render complete")
 		return
 	}
@@ -152,29 +144,20 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 			return
 		}
 
-		loc, err := time.LoadLocation("America/La_Paz")
+		status, err := helper.GetDateStatus(assignment.DueDate)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Invalid due date: %w", err)
+			http.Error(w, "Invalid due date", http.StatusBadRequest)
+			return
 		}
 
-		deadline, err := time.ParseInLocation("02/01/2006", assignment.DueDate, loc)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		now := time.Now().In(loc)
-
-		// Consider the deadline valid until the end of its day (i.e. 23:59:59)
-		endOfDeadline := deadline.Add(24 * time.Hour)
-
-		// Then use this instead of now.Before(deadline)
 		var detailWindow templ.Component
-		if now.Before(endOfDeadline) {
-			detailWindow = submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title)
+		if status.Past {
+			detailWindow = submissionEditor.SubmissionEditor(submission, arguments[0], arguments[1], assignment.Title)
 		} else {
-			detailWindow = submissionDetail.SubmissionDetail(s, parts[0], parts[2], false, false)
+			detailWindow = submissionDetail.SubmissionDetail(submission, parts[0], parts[2], false, false)
 		}
-		assignmentDetailWindow := assignmentDetail.AssignmentDetail(dto.AssignmentFromModel(assignment), false)
+		assignmentDetailWindow := assignmentDetail.AssignmentDetail(assignment, false)
 
 		detailWindow.Render(r.Context(), w)
 		assignmentDetailWindow.Render(r.Context(), w)
@@ -210,7 +193,7 @@ func HandleSubmissionGrade(store *database.Store, w http.ResponseWriter, r *http
 	}
 
 	fmt.Println("→ Rendering Student Submission Slot")
-	studentSubmissionSlot.StudentSubmissionSlot(classId, assignmentId, dto.SubmissionFromModel(submission)).Render(r.Context(), w)
+	studentSubmissionSlot.StudentSubmissionSlot(classId, assignmentId, submission).Render(r.Context(), w)
 	fmt.Println("✔ Render complete")
 }
 

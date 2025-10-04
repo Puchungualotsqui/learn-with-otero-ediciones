@@ -1,13 +1,13 @@
 package assignmentList
 
 import (
-	"frontend/dto"
+	"frontend/database/models"
 	"frontend/templates/components/assignment/assignmentSlotStudent"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
 	"strconv"
 )
 
-templ AssignmentList(classId int, assignments []*dto.Assignment, grades []string, professor, deleteButton bool, username string) {
+templ AssignmentList(classId int, assignments []*models.Assignment, grades []string, professor, deleteButton bool, username string) {
 	<aside class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">
 

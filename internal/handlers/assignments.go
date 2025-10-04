@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"frontend/database"
 	"frontend/database/models"
-	"frontend/dto"
 	"frontend/helper"
 	"frontend/internal/render"
 	"frontend/storage"
@@ -33,39 +32,24 @@ func HandleAssignmentDefault(
 ) {
 	assignments := database.ListAssignmentsOfClass(store, classId)
 
-	// Convert models to DTO once
-	assignmentsDTO := dto.AssignmentFromModels(assignments)
-
-	// Grab the “first assignment” bits once
-	var (
-		firstDTO   *dto.Assignment
-		firstId    int
-		firstTitle string
-	)
-	if len(assignments) > 0 {
-		firstDTO = dto.AssignmentFromModel(assignments[0])
-		firstId = firstDTO.Id
-		firstTitle = firstDTO.Title
-	}
-
 	// Right panel differs by role
 	var panels []templ.Component
 	var grades []string = []string{}
 	if professor {
 		panels = make([]templ.Component, 2)
-		panels[0] = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels[0] = assignmentList.AssignmentList(classId, assignments, grades, professor, professor, username)
 		panels[1] = assignmentEditor.AssignmentEditor(nil, classId)
 
 	} else {
 		panels = make([]templ.Component, 3)
-		grades = make([]string, len(assignmentsDTO))
+		grades = make([]string, len(assignments))
 		classIdString := strconv.Itoa(classId)
 
 		var assignmentIdString string
 		var err error
 		var tempSubmission *models.Submission
 
-		for i, assignment := range assignmentsDTO {
+		for i, assignment := range assignments {
 			assignmentIdString = strconv.Itoa(assignment.Id)
 			tempSubmission, err = database.GetWithPrefix[models.Submission](store, database.Buckets["submissions"], username, classIdString, assignmentIdString)
 			if err != nil {
@@ -78,9 +62,9 @@ func HandleAssignmentDefault(
 			err = nil
 			fmt.Println("Grade: ", grades[i])
 		}
-		panels[0] = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
+		panels[0] = assignmentList.AssignmentList(classId, assignments, grades, professor, professor, username)
 		panels[1] = assignmentDetail.AssignmentDetail(nil, true)
-		panels[2] = submissionEditor.SubmissionEditor(nil, classId, firstId, firstTitle)
+		panels[2] = submissionEditor.SubmissionEditor(nil, classId, 0, "")
 
 	}
 
@@ -142,7 +126,7 @@ func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *htt
 		}
 	}
 
-	assignmentEditor.AssignmentEditor(dto.AssignmentFromModel(assignmentModel), classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(assignmentModel, classId).Render(r.Context(), w)
 	fmt.Println("  ✔ Render complete")
 }
 
@@ -174,16 +158,13 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 	}
 	fmt.Printf("✅ Created new assignment: %+v\n", newAssignment)
 
-	// 2. Convert to DTO
-	a := dto.AssignmentFromModel(newAssignment)
-
 	// 3. Render updated slot list
 	fmt.Fprintf(w, `<div hx-swap-oob="beforeend:#assignments-list">`)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, true).Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, newAssignment, true).Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	// 4. Render editor into #assignment-detail
-	assignmentEditor.AssignmentEditor(a, classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(newAssignment, classId).Render(r.Context(), w)
 
 	fmt.Println("✔ New assignment created and rendered")
 }
@@ -331,10 +312,9 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	fmt.Println("✅ Assignment saved successfully")
 
 	// 5. Re-render editor
-	a := dto.AssignmentFromModel(assignmentModel)
 	fmt.Println("📤 Rendering updated slot")
 
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, true).Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, assignmentModel, true).Render(r.Context(), w)
 	fmt.Println("✔ Render complete")
 }
 

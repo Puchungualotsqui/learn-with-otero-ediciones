@@ -5,7 +5,6 @@ import (
 	"frontend/auth"
 	"frontend/database"
 	"frontend/database/models"
-	"frontend/dto"
 	"frontend/helper"
 	"frontend/internal/handlers"
 	"frontend/internal/render"
@@ -110,7 +109,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			log.Printf("fallback: user %s classes not loaded: %v", username, err)
 			classes = []*models.Class{}
 		}
-		slotsInfo := dto.ClassSlotFromModels(classes)
 
 		professor, err := isProfessor(store, username)
 		if err != nil {
@@ -118,7 +116,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			return
 		}
 
-		render.RenderWithLayout(w, r, home.Home(slotsInfo, professor), body.Home)
+		render.RenderWithLayout(w, r, home.Home(classes, professor), body.Home)
 		return
 
 	case isClassValid(store, username, parts[0]):

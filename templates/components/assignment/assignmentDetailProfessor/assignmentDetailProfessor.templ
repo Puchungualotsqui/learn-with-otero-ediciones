@@ -1,11 +1,11 @@
 package assignmentDetailProfessor
 
 import (
-	"frontend/dto"
+	"frontend/database/models"
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 )
 
-templ AssignmentDetailProfessor(classId int, a *dto.Assignment, submissions []*dto.Submission) {
+templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission) {
 	<section id="assignment-detail"
 		class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">

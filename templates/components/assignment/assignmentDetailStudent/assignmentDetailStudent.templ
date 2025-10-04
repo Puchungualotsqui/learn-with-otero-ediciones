@@ -1,10 +1,10 @@
 package assignmentDetailStudent
 
 import (
-	"frontend/dto"
+	"frontend/database/models"
 )
 
-templ AssignmentDetailStudent(a *dto.Assignment){
+templ AssignmentDetailStudent(a *models.Assignment){
 	<h2 class="text-xl font-semibold text-gray-900 mb-2">{ a.Title }</h2>
     <p class="text-gray-700 mb-4">{ a.Description }</p>
 

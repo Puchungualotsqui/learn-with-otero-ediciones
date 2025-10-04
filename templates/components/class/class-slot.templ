@@ -2,14 +2,14 @@ package class
 
 import (
 	"strconv"
-	"frontend/dto"
+	"frontend/database/models"
 )
 
-templ ClassSlot(item *dto.ClassSlot, professor bool) {
+templ ClassSlot(item *models.Class, professor bool) {
 	<div class="bg-white border border-gray-200 shadow hover:shadow-md transition rounded-lg flex flex-col">
 		<div class="p-5 flex-1">
-			<h2 class="text-lg font-semibold text-gray-900">{ item.Title }</h2>
-			<p class="text-gray-600 text-sm mt-1">{ item.SubTitle }</p>
+			<h2 class="text-lg font-semibold text-gray-900">{ item.Name }</h2>
+			<p class="text-gray-600 text-sm mt-1">{ item.Description }</p>
 		</div>
 		<div class="flex divide-x divide-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
 			<!-- Asignaciones -->

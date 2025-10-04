@@ -1,13 +1,13 @@
 package assignmentEditor
 
 import (
-	"frontend/dto"
+	"frontend/database/models"
 	"encoding/json"
 	"frontend/helper"
 	"strconv"
 )
 
-templ AssignmentEditor(a *dto.Assignment, classId int) {
+templ AssignmentEditor(a *models.Assignment, classId int) {
 	{{
 		var files []string
 	    if a != nil {
