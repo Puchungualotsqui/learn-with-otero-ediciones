@@ -29,6 +29,7 @@ func HandleSubmissionDefault(
 	classId int,
 	professor bool,
 	username string) {
+	fmt.Println("📥 [HandleSubmissionDefault] Request received")
 
 	if !professor {
 		fmt.Println("Acces denied")
@@ -37,6 +38,11 @@ func HandleSubmissionDefault(
 	}
 
 	assignments := database.ListAssignmentsOfClass(store, classId)
+
+	assignments, err := helper.OrderAssignments(assignments)
+	if err != nil {
+		fmt.Println("Error ordering assignments:", err)
+	}
 
 	render.RenderWithLayout(
 		w, r,
@@ -53,6 +59,7 @@ func HandleSubmissionDefault(
 				classId,
 				nil,
 				nil,
+				false,
 			),
 			submissionDetail.SubmissionDetail(
 				nil,
@@ -66,16 +73,11 @@ func HandleSubmissionDefault(
 }
 
 func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r *http.Request, professor bool) {
+	fmt.Println("📥 [HandleAssignmentSubmissions] Request received")
+
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 	helper.PrintArray(parts)
-
-	submissions, err := database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
-	if err != nil {
-		fmt.Println("Error fetching submissions: %w", err)
-		http.Error(w, "Server database error", http.StatusInternalServerError)
-		return
-	}
 
 	if professor {
 		classIdInt, err := strconv.Atoi(parts[0])
@@ -89,10 +91,29 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 		if err != nil {
 			fmt.Println("Error fetching assignment: %w", err)
 			http.Error(w, "Server database error", http.StatusInternalServerError)
+			return
+		}
+		dateStatus, err := helper.GetDateStatus(assignment.DueDate)
+		if err != nil {
+			fmt.Println("Error calculating date status of assignment: %w", err)
+			http.Error(w, "Error calculating date status of assignment", http.StatusInternalServerError)
+			return
+		}
+
+		var submissions []*models.Submission
+		if dateStatus.Past {
+			assignment = nil
+		} else {
+			submissions, err = database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
+			if err != nil {
+				fmt.Println("Error fetching submissions: %w", err)
+				http.Error(w, "Server database error", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		fmt.Println("→ Rendering professor submissions list")
-		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignment, submissions).Render(r.Context(), w)
+		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignment, submissions, dateStatus.Past).Render(r.Context(), w)
 		submissionDetail.SubmissionDetail(nil, "", "", false, false).Render(r.Context(), w)
 		fmt.Println("✔ Render complete")
 		return
@@ -100,6 +121,8 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 }
 
 func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r *http.Request, username string, professor bool) {
+	fmt.Println("📥 [HandleAssignmentSubmission] Request received")
+
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
@@ -110,7 +133,6 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 		return
 	}
 
-	fmt.Println("📥 [HandleAssignmentSubmission] Request received")
 	fmt.Printf("  > Class: %d | Assignment: %s | Professor: %v\n", classIdInt, parts[0], professor)
 
 	submission, err := database.GetWithPrefix[models.Submission](store, database.Buckets["submissions"], parts[4], parts[0], parts[2])

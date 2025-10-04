@@ -1,6 +1,9 @@
 package helper
 
 import (
+	"fmt"
+	"frontend/database/models"
+	"sort"
 	"time"
 )
 
@@ -32,4 +35,50 @@ func GetDateStatus(dueDate string) (DateStatus, error) {
 	past := today.After(dueDateOnly)
 
 	return DateStatus{Past: past, DaysLeft: daysLeft}, nil
+}
+
+// OrderAssignments sorts assignments in-place from older to newer due dates.
+func OrderAssignments(assignments []*models.Assignment) ([]*models.Assignment, error) {
+	loc, err := time.LoadLocation("America/La_Paz")
+	if err != nil {
+		return nil, fmt.Errorf("error loading location: %w", err)
+	}
+
+	layout := "02/01/2006"
+
+	sort.Slice(assignments, func(i, j int) bool {
+		dateI, errI := time.ParseInLocation(layout, assignments[i].DueDate, loc)
+		dateJ, errJ := time.ParseInLocation(layout, assignments[j].DueDate, loc)
+
+		// handle invalid dates gracefully
+		if errI != nil || errJ != nil {
+			return assignments[i].DueDate > assignments[j].DueDate
+		}
+
+		return dateI.After(dateJ)
+	})
+
+	return assignments, nil
+}
+
+func RemovePastAssignments(assignments []*models.Assignment) ([]*models.Assignment, error) {
+	n := 0
+	var status DateStatus
+	var err error
+
+	for _, a := range assignments {
+		status, err = GetDateStatus(a.DueDate)
+		if err != nil {
+			fmt.Println("Error filtering")
+		}
+
+		// keep only if NOT past (today or future)
+		if status.Past {
+			assignments[n] = a
+			n++
+		}
+	}
+
+	// Trim the slice (no reallocation)
+	return assignments[:n], nil
 }

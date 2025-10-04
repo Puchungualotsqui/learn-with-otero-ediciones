@@ -5,12 +5,16 @@ import (
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 )
 
-templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission) {
+templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission, pastDate bool) {
 	<section id="assignment-detail"
 		class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">
-		if a == nil {
-			<p class="text-gray-500 text-center">No hay asignaciones disponibles.</p>
+        if pastDate {
+        	<p class="text-gray-500 text-center">La fecha de entrega todavía no ha llegado.</p>
+        } else if a == nil {
+			<p class="text-gray-500 text-center">Seleccione una asignación para ver las entregas.</p>
+		} else if len(submissions) == 0 {
+			<p class="text-gray-500 text-center">No tiene estudiantes designados a su clase.</p>
 		} else {
 			<div class="flex items-center justify-between mb-4 shrink-0">
             	<h2 class="text-lg font-bold text-gray-900">{ a.Title }</h2>

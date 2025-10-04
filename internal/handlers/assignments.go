@@ -32,6 +32,11 @@ func HandleAssignmentDefault(
 ) {
 	assignments := database.ListAssignmentsOfClass(store, classId)
 
+	assignments, err := helper.OrderAssignments(assignments)
+	if err != nil {
+		fmt.Println("Error ordering assignments:", err)
+	}
+
 	// Right panel differs by role
 	var panels []templ.Component
 	var grades []string = []string{}

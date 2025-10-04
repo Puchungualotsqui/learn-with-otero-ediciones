@@ -5489,6 +5489,9 @@
 .h-1 {
   height: calc(var(--spacing) * 1);
 }
+.h-2 {
+  height: calc(var(--spacing) * 2);
+}
 .h-5 {
   height: calc(var(--spacing) * 5);
 }
@@ -5760,12 +5763,6 @@
     scroll-snap-align: start;
   }
 }
-.list-inside {
-  list-style-position: inside;
-}
-.list-disc {
-  list-style-type: disc;
-}
 .\[appearance\:textfield\] {
   appearance: textfield;
 }
@@ -5855,13 +5852,6 @@
 }
 .gap-6 {
   gap: calc(var(--spacing) * 6);
-}
-.space-y-1 {
-  :where(& > :not(:last-child)) {
-    --tw-space-y-reverse: 0;
-    margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
-    margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
-  }
 }
 .space-y-2 {
   :where(& > :not(:last-child)) {
@@ -8247,7 +8237,6 @@
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
-    --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
