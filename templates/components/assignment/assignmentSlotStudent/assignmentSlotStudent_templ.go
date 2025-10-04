@@ -43,42 +43,53 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 			fmt.Println("error loading time location")
 		}
 
-		// Parse due date in Bolivia timezone
+		// Parse due date (date only)
 		due, err := time.ParseInLocation("02/01/2006", a.DueDate, loc)
 		if err != nil {
-			fmt.Println("Error parsing in location")
+			fmt.Println("Error parsing due date in location")
 		}
 
 		now := time.Now().In(loc)
-		daysLeft := int(due.Sub(now).Hours() / 24)
 
-		past := now.After(due)
-
-		var textColor string
-		switch {
-		case due.Before(now):
-			textColor = "text-red-600"
-		case daysLeft <= 1:
-			textColor = "text-yellow-600"
-		default:
-			textColor = "text-gray-700"
-		}
+		// Compare only calendar dates
+		dueDate := due.Truncate(24 * time.Hour)
+		today := now.Truncate(24 * time.Hour)
+		daysLeft := int(dueDate.Sub(today).Hours() / 24)
+		past := today.After(dueDate)
 
 		// Grade badge color
 		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"
+		gradeTextColor := "text-gray-500" // fallback if used for textColor
 		if grade != "" {
 			if g, err := strconv.Atoi(grade); err == nil {
 				switch {
 				case g >= 90:
 					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+					gradeTextColor = "text-green-700"
 				case g >= 70:
 					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+					gradeTextColor = "text-blue-700"
 				case g >= 50:
 					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+					gradeTextColor = "text-yellow-700"
 				default:
 					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+					gradeTextColor = "text-red-700"
 				}
 			}
+		}
+
+		// Text color logic
+		var textColor string
+		switch {
+		case daysLeft == 0:
+			textColor = "text-red-600" // due today
+		case daysLeft == 1:
+			textColor = "text-yellow-600" // one day left
+		case past:
+			textColor = gradeTextColor // use grade color when past
+		default:
+			textColor = "text-gray-700" // more than 1 day left
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<li id=\"")
 		if templ_7745c5c3_Err != nil {
@@ -87,7 +98,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("assignment-slot-" + strconv.Itoa(a.Id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 57, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 68, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -109,7 +120,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/submission/" + username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 59, Col: 106}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 70, Col: 106}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -135,7 +146,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(a.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 64, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 75, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -177,7 +188,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(grade)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 69, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 80, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -196,7 +207,7 @@ func AssignmentSlotStudent(classId int, a *dto.Assignment, username, grade strin
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(a.DueDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 72, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentSlotStudent/assignmentSlotStudent.templ`, Line: 83, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {

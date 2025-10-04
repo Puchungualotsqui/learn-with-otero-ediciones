@@ -61,7 +61,8 @@ func HandleSubmissionDefault(
 				nil,
 				"",
 				"",
-				professor),
+				professor,
+				true),
 		),
 		body.Home,
 	)
@@ -98,6 +99,7 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 
 		fmt.Println("→ Rendering professor submissions list")
 		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignmentDto, submissionsDto).Render(r.Context(), w)
+		submissionDetail.SubmissionDetail(nil, "", "", false, false).Render(r.Context(), w)
 		fmt.Println("✔ Render complete")
 		return
 	}
@@ -129,7 +131,7 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 
 	if professor {
 		fmt.Println("  → Rendering professor detail")
-		submissionDetail.SubmissionDetail(s, parts[0], parts[2], professor).Render(r.Context(), w)
+		submissionDetail.SubmissionDetail(s, parts[0], parts[2], professor, false).Render(r.Context(), w)
 		fmt.Println("  ✔ Render complete")
 		return
 	}
@@ -162,11 +164,15 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 
 		now := time.Now().In(loc)
 
+		// Consider the deadline valid until the end of its day (i.e. 23:59:59)
+		endOfDeadline := deadline.Add(24 * time.Hour)
+
+		// Then use this instead of now.Before(deadline)
 		var detailWindow templ.Component
-		if now.Before(deadline) || now.Equal(deadline) {
+		if now.Before(endOfDeadline) {
 			detailWindow = submissionEditor.SubmissionEditor(s, arguments[0], arguments[1], assignment.Title)
 		} else {
-			detailWindow = submissionDetail.SubmissionDetail(s, parts[0], parts[2], false)
+			detailWindow = submissionDetail.SubmissionDetail(s, parts[0], parts[2], false, false)
 		}
 		assignmentDetailWindow := assignmentDetail.AssignmentDetail(dto.AssignmentFromModel(assignment), false)
 

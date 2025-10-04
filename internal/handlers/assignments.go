@@ -54,7 +54,7 @@ func HandleAssignmentDefault(
 	if professor {
 		panels = make([]templ.Component, 2)
 		panels[0] = assignmentList.AssignmentList(classId, assignmentsDTO, grades, professor, professor, username)
-		panels[1] = assignmentEditor.AssignmentEditor(firstDTO, classId)
+		panels[1] = assignmentEditor.AssignmentEditor(nil, classId)
 
 	} else {
 		panels = make([]templ.Component, 3)
