@@ -174,7 +174,7 @@ func HandleAssignmentSubmission(store *database.Store, w http.ResponseWriter, r 
 		}
 
 		var detailWindow templ.Component
-		if status.Past {
+		if !status.Past {
 			detailWindow = submissionEditor.SubmissionEditor(submission, arguments[0], arguments[1], assignment.Title)
 		} else {
 			detailWindow = submissionDetail.SubmissionDetail(submission, parts[0], parts[2], false, false)
@@ -337,5 +337,10 @@ func HandleSubmissionUpdate(store *database.Store, storage *storage.B2Storage, w
 		http.Error(w, "Failed to save submission", http.StatusInternalServerError)
 		return
 	}
+
+	// Get info to rerender submission Editor
+	assignmentModel, err := database.GetWithPrefix[models.Assignment](store, database.Buckets["assignments"], assignmentId, fmt.Sprintf("%d", classId))
+
+	submissionEditor.SubmissionEditor(submissionModel, classId, assignmentIdInt, assignmentModel.Title).Render(r.Context(), w)
 	fmt.Println("✅ Submission saved successfully")
 }

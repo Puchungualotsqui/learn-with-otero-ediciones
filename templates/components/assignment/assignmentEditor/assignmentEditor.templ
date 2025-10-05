@@ -34,7 +34,7 @@ templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
 		  enctype="multipart/form-data"
 		  x-data="fileManager()"
 		  x-init={"initExisting(" + filesJSON + ")"}
-		  @submit="uploading = true"
+		  @submit="uploading = true; finalizeDeletions()"
 		  class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
 		>
 
@@ -69,15 +69,21 @@ templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
 
 			<ul class="space-y-2 mb-4">
 			  <template x-for="(value, name) in files" :key="name">
-			    <li class="flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200">
-
+			    <li
+			      class="flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200"
+			      :class="{'opacity-50 italic': toDelete[name]}"
+			    >
 			      <!-- Already uploaded (URL) -->
 			      <template x-if="typeof value === 'string'">
 			        <div class="flex-1 flex justify-between gap-2">
 			          <a :href="value" target="_blank"
 			             class="truncate text-red-600 hover:underline"
 			             x-text="name"></a>
-			          <input type="hidden" name="keep[]" :value="value">
+
+			          <!-- Only send keep[] if not marked for deletion -->
+			          <template x-if="!toDelete[name]">
+			            <input type="hidden" name="keep[]" :value="value">
+			          </template>
 			        </div>
 			      </template>
 
@@ -91,17 +97,26 @@ templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
 			        </div>
 			      </template>
 
-			      <!-- Remove button -->
-			      <button type="button"
-			              @click="remove(name)"
-			              class="ml-2 text-red-600 hover:text-red-800 cursor-pointer">
-			        ✕
-			      </button>
+			      <!-- Action buttons -->
+			      <div class="ml-2 flex items-center gap-2">
+			        <template x-if="!toDelete[name]">
+			          <button type="button"
+			                  @click="markForDeletion(name)"
+			                  class="text-red-600 hover:text-red-800 cursor-pointer">
+			            ✕
+			          </button>
+			        </template>
+			        <template x-if="toDelete[name]">
+			          <button type="button"
+			                  @click="restore(name)"
+			                  class="text-gray-500 hover:text-gray-700 text-xs cursor-pointer">
+			            ↩️
+			          </button>
+			        </template>
+			      </div>
 			    </li>
 			  </template>
 			</ul>
-
-
 			</div>
 
 			<!-- Dropzone -->

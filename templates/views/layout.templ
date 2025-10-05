@@ -35,6 +35,7 @@ templ Layout(body templ.Component) {
 function fileManager() {
   return {
     files: {},
+    toDelete: {}, // 🆕 track files marked for deletion
     uploading: false,
 
     initExisting(urls) {
@@ -47,12 +48,30 @@ function fileManager() {
     },
 
     addFiles(list) {
-      Array.from(list).forEach(f => this.files[f.name] = f);
+      Array.from(list).forEach(f => {
+        this.files[f.name] = f;
+      });
       this.syncUploads();
     },
 
-    remove(name) {
-      delete this.files[name];
+    markForDeletion(name) {
+      // 🆕 mark file to delete but don’t remove yet
+      if (this.files[name]) {
+        this.toDelete[name] = true;
+      }
+    },
+
+    restore(name) {
+      // allow user to undo delete (optional)
+      delete this.toDelete[name];
+    },
+
+    finalizeDeletions() {
+      // remove all truly deleted files before sending form
+      for (const name in this.toDelete) {
+        delete this.files[name];
+      }
+      this.toDelete = {};
       this.syncUploads();
     },
 
@@ -65,7 +84,6 @@ function fileManager() {
     },
   };
 }
-
 </script>
 
 </body>
