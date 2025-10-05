@@ -38,7 +38,7 @@ func AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if pastDate {
+		if !pastDate {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<p class=\"text-gray-500 text-center\">La fecha de entrega todavía no ha llegado.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"frontend/database"
 	"frontend/database/models"
@@ -43,7 +44,7 @@ func HandleAssignmentDefault(
 	if professor {
 		panels = make([]templ.Component, 2)
 		panels[0] = assignmentList.AssignmentList(classId, assignments, grades, professor, professor, username)
-		panels[1] = assignmentEditor.AssignmentEditor(nil, classId)
+		panels[1] = assignmentEditor.AssignmentEditor(nil, classId, true)
 
 	} else {
 		panels = make([]templ.Component, 3)
@@ -125,13 +126,13 @@ func HandleAssignmentDetail(store *database.Store, w http.ResponseWriter, r *htt
 			assignmentModel = assignments[0]
 		} else {
 			// No assignments at all
-			assignmentEditor.AssignmentEditor(nil, classId).Render(r.Context(), w)
+			assignmentEditor.AssignmentEditor(nil, classId, true).Render(r.Context(), w)
 			fmt.Println("✔ No assignments, rendered empty editor")
 			return
 		}
 	}
 
-	assignmentEditor.AssignmentEditor(assignmentModel, classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(assignmentModel, classId, true).Render(r.Context(), w)
 	fmt.Println("  ✔ Render complete")
 }
 
@@ -169,7 +170,7 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 	fmt.Fprint(w, `</div>`)
 
 	// 4. Render editor into #assignment-detail
-	assignmentEditor.AssignmentEditor(newAssignment, classId).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(newAssignment, classId, true).Render(r.Context(), w)
 
 	fmt.Println("✔ New assignment created and rendered")
 }
@@ -285,7 +286,7 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 			fmt.Printf("ℹ️ No old version to delete for %s (or delete failed: %v)\n", key, err)
 		}
 
-		fileURL, err := storage.UploadFile(r.Context(), key, file)
+		fileURL, err := storage.UploadFile(context.Background(), key, file)
 		if err != nil {
 			fmt.Printf("❌ Failed to upload file %s: %v\n", f.Filename, err)
 			http.Error(w, "Failed to upload file", http.StatusInternalServerError)
@@ -320,6 +321,7 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	fmt.Println("📤 Rendering updated slot")
 
 	assignmentSlotProfessor.AssignmentSlotProfessor(classId, assignmentModel, true).Render(r.Context(), w)
+	assignmentEditor.AssignmentEditor(assignmentModel, classId, false).Render(r.Context(), w)
 	fmt.Println("✔ Render complete")
 }
 

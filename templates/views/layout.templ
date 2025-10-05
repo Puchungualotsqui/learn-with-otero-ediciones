@@ -35,6 +35,7 @@ templ Layout(body templ.Component) {
 function fileManager() {
   return {
     files: {},
+    uploading: false,
 
     initExisting(urls) {
       if (!urls) return;
@@ -46,9 +47,7 @@ function fileManager() {
     },
 
     addFiles(list) {
-      Array.from(list).forEach(f => {
-        this.files[f.name] = f;
-      });
+      Array.from(list).forEach(f => this.files[f.name] = f);
       this.syncUploads();
     },
 
@@ -59,13 +58,14 @@ function fileManager() {
 
     syncUploads() {
       const dt = new DataTransfer();
-      for (const value of Object.values(this.files)) {
-        if (value instanceof File) dt.items.add(value);
+      for (const v of Object.values(this.files)) {
+        if (v instanceof File) dt.items.add(v);
       }
       this.$refs.uploads.files = dt.files;
-    }
-  }
+    },
+  };
 }
+
 </script>
 
 </body>

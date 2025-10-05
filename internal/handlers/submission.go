@@ -101,7 +101,7 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 		}
 
 		var submissions []*models.Submission
-		if dateStatus.Past {
+		if !dateStatus.Past {
 			assignment = nil
 		} else {
 			submissions, err = database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])

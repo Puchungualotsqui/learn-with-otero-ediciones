@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-templ AssignmentEditor(a *models.Assignment, classId int) {
+templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
 	{{
 		var files []string
 	    if a != nil {
@@ -19,20 +19,22 @@ templ AssignmentEditor(a *models.Assignment, classId int) {
 	}}
 
 	<section id="assignment-detail"
-      class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col lg:w-1/3">
+      class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg p-4 flex flex-col lg:w-1/3"
+      if !firstRender{hx-swap-oob="true"}>
         <div class="flex-1 overflow-y-auto min-h-0">
             if a == nil {
                 <p class="text-gray-500 text-center">
                     Selecciona o crea una asignación para editar.
                 </p>
             } else {
-          		<form
+        <form
 		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/update"}
 		  hx-target={"#assignment-slot-" + strconv.Itoa(a.Id)}
-		  hx-swap="innerHTML"
+		  hx-swap="outerHTML"
 		  enctype="multipart/form-data"
 		  x-data="fileManager()"
 		  x-init={"initExisting(" + filesJSON + ")"}
+		  @submit="uploading = true"
 		  class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
 		>
 
@@ -72,9 +74,7 @@ templ AssignmentEditor(a *models.Assignment, classId int) {
 			      <!-- Already uploaded (URL) -->
 			      <template x-if="typeof value === 'string'">
 			        <div class="flex-1 flex justify-between gap-2">
-		          <a :href="value"
-
-						 target="_blank"
+			          <a :href="value" target="_blank"
 			             class="truncate text-red-600 hover:underline"
 			             x-text="name"></a>
 			          <input type="hidden" name="keep[]" :value="value">
@@ -83,7 +83,12 @@ templ AssignmentEditor(a *models.Assignment, classId int) {
 
 			      <!-- Pending upload (File) -->
 			      <template x-if="value instanceof File">
-			        <span class="truncate text-gray-800" x-text="name"></span>
+			        <div class="flex-1 flex justify-between gap-2 items-center">
+			          <span class="truncate text-gray-800" x-text="name"></span>
+			          <template x-if="uploading">
+			            <span class="text-gray-500 text-xs italic">Subiendo...</span>
+			          </template>
+			        </div>
 			      </template>
 
 			      <!-- Remove button -->
@@ -95,6 +100,7 @@ templ AssignmentEditor(a *models.Assignment, classId int) {
 			    </li>
 			  </template>
 			</ul>
+
 
 			</div>
 
