@@ -9,7 +9,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func CreateClass(s *Store, name, description, subject string) (*models.Class, error) {
+func CreateClass(s *Store, name, description, subject, grade string) (*models.Class, error) {
 	var c *models.Class
 	err := s.db.Update(func(tx *bbolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(Buckets["classes"])
@@ -26,6 +26,7 @@ func CreateClass(s *Store, name, description, subject string) (*models.Class, er
 			Id:          int(id64),
 			Name:        name,
 			Description: description,
+			Grade:       grade,
 			Subject:     subject,
 			Users:       []string{},
 		}

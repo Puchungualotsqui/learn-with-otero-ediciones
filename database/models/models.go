@@ -18,6 +18,7 @@ type Class struct {
 	Id          int      `json:"id"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
+	Grade       string   `json:"grade"`
 	Subject     string   `json:"subject"`
 	Users       []string `json:"users"`
 }

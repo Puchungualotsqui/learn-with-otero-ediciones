@@ -1,0 +1,54 @@
+package pdfViewer
+
+templ PDFViewer(currentPDF string, pdfList []string) {
+    <section
+      class="flex flex-col lg:flex-row h-[calc(100vh-5rem)] bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden"
+    >
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-800 text-center lg:text-left">Documentos</h2>
+        </div>
+
+        <ul class="menu bg-gray-50 text-sm">
+	        for _, pdf := range pdfList {
+	          <li>
+	            <button
+	              hx-get={"/ver-pdf?src=" + pdf}
+	              hx-target="#pdf-viewer-frame"
+	              hx-swap="outerHTML"
+	              class={"truncate w-full text-left hover:bg-red-100 px-4 py-2 transition " + (func() string {
+	                if pdf == currentPDF {
+	                  return "bg-red-50 font-semibold text-red-700"
+	                }
+	                return "text-gray-700"
+	              }())}
+	            >
+	              { helper.BaseName(pdf) }
+	            </button>
+	          </li>
+	        }
+        </ul>
+      </aside>
+
+      <!-- PDF Viewer -->
+      <div class="flex-1 flex items-center justify-center bg-gray-100 relative">
+        if currentPDF == "" {
+          <p class="text-gray-500 italic">Selecciona un documento para ver.</p>
+        } else {
+          <div id="pdf-viewer-frame" class="relative w-full h-full flex items-center justify-center">
+            <iframe
+              src={currentPDF + "#toolbar=0&navpanes=0&scrollbar=0"}
+              class="w-full h-full border-none rounded-lg shadow-sm bg-white"
+              allow="clipboard-write 'none'; encrypted-media 'none';"
+              sandbox="allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+              oncontextmenu="return false"
+            ></iframe>
+
+            <!-- Overlay to reduce saving via right-click -->
+            <div class="absolute inset-0 pointer-events-none bg-transparent"></div>
+          </div>
+        }
+      </div>
+    </section>
+}

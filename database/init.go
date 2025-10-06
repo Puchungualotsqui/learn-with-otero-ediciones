@@ -65,12 +65,12 @@ func Init(path string) (*Store, error) {
 
 		// Create a subject
 		subject := models.Subject{
-			InternalName: "matematicas",
-			Name:         "Matemáticas",
+			InternalName: "literatura",
+			Name:         "Literatura",
 		}
 		CreateSubject(store, subject.InternalName, subject.Name)
 
-		class, _ := CreateClass(store, "Matemáticas", "Clase con el profe Hugo", "matematicas")
+		class, _ := CreateClass(store, "Matemáticas", "Clase con el profe Hugo", "matematicas", "1primaria")
 
 		AddUserToClass(store, class.Id, "prof1")
 		AddUserToClass(store, class.Id, "student1")
