@@ -58,8 +58,8 @@ func Init(path string) (*Store, error) {
 		log.Println("🌱 Seeding database with test data...")
 
 		// Create sample users
-		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor", []byte("my-secret-key-12"))
-		if err := CreateUser(store, "student1", "password", "Bob", "Perez", "student", []byte("my-secret-key-12")); err != nil {
+		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor")
+		if err := CreateUser(store, "student1", "password", "Bob", "Perez", "student"); err != nil {
 			fmt.Printf("Error creating User: %v\n", err)
 		}
 
