@@ -10,8 +10,7 @@ type User struct {
 }
 
 type Subject struct {
-	InternalName string `json:"internal_name"`
-	Name         string `json:"name"`
+	Name string `json:"name"`
 }
 
 type Class struct {
@@ -37,4 +36,9 @@ type Submission struct {
 	Content     []string `json:"content"`      // could be file path or text
 	SubmittedAt string   `json:"submitted_at"` // timestamp
 	Grade       string   `json:"grade,omitempty"`
+}
+
+type Asset struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }

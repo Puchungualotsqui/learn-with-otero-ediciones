@@ -13,8 +13,8 @@ import (
 	"frontend/templates/components/assignment/assignmentEditor"
 	"frontend/templates/components/assignment/assignmentList"
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
-	"frontend/templates/components/assignment/panelsContent"
 	"frontend/templates/components/assignment/submissionEditor"
+	"frontend/templates/components/panelsContent"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,6 +31,8 @@ func HandleAssignmentDefault(
 	professor bool,
 	username string,
 ) {
+	fmt.Println("📥 [HandleAssignmentDefault] Request received")
+
 	assignments := database.ListAssignmentsOfClass(store, classId)
 
 	assignments, err := helper.OrderAssignments(assignments)
@@ -361,7 +363,7 @@ func HandleAssignmentDelete(store *database.Store, storage *storage.B2Storage, w
 
 	// 2. Delete attached files from B2
 	for _, url := range assignmentModel.Content {
-		key := strings.TrimPrefix(url, fmt.Sprintf("%s/file/%s/", storage.BaseUrl, storage.Bucket.Name()))
+		key := strings.TrimPrefix(url, fmt.Sprintf("%s/file/%s/", storage.BaseUrl, storage.PublicBucket.Name()))
 		if key == url {
 			// fallback: if TrimPrefix didn’t match, assume full key is stored
 			key = url

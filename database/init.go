@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"frontend/database/models"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,6 +18,7 @@ var Buckets = map[string][]byte{
 	"submissions": []byte("Submissions"),
 	"schools":     []byte("Schools"),
 	"sessions":    []byte("Sessions"),
+	"assets":      []byte("Assets"),
 }
 
 // Init opens (or creates) the DB and seeds test data if new
@@ -63,14 +63,11 @@ func Init(path string) (*Store, error) {
 			fmt.Printf("Error creating User: %v\n", err)
 		}
 
-		// Create a subject
-		subject := models.Subject{
-			InternalName: "literatura",
-			Name:         "Literatura",
+		if err := CreateInitialSubjects(store); err != nil {
+			fmt.Printf("Error creating Subjects: %v\n", err)
 		}
-		CreateSubject(store, subject.InternalName, subject.Name)
 
-		class, _ := CreateClass(store, "Matemáticas", "Clase con el profe Hugo", "matematicas", "1primaria")
+		class, _ := CreateClass(store, "Literatura", "Clase con el profe Hugo", "literatura", "1primaria")
 
 		AddUserToClass(store, class.Id, "prof1")
 		AddUserToClass(store, class.Id, "student1")

@@ -5882,6 +5882,15 @@
     border-inline-end-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)));
   }
 }
+.divide-y {
+  :where(& > :not(:last-child)) {
+    --tw-divide-y-reverse: 0;
+    border-bottom-style: var(--tw-border-style);
+    border-top-style: var(--tw-border-style);
+    border-top-width: calc(1px * var(--tw-divide-y-reverse));
+    border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  }
+}
 .divide-gray-200 {
   :where(& > :not(:last-child)) {
     border-color: var(--color-gray-200);
@@ -6449,6 +6458,9 @@
 .bg-gray-100 {
   background-color: var(--color-gray-100);
 }
+.bg-gray-200 {
+  background-color: var(--color-gray-200);
+}
 .bg-green-100 {
   background-color: var(--color-green-100);
 }
@@ -6703,6 +6715,9 @@
   &:is([type="radio"]) {
     --size: calc(var(--size-selector, 0.25rem) * 4);
   }
+}
+.p-3 {
+  padding: calc(var(--spacing) * 3);
 }
 .p-4 {
   padding: calc(var(--spacing) * 4);
@@ -7435,6 +7450,10 @@
 }
 .shadow {
   --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+.shadow-inner {
+  --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
   box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
 }
 .shadow-lg {
@@ -8233,6 +8252,11 @@
     flex-direction: row;
   }
 }
+.lg\:rounded-none {
+  @media (width >= 64rem) {
+    border-radius: 0;
+  }
+}
 .lg\:border-r {
   @media (width >= 64rem) {
     border-right-style: var(--tw-border-style);
@@ -8733,6 +8757,11 @@
   inherits: false;
   initial-value: solid;
 }
+@property --tw-divide-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
 @property --tw-gradient-position {
   syntax: "*";
   inherits: false;
@@ -8981,6 +9010,7 @@
       --tw-space-x-reverse: 0;
       --tw-divide-x-reverse: 0;
       --tw-border-style: solid;
+      --tw-divide-y-reverse: 0;
       --tw-gradient-position: initial;
       --tw-gradient-from: #0000;
       --tw-gradient-via: #0000;

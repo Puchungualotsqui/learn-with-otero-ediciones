@@ -127,63 +127,70 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			if err != nil {
 				http.Error(w, "Error with the class id", http.StatusInternalServerError)
 			}
+
+			professor, err := isProfessor(store, username)
+			if err != nil {
+				http.Error(w, "Internal error", http.StatusInternalServerError)
+				return
+			}
+
 			switch parts[1] {
 			case "asignaciones":
 
 				helper.PrintArray(parts)
 
-				professor, err := isProfessor(store, username)
-				if err != nil {
-					http.Error(w, "Internal error", http.StatusInternalServerError)
-					return
-				}
+				switch len(parts) {
 
-				if len(parts) == 3 && parts[2] == "new" {
-					fmt.Println("📌 Routed to NewAssignment (professor)")
-					handlers.HandleAssignmentNew(store, storage, w, r, classId, professor)
-					return
-				}
+				case 3:
+					switch parts[2] {
+					case "new":
+						fmt.Println("📌 Routed to NewAssignment (professor)")
+						handlers.HandleAssignmentNew(store, storage, w, r, classId, professor)
+						return
 
-				if len(parts) == 3 && parts[2] == "delete" {
-					fmt.Println("📌 Routed to DeleteAssignment (professor)")
-					handlers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
-					return
-				}
+					case "delete":
+						fmt.Println("📌 Routed to DeleteAssignment (professor)")
+						handlers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
+						return
+					}
 
-				if len(parts) == 4 && parts[3] == "update" {
-					fmt.Println("📌 Routed to UpdateAssignment (professor)")
-					handlers.HandleAssignmentUpdate(store, storage, w, r, classId, parts[2], professor)
-					return
-				}
+				case 4:
+					switch parts[3] {
+					case "update":
+						fmt.Println("📌 Routed to UpdateAssignment (professor)")
+						handlers.HandleAssignmentUpdate(store, storage, w, r, classId, parts[2], professor)
+						return
 
-				if len(parts) == 4 && parts[3] == "submissions" {
-					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
-					handlers.HandleAssignmentSubmissions(store, w, r, professor)
-					return
-				}
+					case "submissions":
+						fmt.Println("📌 Routed to HandleAssignmentSubmissions")
+						handlers.HandleAssignmentSubmissions(store, w, r, professor)
+						return
 
-				if len(parts) == 4 && parts[3] == "details" {
-					fmt.Println("📌 Routed to HandleAssignmentDetail")
-					handlers.HandleAssignmentDetail(store, w, r, classId, professor)
-					return
-				}
+					case "details":
+						fmt.Println("📌 Routed to HandleAssignmentDetail")
+						handlers.HandleAssignmentDetail(store, w, r, classId, professor)
+						return
+					}
 
-				if len(parts) == 5 && parts[3] == "submission" && parts[4] == "update" {
-					fmt.Println("📌 Routed to HandleAssignmentSubmissionsUpdate")
-					handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username, professor)
-					return
-				}
+				case 5:
+					if parts[3] == "submission" && parts[4] == "update" {
+						fmt.Println("📌 Routed to HandleAssignmentSubmissionsUpdate")
+						handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username, professor)
+						return
+					}
 
-				if len(parts) == 5 && parts[3] == "submission" {
-					fmt.Println("📌 Routed to HandleAssignmentSubmissions")
-					handlers.HandleAssignmentSubmission(store, w, r, username, professor)
-					return
-				}
+					if parts[3] == "submission" {
+						fmt.Println("📌 Routed to HandleAssignmentSubmissions")
+						handlers.HandleAssignmentSubmission(store, w, r, username, professor)
+						return
+					}
 
-				if len(parts) == 6 && parts[3] == "submission" && parts[5] == "grade" {
-					fmt.Println("📌 Routed to HandleAssignmentGrade")
-					handlers.HandleSubmissionGrade(store, w, r, classId, parts[4], professor)
-					return
+				case 6:
+					if parts[3] == "submission" && parts[5] == "grade" {
+						fmt.Println("📌 Routed to HandleAssignmentGrade")
+						handlers.HandleSubmissionGrade(store, w, r, classId, parts[4], professor)
+						return
+					}
 				}
 
 				fmt.Println("📌 Routed to HandleAssignmentDefault")
@@ -191,16 +198,14 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				return
 
 			case "entregas":
-				classId, _ := strconv.Atoi(parts[0])
-
-				professor, err := isProfessor(store, username)
-				if err != nil {
-					http.Error(w, "Internal error", http.StatusInternalServerError)
-					return
-				}
 
 				fmt.Printf("📌 Routed to HandleSubmissionDefault")
 				handlers.HandleSubmissionDefault(store, w, r, classId, professor, username)
+				return
+
+			case "recursos":
+				fmt.Printf("📌 Routed to HandleSubmissionDefault")
+				handlers.HandleAssetsDefault(store, w, r, classId)
 				return
 			}
 		}

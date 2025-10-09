@@ -9,6 +9,11 @@ import (
 	"go.etcd.io/bbolt"
 )
 
+var Grades []string = []string{
+	"1primaria", "2primaria", "3primaria", "4primaria", "5primaria", "6primaria",
+	"1secundaria", "2secundaria", "3secundaria", "4secundaria", "5secundaria", "6secundaria",
+}
+
 func CreateClass(s *Store, name, description, subject, grade string) (*models.Class, error) {
 	var c *models.Class
 	err := s.db.Update(func(tx *bbolt.Tx) error {
