@@ -97,57 +97,72 @@ function fileManager() {
 
   async function renderPDFInto(container, url) {
     const { getDocument } = pdfjsLib;
+    const loadingEl = document.getElementById("pdf-loading");
 
-    // Cleanup previous session (if any)
-    const prev = sessions.get(container.id);
-    if (prev) {
-      try { prev.observer.disconnect(); } catch {}
-      try { await prev.pdf?.destroy?.(); } catch {}
-      sessions.delete(container.id);
+    // Always show loading before any cleanup
+    if (loadingEl) {
+      loadingEl.classList.remove("hidden");
+      loadingEl.querySelector("p").textContent = "Cargando PDF...";
     }
 
-    container.innerHTML = "";
+    try {
+      // Cleanup previous session immediately to avoid visual delay
+      const prev = sessions.get(container.id);
+      if (prev) {
+        try { prev.observer.disconnect(); } catch {}
+        try { await prev.pdf?.destroy?.(); } catch {}
+        sessions.delete(container.id);
+      }
 
-    // Load PDF
-    const task = getDocument({ url });
-    const pdf = await task.promise;
+      // Clear previous pages early to show loading faster
+      container.innerHTML = "<p class='text-gray-400 text-center py-8 italic'>Preparando visor...</p>";
 
-    // Debounced renderer that scales pages to container width
-    let debounce;
-    const renderAllPages = async () => {
-      clearTimeout(debounce);
-      debounce = setTimeout(async () => {
-        container.innerHTML = "";
-        for (let n = 1; n <= pdf.numPages; n++) {
-          const page = await pdf.getPage(n);
 
-          const v1 = page.getViewport({ scale: 1 });
-          const width = container.clientWidth || 800;
-          const scale = width / v1.width;
-          const viewport = page.getViewport({ scale });
+      // Load PDF
+      const task = getDocument({ url });
+      const pdf = await task.promise;
 
-          const canvas = document.createElement("canvas");
-          canvas.width  = Math.floor(viewport.width);
-          canvas.height = Math.floor(viewport.height);
-          canvas.style.width = "100%";
-          canvas.style.height = "auto";
+      // Debounced renderer that scales pages to container width
+      let debounce;
+      const renderAllPages = async () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(async () => {
+          container.innerHTML = "";
+          for (let n = 1; n <= pdf.numPages; n++) {
+            const page = await pdf.getPage(n);
 
-          const ctx = canvas.getContext("2d", { alpha: false });
-          container.appendChild(canvas);
+            const v1 = page.getViewport({ scale: 1 });
+            const width = container.clientWidth || 800;
+            const scale = width / v1.width;
+            const viewport = page.getViewport({ scale });
 
-          await page.render({ canvasContext: ctx, viewport }).promise;
-        }
-      }, 120);
-    };
+            const canvas = document.createElement("canvas");
+            canvas.width  = Math.floor(viewport.width);
+            canvas.height = Math.floor(viewport.height);
+            canvas.style.width = "100%";
+            canvas.style.height = "auto";
 
-    await renderAllPages();
+            const ctx = canvas.getContext("2d", { alpha: false });
+            container.appendChild(canvas);
 
-    // Re-render on size changes of the container
-    const ro = new ResizeObserver(() => renderAllPages());
-    ro.observe(container);
+            await page.render({ canvasContext: ctx, viewport }).promise;
+          }
+        }, 120);
+      };
 
-    // Save session for cleanup on next init
-    sessions.set(container.id, { pdf, observer: ro });
+      await renderAllPages();
+
+      // Re-render on resize
+      const ro = new ResizeObserver(() => renderAllPages());
+      ro.observe(container);
+      sessions.set(container.id, { pdf, observer: ro });
+    } catch (e) {
+      console.error("PDF render failed:", e);
+    } finally {
+      if (loadingEl) loadingEl.classList.add("hidden");
+    }
+
+
   }
 
   // Public init used by HTMX hooks and initial load

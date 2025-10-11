@@ -20,27 +20,28 @@ templ PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) {
 				</h2>
 			</div>
 
-			<div class="flex-1 overflow-y-auto">
-				<ul class="divide-y divide-gray-200 text-sm">
-					for _, pdf := range pdfList {
-						<li>
-							<button
-								hx-get={"/" + classId + "/recursos/get-asset/" + pdf.Name}
-								hx-target="#pdf-viewer-frame"
-								hx-swap="outerHTML"
-								class={"w-full text-left px-4 py-3 truncate transition hover:bg-red-50 cursor-pointer " + (func() string {
-									if pdf.Name == currentPDF {
-										return "bg-red-100 font-semibold text-red-700"
-									}
-									return "text-gray-700"
-								}())}
-							>
-								{ pdf.Name }
-							</button>
-						</li>
-					}
-				</ul>
+			<div class="overflow-y-auto max-h-[70vh] lg:max-h-[calc(100vh-10rem)]">
+			  <ul class="divide-y divide-gray-200 text-sm">
+			    for _, pdf := range pdfList {
+			      <li>
+			        <button
+			          hx-get={"/" + classId + "/recursos/get-asset/" + pdf.Name}
+			          hx-target="#pdf-viewer-frame"
+			          hx-swap="outerHTML"
+			          class={"w-full text-left px-4 py-3 truncate transition hover:bg-red-50 cursor-pointer " + (func() string {
+			            if pdf.Name == currentPDF {
+			              return "bg-red-100 font-semibold text-red-700"
+			            }
+			            return "text-gray-700"
+			          }())}
+			        >
+			          { pdf.Name }
+			        </button>
+			      </li>
+			    }
+			  </ul>
 			</div>
+
 		</aside>
 
 		<!-- PDF Viewer -->

@@ -34,7 +34,7 @@ func PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) templ
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section id=\"pdf-viewer\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col lg:flex-row overflow-hidden\"><!-- Sidebar --><aside class=\"w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50 flex flex-col\"><div class=\"p-4 border-b border-gray-200 flex justify-between items-center\"><h2 class=\"text-lg font-semibold text-gray-800 text-center lg:text-left flex-1\">Documentos</h2></div><div class=\"flex-1 overflow-y-auto\"><ul class=\"divide-y divide-gray-200 text-sm\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section id=\"pdf-viewer\" class=\"flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col lg:flex-row overflow-hidden\"><!-- Sidebar --><aside class=\"w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50 flex flex-col\"><div class=\"p-4 border-b border-gray-200 flex justify-between items-center\"><h2 class=\"text-lg font-semibold text-gray-800 text-center lg:text-left flex-1\">Documentos</h2></div><div class=\"overflow-y-auto max-h-[70vh] lg:max-h-[calc(100vh-10rem)]\"><ul class=\"divide-y divide-gray-200 text-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -60,7 +60,7 @@ func PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) templ
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + classId + "/recursos/get-asset/" + pdf.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 28, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 28, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -86,7 +86,7 @@ func PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) templ
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(pdf.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 38, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 38, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

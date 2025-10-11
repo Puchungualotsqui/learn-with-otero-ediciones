@@ -52,7 +52,7 @@ func PdfViewerFrame(currentPDF string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"absolute inset-0 overflow-auto bg-gray-100 px-4 py-6\"></div><!-- Transparent overlay (optional: blocks right-click on container) --> <div class=\"absolute inset-0 pointer-events-none select-none\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"absolute inset-0 overflow-auto bg-gray-100 px-4 py-6 custom-scrollbar\"></div><!-- Loading overlay --> <div id=\"pdf-loading\" class=\"absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm z-10 hidden\"><p class=\"text-gray-600 font-medium\">Cargando PDF...</p></div><!-- Transparent overlay (optional: blocks right-click on container) --> <div class=\"absolute inset-0 pointer-events-none select-none\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

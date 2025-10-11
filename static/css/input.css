@@ -8,3 +8,44 @@
 @source "../**/*.html";
 
 @plugin "./daisyui.js";
+
+/** @type {import('tailwindcss').Config} */
+	module.exports = {
+	  content: [
+	    "../../**/*.templ",
+	    "./static/**/*.html",
+	  ],
+	  theme: {
+	    extend: {},
+	  },
+	};
+
+
+	@layer base {
+  /* Force visible scrollbar in all browsers */
+  .custom-scrollbar {
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable; /* prevents content shift */
+    scrollbar-width: auto; /* for Firefox */
+    scrollbar-color: #000000 #f3f4f6; /* thumb, track */
+  }
+
+  /* WebKit-based browsers (Chrome, Edge, Safari, Brave, etc.) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f3f4f6; /* gray-100 track */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #000000; /* solid black thumb */
+    border-radius: 6px;
+    border: 2px solid #f3f4f6; /* gives visual gap */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #111111; /* slightly lighter black on hover */
+  }
+}
