@@ -86,6 +86,92 @@ function fileManager() {
 }
 </script>
 
+<script type="module">
+  // Load pdf.js (module build) and point to the worker file
+  import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs";
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.mjs";
+
+  // Keep sessions per container to clean up between swaps
+  const sessions = new Map(); // containerId -> { pdf, observer }
+
+  async function renderPDFInto(container, url) {
+    const { getDocument } = pdfjsLib;
+
+    // Cleanup previous session (if any)
+    const prev = sessions.get(container.id);
+    if (prev) {
+      try { prev.observer.disconnect(); } catch {}
+      try { await prev.pdf?.destroy?.(); } catch {}
+      sessions.delete(container.id);
+    }
+
+    container.innerHTML = "";
+
+    // Load PDF
+    const task = getDocument({ url });
+    const pdf = await task.promise;
+
+    // Debounced renderer that scales pages to container width
+    let debounce;
+    const renderAllPages = async () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        container.innerHTML = "";
+        for (let n = 1; n <= pdf.numPages; n++) {
+          const page = await pdf.getPage(n);
+
+          const v1 = page.getViewport({ scale: 1 });
+          const width = container.clientWidth || 800;
+          const scale = width / v1.width;
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement("canvas");
+          canvas.width  = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          canvas.style.width = "100%";
+          canvas.style.height = "auto";
+
+          const ctx = canvas.getContext("2d", { alpha: false });
+          container.appendChild(canvas);
+
+          await page.render({ canvasContext: ctx, viewport }).promise;
+        }
+      }, 120);
+    };
+
+    await renderAllPages();
+
+    // Re-render on size changes of the container
+    const ro = new ResizeObserver(() => renderAllPages());
+    ro.observe(container);
+
+    // Save session for cleanup on next init
+    sessions.set(container.id, { pdf, observer: ro });
+  }
+
+  // Public init used by HTMX hooks and initial load
+  window.initPDFViewer = async function (url, containerId = "pdf-pages") {
+    const el = document.getElementById(containerId);
+    if (!el || !url) return;
+    try { await renderPDFInto(el, url); }
+    catch (e) { console.error("PDF render failed:", e); }
+  };
+
+  // Initial load: if a container with data-pdf-src is present, render it
+  document.addEventListener("DOMContentLoaded", () => {
+    const el = document.querySelector("[data-pdf-src]");
+    if (el) window.initPDFViewer(el.getAttribute("data-pdf-src"), el.id);
+  });
+
+  // After HTMX swaps: re-init if a PDF container was swapped in
+  document.body.addEventListener("htmx:afterSwap", (e) => {
+    const el = e.target.querySelector?.("[data-pdf-src]");
+    if (el) window.initPDFViewer(el.getAttribute("data-pdf-src"), el.id);
+  });
+</script>
+
+
 </body>
 </html>
 

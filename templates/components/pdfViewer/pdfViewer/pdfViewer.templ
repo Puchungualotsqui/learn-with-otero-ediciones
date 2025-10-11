@@ -1,0 +1,49 @@
+package pdfViewer
+
+import (
+	"frontend/database/models"
+	"frontend/templates/components/pdfViewer/pdfViewerFrame"
+)
+
+templ PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) {
+	<section
+		id="pdf-viewer"
+		class="flex-1 basis-0 min-h-0 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col lg:flex-row overflow-hidden"
+	>
+		<!-- Sidebar -->
+		<aside
+			class="w-full lg:w-1/4 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50 flex flex-col"
+		>
+			<div class="p-4 border-b border-gray-200 flex justify-between items-center">
+				<h2 class="text-lg font-semibold text-gray-800 text-center lg:text-left flex-1">
+					Documentos
+				</h2>
+			</div>
+
+			<div class="flex-1 overflow-y-auto">
+				<ul class="divide-y divide-gray-200 text-sm">
+					for _, pdf := range pdfList {
+						<li>
+							<button
+								hx-get={"/" + classId + "/recursos/get-asset/" + pdf.Name}
+								hx-target="#pdf-viewer-frame"
+								hx-swap="outerHTML"
+								class={"w-full text-left px-4 py-3 truncate transition hover:bg-red-50 cursor-pointer " + (func() string {
+									if pdf.Name == currentPDF {
+										return "bg-red-100 font-semibold text-red-700"
+									}
+									return "text-gray-700"
+								}())}
+							>
+								{ pdf.Name }
+							</button>
+						</li>
+					}
+				</ul>
+			</div>
+		</aside>
+
+		<!-- PDF Viewer -->
+		@pdfViewerFrame.PdfViewerFrame(currentPDF)
+	</section>
+}

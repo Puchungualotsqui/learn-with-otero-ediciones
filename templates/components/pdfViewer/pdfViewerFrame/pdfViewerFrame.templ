@@ -1,0 +1,53 @@
+package pdfViewerFrame
+
+templ PdfViewerFrame(currentPDF string) {
+	templ PdfViewerFrame(currentPDF string) {
+  <div class="flex-1 flex flex-col bg-gray-100 relative min-h-0">
+    <div id="pdf-viewer-frame" class="flex-1 relative bg-gray-200 min-h-0">
+      if currentPDF == "" {
+        <div class="absolute inset-0 flex items-center justify-center">
+          <p class="text-gray-500 italic text-center px-4">
+            Ningún documento seleccionado.
+          </p>
+        </div>
+      } else {
+        <!-- Scrollable canvas container; pages will be injected here -->
+        <div
+          id="pdf-pages"
+          data-pdf-src={ currentPDF }
+          class="absolute inset-0 overflow-auto bg-gray-100 px-4 py-6 custom-scrollbar"
+        ></div>
+
+        <!-- Loading overlay -->
+        <div
+          id="pdf-loading"
+          class="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm z-10 hidden"
+        >
+          <p class="text-gray-600 font-medium">Cargando PDF...</p>
+        </div>
+
+        <!-- Transparent overlay (optional: blocks right-click on container) -->
+        <div class="absolute inset-0 pointer-events-none select-none"></div>
+      }
+    </div>
+  </div>
+}
+
+<style>
+  /* Scrollbar styling — only affects the viewer container */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #e5e7eb; /* gray-200 */
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #9ca3af; /* gray-400 */
+    border-radius: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #6b7280; /* gray-500 */
+  }
+</style>
+
+}

@@ -10,9 +10,10 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"frontend/database/models"
+	"frontend/templates/components/pdfViewer/pdfViewerFrame"
 )
 
-func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
+func PdfViewer(currentPDF string, pdfList []*models.Asset, classId string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,7 +44,7 @@ func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 = []any{"w-full text-left px-4 py-3 truncate transition hover:bg-red-50 cursor-pointer " + (func() string {
-				if pdf.Url == currentPDF {
+				if pdf.Name == currentPDF {
 					return "bg-red-100 font-semibold text-red-700"
 				}
 				return "text-gray-700"
@@ -57,9 +58,9 @@ func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/ver-pdf?src=" + pdf.Url)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/" + classId + "/recursos/get-asset/" + pdf.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer.templ`, Line: 27, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 28, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -72,7 +73,7 @@ func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var2).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer.templ`, Line: 1, Col: 0}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 1, Col: 0}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -85,7 +86,7 @@ func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(pdf.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer.templ`, Line: 37, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer/pdfViewer.templ`, Line: 38, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -96,35 +97,15 @@ func PDFViewer(currentPDF string, pdfList []*models.Asset) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</ul></div></aside><!-- PDF Viewer --><div class=\"flex-1 flex flex-col bg-gray-100\"><div id=\"pdf-viewer-frame\" class=\"flex-1 relative bg-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</ul></div></aside><!-- PDF Viewer -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if currentPDF == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"absolute inset-0 flex items-center justify-center\"><p class=\"text-gray-500 italic text-center px-4\">Ningún documento seleccionado.</p></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<!-- 📄 Centered, fullscreen PDF iframe --> <div class=\"absolute inset-0 flex justify-center items-center bg-gray-100\"><iframe src=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(currentPDF + "#toolbar=0&navpanes=0&scrollbar=0")
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/pdfViewer/pdfViewer.templ`, Line: 58, Col: 60}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"w-full h-full lg:rounded-none border-none shadow-inner bg-white\" sandbox=\"allow-same-origin allow-scripts allow-top-navigation-by-user-activation\" allow=\"clipboard-write 'none'; encrypted-media 'none';\" oncontextmenu=\"return false\"></iframe><!-- Transparent overlay to discourage right-click save --><div class=\"absolute inset-0 pointer-events-none bg-transparent\"></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = pdfViewerFrame.PdfViewerFrame(currentPDF).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

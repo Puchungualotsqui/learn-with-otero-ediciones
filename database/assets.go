@@ -23,12 +23,22 @@ func CreateAsset(s *Store, subject, grade, name, url string) (*models.Asset, err
 			return err
 		}
 
+		originalName := name
+
+		if slash := strings.LastIndex(name, "/"); slash != -1 {
+			name = name[slash+1:]
+		}
+		if dot := strings.LastIndex(name, "."); dot != -1 {
+			name = name[:dot]
+		}
+
 		// Composite key: classId:assignmentId:username
 		key := fmt.Sprintf("%s:%s:%s", subject, grade, name)
 
 		sub = &models.Asset{
-			Name: name,
-			Url:  url,
+			Name:         name,
+			OriginalName: originalName,
+			Url:          url,
 		}
 
 		data, err := json.Marshal(sub)
@@ -100,11 +110,11 @@ func RefreshAssets(store *Store, storage *storage.B2Storage) {
 }
 
 func FilterInvalidAssets(assets []*models.Asset) []*models.Asset {
-	validExtensions := []string{".pdf"}
+	var validExtensions = []string{".pdf"}
 	filtered := make([]*models.Asset, 0, len(assets))
 
 	for _, asset := range assets {
-		ext := strings.ToLower(filepath.Ext(asset.Name))
+		ext := strings.ToLower(filepath.Ext(asset.OriginalName))
 		if slices.Contains(validExtensions, ext) {
 			filtered = append(filtered, asset)
 		}

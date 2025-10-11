@@ -21,6 +21,8 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
+	helper.PrintArray(parts)
+
 	var username string
 	if parts[0] != "login" { // protect everything except /login
 		cookie, err := r.Cookie("session_id")
@@ -137,8 +139,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			switch parts[1] {
 			case "asignaciones":
 
-				helper.PrintArray(parts)
-
 				switch len(parts) {
 
 				case 3:
@@ -204,7 +204,15 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				return
 
 			case "recursos":
-				fmt.Printf("📌 Routed to HandleSubmissionDefault")
+				switch len(parts) {
+				case 4:
+					if parts[2] == "get-asset" {
+						fmt.Printf("📌 Routed to HandleGetAsset")
+						handlers.HandleGetAsset(store, storage, w, r, classId, parts[3])
+						return
+					}
+				}
+				fmt.Printf("📌 Routed to HandleAssetsDefault")
 				handlers.HandleAssetsDefault(store, w, r, classId)
 				return
 			}
