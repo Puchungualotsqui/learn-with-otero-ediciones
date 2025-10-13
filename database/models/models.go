@@ -7,6 +7,7 @@ type User struct {
 	FirstName         string `json:"first_name"`
 	LastName          string `json:"last_name"`
 	Role              string `json:"role"`
+	Classes           []int  `json:"classes"`
 }
 
 type Subject struct {

@@ -41,3 +41,13 @@ func PrintArray[T any](arr []T) {
 		fmt.Printf("Index %d: %v\n", i, v)
 	}
 }
+
+func RemoveElement[T comparable](slice []T, target T) []T {
+	for i, v := range slice {
+		if v == target {
+			// Remove element at index i
+			return append(slice[:i], slice[i+1:]...)
+		}
+	}
+	return slice
+}

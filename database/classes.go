@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
-	"slices"
+	"frontend/helper"
+	"strconv"
 
 	"go.etcd.io/bbolt"
 )
@@ -50,57 +51,22 @@ func CreateClass(s *Store, name, description, subject, grade string) (*models.Cl
 	return c, nil
 }
 
-func updateClass(s *Store, classId int, updater func(*models.Class) error) error {
-	return s.db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket(Buckets["classes"])
-		if b == nil {
-			return fmt.Errorf("bucket %s not found", Buckets["classes"])
+func DeleteClass(s *Store, classId int) error {
+	classIdString := strconv.Itoa(classId)
+
+	class, err := Get[models.Class](s, Buckets["classes"], classIdString)
+	if err != nil {
+		return fmt.Errorf("Error getting class to remove: %w", err)
+	}
+
+	for _, user := range class.Users {
+		if err := UpdateWithPrefix(s, Buckets["users"], func(t *models.User) error {
+			t.Classes = helper.Remove(t.Classes, classId)
+			return nil
+		}, user); err != nil {
+			return fmt.Errorf("Error updating class: %w", err)
 		}
+	}
 
-		key := []byte(fmt.Appendf(nil, "%d", classId))
-		v := b.Get(key)
-		if v == nil {
-			return fmt.Errorf("class %d not found", classId)
-		}
-
-		var c models.Class
-		if err := json.Unmarshal(v, &c); err != nil {
-			return err
-		}
-
-		// Apply caller's logic
-		if err := updater(&c); err != nil {
-			return err
-		}
-
-		data, _ := json.Marshal(c)
-		return b.Put(key, data)
-	})
-}
-
-func ListClassesForUser(s *Store, username string) ([]*models.Class, error) {
-	var results []*models.Class
-
-	err := s.db.View(func(tx *bbolt.Tx) error {
-		b := tx.Bucket(Buckets["classes"])
-		if b == nil {
-			return fmt.Errorf("bucket %s not found", Buckets["classes"])
-		}
-
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			var class models.Class
-			if err := json.Unmarshal(v, &class); err != nil {
-				return err
-			}
-
-			if slices.Contains(class.Users, username) {
-				classCopy := class
-				results = append(results, &classCopy)
-			}
-		}
-		return nil
-	})
-
-	return results, err
+	return Delete(s, Buckets["classes"], classIdString)
 }

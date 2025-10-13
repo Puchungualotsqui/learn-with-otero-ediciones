@@ -3,6 +3,7 @@ package helper
 import (
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -22,4 +23,12 @@ func NormalizeFilename(name string) string {
 	base = strings.ToLower(base)
 
 	return base + ext
+}
+
+func IntsToStrings(ii ...int) []string {
+	out := make([]string, len(ii))
+	for i, n := range ii {
+		out[i] = strconv.Itoa(n)
+	}
+	return out
 }

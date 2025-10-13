@@ -97,6 +97,42 @@ func GetWithPrefix[T any](s *Store, bucket []byte, id string, prefixes ...string
 	return result, err
 }
 
+func GetManyWithPrefix[T any](s *Store, bucket []byte, ids []string, prefixes ...string) ([]*T, error) {
+	results := make([]*T, 0, len(ids)) // preserve order
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		for _, id := range ids {
+			// Build key: prefix1:prefix2:...:id
+			key := []byte(strings.Join(append(prefixes, id), ":"))
+
+			v := b.Get(key)
+			if v == nil {
+				// skip silently
+				continue
+			}
+
+			var out T
+			if err := json.Unmarshal(v, &out); err != nil {
+				return fmt.Errorf("unmarshal %q: %w", key, err)
+			}
+
+			// Keep results in same order as input IDs
+			results = append(results, &out)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
 func Exists(s *Store, bucket []byte, key string) (bool, error) {
 	var found bool
 	err := s.db.View(func(tx *bbolt.Tx) error {
@@ -189,5 +225,44 @@ func Delete(s *Store, bucketName []byte, key string) error {
 			return fmt.Errorf("bucket %s not found", bucketName)
 		}
 		return b.Delete([]byte(key))
+	})
+}
+
+func UpdateWithPrefix[T any](s *Store, bucket []byte, updater func(*T) error, id string, prefixes ...string) error {
+	return s.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		// Build composite key like "prefix1:prefix2:id"
+		parts := append(prefixes, id)
+		key := []byte(strings.Join(parts, ":"))
+
+		v := b.Get(key)
+		if v == nil {
+			return fmt.Errorf("record not found for key %s", key)
+		}
+
+		var obj T
+		if err := json.Unmarshal(v, &obj); err != nil {
+			return fmt.Errorf("failed to unmarshal value: %w", err)
+		}
+
+		// Apply caller’s logic
+		if err := updater(&obj); err != nil {
+			return fmt.Errorf("updater error: %w", err)
+		}
+
+		data, err := json.Marshal(obj)
+		if err != nil {
+			return fmt.Errorf("failed to marshal updated object: %w", err)
+		}
+
+		if err := b.Put(key, data); err != nil {
+			return fmt.Errorf("failed to update record: %w", err)
+		}
+
+		return nil
 	})
 }

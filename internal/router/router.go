@@ -106,7 +106,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		return
 
 	case parts[0] == "":
-		classes, err := database.ListClassesForUser(store, username)
+		user, err := database.Get[models.User](store, database.Buckets["users"], username)
+		if err != nil {
+			log.Printf("panic: user %s info not loaded: %v", username, err)
+			return
+		}
+		classes, err := database.GetManyWithPrefix[models.Class](store, database.Buckets["classes"], helper.IntsToStrings(user.Classes...))
 		if err != nil {
 			log.Printf("fallback: user %s classes not loaded: %v", username, err)
 			classes = []*models.Class{}
