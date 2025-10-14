@@ -69,7 +69,7 @@ func Init(path string) (*Store, error) {
 			log.Fatal("missing adminPassword env vars")
 		}
 
-		if _, err := CreateUser(store, adminPassword, "admin", "", "", "admin", "", ""); err != nil {
+		if _, err := CreateUser(store, "admin", adminPassword, "", "", "admin", "", ""); err != nil {
 			fmt.Printf("Error creating Admin user: %v\n", err)
 		}
 

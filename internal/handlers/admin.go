@@ -3,35 +3,70 @@ package handlers
 import (
 	"fmt"
 	"frontend/database"
-	"frontend/database/models"
+	"frontend/dto"
 	"frontend/internal/render"
 	"frontend/templates/body"
-	"frontend/templates/components/panelsContent"
-	"frontend/templates/components/pdfViewer/pdfViewer"
+	"frontend/templates/components/admin/adminHome"
 	"net/http"
-	"strconv"
 )
 
-type SubOptionSlot struct {
-	Title string
-	Url   string
+var options []*dto.AdminOption = []*dto.AdminOption{
+	&dto.AdminOption{
+		Title:       "Gestión de Usuarios",
+		Description: "Ver y modificar información de los usuarios",
+		SubUrl:      "user",
+		SubOptions: []*dto.AdminSubOptionSlot{
+			&dto.AdminSubOptionSlot{
+				Title: "Crear",
+				Url:   "create",
+			},
+			&dto.AdminSubOptionSlot{
+				Title: "Buscar",
+				Url:   "search",
+			},
+		},
+	},
+	&dto.AdminOption{
+		Title:       "Gestión de Materias",
+		Description: "Crear, editar y administrar información de materias",
+		SubUrl:      "user",
+		SubOptions: []*dto.AdminSubOptionSlot{
+			&dto.AdminSubOptionSlot{
+				Title: "Administrar",
+				Url:   "manage",
+			},
+		},
+	},
+	&dto.AdminOption{
+		Title:       "Clases",
+		Description: "Crear, buscar y administrar clases",
+		SubUrl:      "class",
+		SubOptions: []*dto.AdminSubOptionSlot{
+			&dto.AdminSubOptionSlot{
+				Title: "Crear",
+				Url:   "create",
+			},
+			&dto.AdminSubOptionSlot{
+				Title: "Buscar",
+				Url:   "search",
+			},
+		},
+	},
+	&dto.AdminOption{
+		Title:       "Recursos",
+		Description: "Agregar y eliminar materiales y archivos",
+		SubUrl:      "class",
+		SubOptions: []*dto.AdminSubOptionSlot{
+			&dto.AdminSubOptionSlot{
+				Title: "Administrar",
+				Url:   "manage",
+			},
+		},
+	},
 }
 
 func HandleAdminDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminDefault] Request received")
 
-	classIdString := strconv.Itoa(classId)
-	class, err := database.Get[models.Class](store, database.Buckets["classes"], classIdString)
-	if err != nil {
-		fmt.Printf("Error getting user: %v \n", err)
-	}
-
-	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], class.Subject, class.Grade)
-	if err != nil {
-		fmt.Printf("Error getting assets: %v \n", err)
-	}
-
-	assets = database.FilterInvalidAssets(assets)
-
-	render.RenderWithLayout(w, r, panelsContent.PanelsContent(pdfViewer.PdfViewer("", assets, classIdString)), body.Home)
+	render.RenderWithLayout(w, r, adminHome.AdminHome(options), body.Home)
 }

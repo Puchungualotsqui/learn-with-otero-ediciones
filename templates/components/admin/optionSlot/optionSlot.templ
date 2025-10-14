@@ -1,19 +1,19 @@
 package optionSlot
 
 import (
-	"frontend/internal/handlers"
+	"frontend/dto"
 )
 
-templ ClassSlot(title, description string, options []handlers.SubOptionSlot) {
+templ OptionSlot(info *dto.AdminOption) {
 	<div class="bg-white border border-gray-200 shadow hover:shadow-md transition rounded-lg flex flex-col">
 		<div class="p-5 flex-1">
-			<h2 class="text-lg font-semibold text-gray-900">{ title }</h2>
-			<p class="text-gray-600 text-sm mt-1">{ description }</p>
+			<h2 class="text-lg font-semibold text-gray-900">{ info.Title }</h2>
+			<p class="text-gray-600 text-sm mt-1">{ info.Description }</p>
 		</div>
 		<div class="flex divide-x divide-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
-			for _, option := range options {
+			for _, option := range info.SubOptions {
 				<button
-					hx-get={"/admin/" + option.Url}
+					hx-get={"/admin/" + info.SubUrl + "/" + option.Url}
 					hx-target="#content"
 					hx-push-url="true"
 					class="flex-1 py-2 text-sm text-gray-700 hover:bg-gray-100 transition cursor-pointer">

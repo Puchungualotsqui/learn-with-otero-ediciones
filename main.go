@@ -22,7 +22,7 @@ func main() {
 	}
 	defer store.Close()
 
-	database.RefreshAssets(store, storage)
+	//database.RefreshAssets(store, storage)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		router.Router(store, storage, w, r)
