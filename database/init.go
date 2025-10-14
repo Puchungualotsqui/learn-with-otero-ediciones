@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.etcd.io/bbolt"
 )
 
@@ -57,9 +58,24 @@ func Init(path string) (*Store, error) {
 	if newDB {
 		log.Println("🌱 Seeding database with test data...")
 
+		err := godotenv.Load(".venv") // use ".env" if you renamed it
+		if err != nil {
+			log.Fatal("Error loading .venv file")
+		}
+
+		adminPassword := os.Getenv("ADMIN_PASSWORD")
+
+		if adminPassword == "" {
+			log.Fatal("missing adminPassword env vars")
+		}
+
+		if _, err := CreateUser(store, adminPassword, "admin", "", "", "admin", "", ""); err != nil {
+			fmt.Printf("Error creating Admin user: %v\n", err)
+		}
+
 		// Create sample users
-		_ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor")
-		if err := CreateUser(store, "student1", "password", "Bob", "Perez", "student"); err != nil {
+		_, _ = CreateUser(store, "prof1", "password", "Alice", "Smith", "professor", "Otero Ediciones", "1primaria")
+		if _, err := CreateUser(store, "student1", "password", "Bob", "Perez", "student", "Otero Ediciones", "1primaria"); err != nil {
 			fmt.Printf("Error creating User: %v\n", err)
 		}
 

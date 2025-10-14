@@ -7,26 +7,39 @@ import (
 	"frontend/helper"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 // CreateUser stores a new user with hashing + encryption
-func CreateUser(s *Store, username, plainPassword, firstName, lastName, role string) error {
-	err := godotenv.Load(".venv")
-	if err != nil {
-		return fmt.Errorf("Error loading .env file")
+func CreateUser(s *Store, username, plainPassword, firstName, lastName, role, school, grade string) (*models.User, error) {
+	// --- Load encryption key
+	if err := godotenv.Load(".venv"); err != nil {
+		return nil, fmt.Errorf("Error loading .env file: %w", err)
+	}
+	encKey := os.Getenv("ENC_KEY")
+	if encKey == "" {
+		return nil, fmt.Errorf("ENC_KEY not found in environment")
 	}
 
-	encKey := os.Getenv("ENC_KEY")
+	if strings.TrimSpace(plainPassword) == "" {
+		plainPassword = auth.GenerateRandomPassword(10)
+	}
 
+	// --- Hash and encrypt password
 	hashed, err := auth.HashPassword(plainPassword)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("hash password: %w", err)
 	}
 	encrypted, err := auth.Encrypt([]byte(encKey), plainPassword)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("encrypt password: %w", err)
+	}
+
+	// --- Generate username
+	if strings.TrimSpace(username) == "" {
+		username = generateUsername(s, firstName, lastName, school, grade)
 	}
 
 	u := models.User{
@@ -35,10 +48,17 @@ func CreateUser(s *Store, username, plainPassword, firstName, lastName, role str
 		PasswordNotHashed: encrypted,
 		FirstName:         firstName,
 		LastName:          lastName,
+		School:            school,
+		Grade:             grade,
 		Role:              role,
 	}
 
-	return Save(s, Buckets["users"], u.Username, u)
+	// --- Save to database
+	if err := Save(s, Buckets["users"], u.Username, u); err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 func DeleteUser(s *Store, username string) error {
@@ -57,4 +77,63 @@ func DeleteUser(s *Store, username string) error {
 	}
 
 	return Delete(s, Buckets["users"], username)
+}
+
+func generateUsername(s *Store, firstName, lastName, school, grade string) string {
+	// Helper: lowercases and takes first word
+	clean := func(v string) string {
+		parts := strings.Fields(v)
+		for i := range parts {
+			parts[i] = strings.ToLower(parts[i])
+		}
+		parts = helper.Remove(parts, "colegio") // removes word "colegio"
+		if len(parts) == 0 {
+			return ""
+		}
+		return parts[0]
+	}
+
+	f := clean(firstName)
+	l := clean(lastName)
+	schoolPart := clean(school)
+
+	// ✅ Handle special or minimal cases
+	if f == "admin" {
+		return "admin"
+	}
+	if f == "" && l == "" {
+		return "user"
+	}
+	if l == "" {
+		l = f
+	}
+	if schoolPart == "" {
+		schoolPart = "school"
+	}
+
+	// Base like "juanp-germania"
+	base := fmt.Sprintf("%s%s-%s", f, string(l[0]), schoolPart)
+
+	// Check uniqueness
+	username := base
+	counter := 1
+	for {
+		exists, _ := Exists(s, Buckets["users"], username)
+		if !exists {
+			break
+		}
+
+		// Try variant with grade
+		username = fmt.Sprintf("%s%s-%s", f, string(l[0]), grade)
+		exists, _ = Exists(s, Buckets["users"], username)
+		if !exists {
+			break
+		}
+
+		// Add numeric suffix
+		username = fmt.Sprintf("%s%d", base, counter)
+		counter++
+	}
+
+	return username
 }

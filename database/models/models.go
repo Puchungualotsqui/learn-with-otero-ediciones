@@ -6,6 +6,8 @@ type User struct {
 	PasswordNotHashed string `json:"password_now_hashed"`
 	FirstName         string `json:"first_name"`
 	LastName          string `json:"last_name"`
+	School            string `json:"school"`
+	Grade             string `json:"grade"`
 	Role              string `json:"role"`
 	Classes           []int  `json:"classes"`
 }

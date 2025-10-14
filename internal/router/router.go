@@ -123,6 +123,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			return
 		}
 
+		if user.Role == "admin" {
+			fmt.Println("📌 Routed to HandleAdminDefault")
+			handlers.HandleAdminDefault(store, w, r)
+			return
+		}
+
 		render.RenderWithLayout(w, r, home.Home(classes, professor), body.Home)
 		return
 

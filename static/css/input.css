@@ -1,51 +1,57 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "./daisyui.js";
 
-@import "tailwindcss" source(none);
 @source "../../**/*.templ";
 @source "../*.html";
 @source "../**/*.html";
 
-@plugin "./daisyui.js";
+@layer base {
+    /* Force visible scrollbar in all browsers */
+    .custom-scrollbar {
+        overflow-y: scroll !important;
+        scrollbar-gutter: stable;
+        scrollbar-width: auto;
+        scrollbar-color: #000000 #f3f4f6;
+    }
 
-/** @type {import('tailwindcss').Config} */
-	module.exports = {
-	  content: [
-	    "../../**/*.templ",
-	    "./static/**/*.html",
-	  ],
-	  theme: {
-	    extend: {},
-	  },
-	};
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 12px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f3f4f6;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #000000;
+        border-radius: 6px;
+        border: 2px solid #f3f4f6;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #111111;
+    }
+}
 
+@layer base {
+    .input-clean {
+        /* replicate DaisyUI input appearance manually */
+        display: block;
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid rgb(209 213 219); /* gray-300 */
+        background-color: white;
+        color: rgb(31 41 55); /* gray-800 */
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem; /* text-sm */
+        line-height: 1.25rem;
+        transition: all 0.2s ease;
+    }
 
-	@layer base {
-  /* Force visible scrollbar in all browsers */
-  .custom-scrollbar {
-    overflow-y: scroll !important;
-    scrollbar-gutter: stable; /* prevents content shift */
-    scrollbar-width: auto; /* for Firefox */
-    scrollbar-color: #000000 #f3f4f6; /* thumb, track */
-  }
+    .input-clean::placeholder {
+        color: rgb(156 163 175); /* gray-400 */
+    }
 
-  /* WebKit-based browsers (Chrome, Edge, Safari, Brave, etc.) */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f3f4f6; /* gray-100 track */
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #000000; /* solid black thumb */
-    border-radius: 6px;
-    border: 2px solid #f3f4f6; /* gives visual gap */
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #111111; /* slightly lighter black on hover */
-  }
+    .input-clean:focus {
+        outline: none;
+        border-color: rgb(248 113 113); /* red-400 */
+        box-shadow: 0 0 0 1px rgb(248 113 113); /* red ring */
+    }
 }
