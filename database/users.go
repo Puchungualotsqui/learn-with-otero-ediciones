@@ -13,6 +13,7 @@ import (
 )
 
 // CreateUser stores a new user with hashing + encryption
+// plainPassword and username are optional
 func CreateUser(s *Store, username, plainPassword, firstName, lastName, role, school, grade string) (*models.User, error) {
 	// --- Load encryption key
 	if err := godotenv.Load(".venv"); err != nil {
@@ -57,6 +58,8 @@ func CreateUser(s *Store, username, plainPassword, firstName, lastName, role, sc
 	if err := Save(s, Buckets["users"], u.Username, u); err != nil {
 		return nil, err
 	}
+
+	u.PasswordNotHashed = plainPassword
 
 	return &u, nil
 }

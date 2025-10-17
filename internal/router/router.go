@@ -125,7 +125,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 		if user.Role == "admin" {
 			fmt.Println("📌 Routed to HandleAdminDefault")
-			handlers.HandleAdminDefault(store, w, r)
+			handlers.HandleAdminDefault(w, r)
 			return
 		}
 
@@ -230,6 +230,37 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		}
 		http.NotFound(w, r)
 		return
+
+	case parts[0] == "admin":
+		user, err := database.Get[models.User](store, database.Buckets["users"], username)
+		if err != nil {
+			log.Printf("panic: user %s info not loaded: %v", username, err)
+			return
+		}
+
+		if user.Role != "admin" {
+			log.Printf("panic: user %s not allowed", username)
+			return
+		}
+
+		switch parts[1] {
+		case "user":
+			switch parts[2] {
+			case "create":
+				switch r.Method {
+				case http.MethodGet:
+					fmt.Printf("📌 Routed to HandleAdminUserCreate")
+					handlers.HandleAdminUserCreateDefault(w, r)
+					return
+
+				case http.MethodPost:
+					fmt.Printf("📌 Routed to HandleAdminUserCreatePost")
+					handlers.HandleAdminUserCreatePost(store, w, r)
+					return
+				}
+
+			}
+		}
 
 	default:
 		http.NotFound(w, r)
