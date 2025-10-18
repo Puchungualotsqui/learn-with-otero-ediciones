@@ -15,6 +15,7 @@ import (
 	"frontend/templates/components/admin/adminMessage"
 	"frontend/templates/components/admin/adminUserModify"
 	"frontend/templates/components/admin/adminUserModifyForm"
+	"html"
 	"net/http"
 )
 
@@ -202,15 +203,16 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 		t.School = school
 		t.Grade = grade
 
-		for _, id := range payload.Del {
-			t.Classes = helper.RemoveElement(t.Classes, id)
-		}
-
-		if len(payload.Add) > 0 || len(payload.Keep) > 0 {
-			t.Classes = append(payload.Keep, payload.Add...)
-		}
 		return nil
 	}, username)
+
+	for _, id := range payload.Add {
+		database.AddUserToClass(store, id, username)
+	}
+
+	for _, id := range payload.Del {
+		database.RemoveUserFromClass(store, id, username)
+	}
 
 	message := fmt.Sprintf("User: %s . Was modified", username)
 
@@ -219,7 +221,7 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 
 func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
-	adminPass := r.URL.Query().Get("prompt") // from hx-prompt
+	key := r.Header.Get("HX-Prompt") // from hx-prompt
 
 	// Validate admin password here (compare hash, or session role == admin)
 	user, err := database.Get[models.User](store, database.Buckets["users"], username)
@@ -228,11 +230,18 @@ func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter,
 		return
 	}
 
-	plain, err := auth.Decrypt([]byte(adminPass), user.PasswordNotHashed)
+	plain, err := auth.Decrypt([]byte(key), user.PasswordNotHashed)
 	if err != nil {
 		http.Error(w, "Error al descifrar contraseña", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, `<input type="text" id="password-field" value="%s" class="input input-bordered w-full bg-white text-gray-800 text-sm" readonly />`, plain)
+	safePassword := html.EscapeString(plain)
+
+	// Return a new input field that HTMX swaps in
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<input type="text" id="password-field"
+			value="%s"
+			readonly
+			class="input input-bordered bg-white text-gray-800 text-sm w-40 cursor-not-allowed" />`, safePassword)
 }

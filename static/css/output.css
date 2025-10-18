@@ -1915,6 +1915,9 @@
       }
     }
   }
+  .\!visible {
+    visibility: visible !important;
+  }
   .collapse {
     visibility: collapse;
   }
@@ -5871,6 +5874,9 @@
   }
   .w-24 {
     width: calc(var(--spacing) * 24);
+  }
+  .w-40 {
+    width: calc(var(--spacing) * 40);
   }
   .w-auto {
     width: auto;

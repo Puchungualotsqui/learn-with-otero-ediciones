@@ -122,15 +122,48 @@ templ AdminUserModifyForm(user *models.User, classes []*models.Class) {
 	    </div>
 
 	    <!-- Contraseña -->
-	    <div class="form-control md:col-span-2 w-fit">
-	      <label class="label p-0 mb-1">
-	        <span class="label-text text-gray-700 text-sm font-medium">Contraseña</span>
-	      </label>
-	      <div class="relative inline-flex items-center border border-gray-300 rounded-lg px-2 py-1 bg-white">
-	        <input type="password" value="********" readonly
-	               class="bg-transparent text-gray-800 text-sm outline-none w-auto px-1 select-none cursor-not-allowed" />
-	      </div>
-	    </div>
+		<div class="form-control md:col-span-2 w-fit"
+		     x-data="{ visible: false }">
+		  <label class="label p-0 mb-1">
+		    <span class="label-text text-gray-700 text-sm font-medium">Contraseña</span>
+		  </label>
+
+		  <div class="flex items-center gap-2">
+		    <!-- Password input -->
+		    <input type="password"
+		           id="password-field"
+		           name="password"
+		           value="********"
+		           readonly
+		           :type="visible ? 'text' : 'password'"
+		           class="input input-bordered bg-white text-gray-800 text-sm w-40 cursor-not-allowed" />
+
+		    <!-- Toggle visibility -->
+		    <button type="button"
+		            class="btn btn-xs btn-outline"
+		            @click="visible = !visible"
+		            x-text="visible ? 'Ocultar' : 'Mostrar'">
+		    </button>
+
+		    <!-- HTMX decryption button -->
+		    <button type="button"
+		            class="btn btn-xs bg-blue-600 text-white"
+		            hx-get={"/admin/user/modify/reveal-password?username=" + user.Username}
+		            hx-prompt="Ingrese la clave de desencriptación:"
+		            hx-target="#password-field"
+		            hx-swap="outerHTML"
+		            hx-indicator="#decrypt-spinner">
+		      Desencriptar
+		    </button>
+
+		    <!-- Spinner indicator -->
+		    <div id="decrypt-spinner" class="htmx-indicator ml-2 text-gray-400 text-xs">
+		      Descifrando...
+		    </div>
+		  </div>
+		</div>
+
+
 
 	    <!-- Guardar -->
 	    <div class="md:col-span-2 flex justify-end mt-4">

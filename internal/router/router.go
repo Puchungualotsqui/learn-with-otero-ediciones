@@ -260,8 +260,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				}
 
 			case "modify":
-				switch len(parts) {
-				case 4:
+				if len(parts) >= 4 {
 					switch parts[3] {
 					case "search":
 						fmt.Printf("📌 Routed to HandleAdminUsserModifySearch")
@@ -278,7 +277,6 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 						handlers.HandleAdminUserModifyUpdate(store, w, r)
 						return
 					}
-
 				}
 
 				fmt.Printf("📌 Routed to HandleAdminUserModify")
