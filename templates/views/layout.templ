@@ -86,6 +86,83 @@ function fileManager() {
 }
 </script>
 
+<script>
+function classManager() {
+  return {
+    classes: {},   // {id: name}
+    toDelete: {},  // track marked-for-deletion
+
+    initExisting(list) {
+      if (!list || list.length === 0) return;
+      if (typeof list === 'string') {
+        try { list = JSON.parse(list); } catch { return; }
+      }
+      if (typeof list[0] === 'object') {
+        list.forEach(c => this.classes[c.id || c.ID] = c.name || c.Name);
+      } else {
+        list.forEach(id => this.classes[id] = 'Desconocido');
+      }
+    },
+
+
+    addClass(id, name = 'Nueva clase') {
+      id = parseInt(id);
+      if (!id || this.classes[id]) return;
+      this.classes[id] = name;
+    },
+
+    markForDeletion(id) {
+      if (this.classes[id]) this.toDelete[id] = true;
+    },
+
+    restore(id) {
+      delete this.toDelete[id];
+    },
+
+    finalizeDeletions() {
+      for (const id in this.toDelete) delete this.classes[id];
+      this.toDelete = {};
+    },
+
+    // 🚀 Converts state into JSON string for backend
+    getPayload() {
+      const add = [];
+      const keep = [];
+      const del = [];
+
+      for (const id in this.classes) {
+        if (this.toDelete[id]) continue;
+        // treat classes not marked for deletion as keep
+        if (this.classes[id] === 'Nueva clase') add.push(parseInt(id));
+        else keep.push(parseInt(id));
+      }
+
+      for (const id in this.toDelete) {
+        del.push(parseInt(id));
+      }
+
+      return JSON.stringify({ add, keep, del });
+    },
+
+    // 🧠 Attach to form before submit (for HTMX)
+    handleSubmit(event) {
+      // just before HTMX serializes inputs
+      const form = event.target;
+      let hidden = form.querySelector('input[name="class_data"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'class_data';
+        form.appendChild(hidden);
+      }
+      hidden.value = this.getPayload(); // inject the JSON
+    }
+
+  };
+}
+</script>
+
+
 <script type="module">
   // Load pdf.js (module build) and point to the worker file
   import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs";

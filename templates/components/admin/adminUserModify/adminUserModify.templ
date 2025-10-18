@@ -1,0 +1,32 @@
+package adminUserModify
+
+templ AdminUserModify() {
+  <section class="bg-white rounded-lg shadow-sm p-6 space-y-4">
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Modificar Usuario</h2>
+    <p class="text-gray-600 text-sm mb-4">
+      Busca un usuario por su nombre de usuario para editar sus datos.
+    </p>
+
+    <!-- Search User -->
+    <form
+      hx-get="/admin/user/modify/search"
+      hx-target="#user-edit-form"
+      hx-swap="innerHTML"
+      class="flex gap-2 items-center"
+    >
+      <input
+        type="text"
+        name="username"
+        placeholder="Nombre de usuario"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm flex-1"
+        required
+      />
+      <button type="submit" class="btn bg-blue-600 text-white hover:bg-blue-700 text-sm">
+        Buscar
+      </button>
+    </form>
+
+    <!-- Dynamic User Form -->
+    <div id="user-edit-form" class="mt-6"></div>
+  </section>
+}

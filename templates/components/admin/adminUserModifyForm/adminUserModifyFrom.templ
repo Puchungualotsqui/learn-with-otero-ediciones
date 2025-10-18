@@ -1,0 +1,145 @@
+package adminUserModifyForm
+
+import (
+	"encoding/json"
+	"fmt"
+	"frontend/database/models"
+)
+
+templ AdminUserModifyForm(user *models.User, classes []*models.Class) {
+	// marshal classes to JSON before writing HTML
+	{{ classesJSONBytes, _ := json.Marshal(classes) }}
+	{{ classesJSON := string(classesJSONBytes) }}
+
+	<div id="user-edit-wrapper"
+	     x-data="classManager()"
+	     x-init={ fmt.Sprintf(`initExisting(%s)`, classesJSON) }
+	     class="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3 animate-fade-in">
+
+	  <h3 class="text-lg font-semibold text-gray-700 mb-3">
+	    Editando: { user.Username }
+	  </h3>
+
+	  <form
+	    id="user-edit-form"
+	    hx-post="/admin/user/modify/update"
+	    hx-target="#create-user-feedback"
+	    hx-swap="innerHTML"
+	    hx-trigger="submit"
+	    @submit="handleSubmit"
+	    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+	  >
+	    <input type="hidden" name="username" value={ user.Username } />
+
+	    <!-- Nombre -->
+	    <div class="form-control">
+	      <label class="label"><span class="label-text text-gray-700">Nombre</span></label>
+	      <input type="text" name="first_name" value={ user.FirstName } required
+	             class="input input-bordered bg-white text-gray-800 text-sm" />
+	    </div>
+
+	    <!-- Apellido -->
+	    <div class="form-control">
+	      <label class="label"><span class="label-text text-gray-700">Apellido</span></label>
+	      <input type="text" name="last_name" value={ user.LastName } required
+	             class="input input-bordered bg-white text-gray-800 text-sm" />
+	    </div>
+
+	    <!-- Colegio -->
+	    <div class="form-control">
+	      <label class="label"><span class="label-text text-gray-700">Colegio</span></label>
+	      <input type="text" name="school" value={ user.School }
+	             class="input input-bordered bg-white text-gray-800 text-sm" />
+	    </div>
+
+	    <!-- Grado -->
+	    <div class="form-control">
+	      <label class="label"><span class="label-text text-gray-700 font-medium">Grado</span></label>
+	      <select name="grade" required class="select select-bordered bg-white text-gray-800 text-sm">
+	        <option disabled selected>Seleccionar grado...</option>
+	        <optgroup label="Primaria">
+			  <option value="1primaria" selected?={ user.Grade == "1primaria" }>1° de Primaria</option>
+			  <option value="2primaria" selected?={ user.Grade == "2primaria" }>2° de Primaria</option>
+			  <option value="3primaria" selected?={ user.Grade == "3primaria" }>3° de Primaria</option>
+			  <option value="4primaria" selected?={ user.Grade == "4primaria" }>4° de Primaria</option>
+			  <option value="5primaria" selected?={ user.Grade == "5primaria" }>5° de Primaria</option>
+			  <option value="6primaria" selected?={ user.Grade == "6primaria" }>6° de Primaria</option>
+			</optgroup>
+
+			<optgroup label="Secundaria">
+			  <option value="1secundaria" selected?={ user.Grade == "1secundaria" }>1° de Secundaria</option>
+			  <option value="2secundaria" selected?={ user.Grade == "2secundaria" }>2° de Secundaria</option>
+			  <option value="3secundaria" selected?={ user.Grade == "3secundaria" }>3° de Secundaria</option>
+			  <option value="4secundaria" selected?={ user.Grade == "4secundaria" }>4° de Secundaria</option>
+			  <option value="5secundaria" selected?={ user.Grade == "5secundaria" }>5° de Secundaria</option>
+			  <option value="6secundaria" selected?={ user.Grade == "6secundaria" }>6° de Secundaria</option>
+			</optgroup>
+
+	      </select>
+	    </div>
+
+	    <!-- Rol -->
+	    <div class="form-control">
+	      <label class="label"><span class="label-text text-gray-700">Rol</span></label>
+	      <select name="role" required class="select select-bordered bg-white text-gray-800 text-sm">
+	        <option value="student" selected?={ user.Role == "student" }>Estudiante</option>
+			<option value="professor" selected?={ user.Role == "professor" }>Profesor</option>
+			<option value="admin" selected?={ user.Role == "admin" }>Administrador</option>
+	      </select>
+	    </div>
+
+	    <!-- Clases -->
+	    <div class="form-control md:col-span-2 space-y-2">
+	      <label class="label p-0 mb-1">
+	        <span class="label-text text-gray-700 text-sm font-medium">Clases asignadas</span>
+	      </label>
+
+	      <div class="border rounded-md bg-white p-2 max-h-48 overflow-y-auto">
+	        <template x-for="(name, id) in classes" :key="id">
+	          <div class="flex justify-between items-center border-b py-1 text-sm">
+	            <span class="text-gray-900">
+				  <b class="text-black" x-text="id"></b> —
+				  <span x-text="name" class="text-gray-800"></span>
+				</span>
+
+	            <button type="button"
+	                    class="btn btn-xs"
+	                    :class="toDelete[id] ? 'btn-warning' : 'btn-error'"
+	                    x-text="toDelete[id] ? 'Restaurar' : 'Eliminar'"
+	                    @click="toDelete[id] ? restore(id) : markForDeletion(id)">
+	            </button>
+	          </div>
+	        </template>
+	        <template x-if="Object.keys(classes).length === 0">
+	          <p class="text-gray-400 italic text-center py-2">Sin clases</p>
+	        </template>
+	      </div>
+
+	      <div class="flex items-center gap-2 mt-2">
+	        <input type="number" x-ref="newId" class="input input-bordered w-24" placeholder="ID" />
+	        <button type="button" class="btn btn-sm" @click="addClass($refs.newId.value)">Agregar</button>
+	      </div>
+	    </div>
+
+	    <!-- Contraseña -->
+	    <div class="form-control md:col-span-2 w-fit">
+	      <label class="label p-0 mb-1">
+	        <span class="label-text text-gray-700 text-sm font-medium">Contraseña</span>
+	      </label>
+	      <div class="relative inline-flex items-center border border-gray-300 rounded-lg px-2 py-1 bg-white">
+	        <input type="password" value="********" readonly
+	               class="bg-transparent text-gray-800 text-sm outline-none w-auto px-1 select-none cursor-not-allowed" />
+	      </div>
+	    </div>
+
+	    <!-- Guardar -->
+	    <div class="md:col-span-2 flex justify-end mt-4">
+	      <button type="submit" class="btn bg-green-600 text-white hover:bg-green-700 text-sm px-6">
+	        Guardar Cambios
+	      </button>
+	    </div>
+	  </form>
+
+	<div id="create-user-feedback"></div>
+	</div>
+}

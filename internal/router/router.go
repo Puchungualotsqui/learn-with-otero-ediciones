@@ -259,6 +259,31 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					return
 				}
 
+			case "modify":
+				switch len(parts) {
+				case 4:
+					switch parts[3] {
+					case "search":
+						fmt.Printf("📌 Routed to HandleAdminUsserModifySearch")
+						handlers.HandleAdminUserModifySearch(store, w, r)
+						return
+
+					case "reveal-password":
+						fmt.Printf("📌 Routed to HandleAdminUserRevealPassword")
+						handlers.HandleAdminUserRevealPassword(store, w, r)
+						return
+
+					case "update":
+						fmt.Printf("📌 Routed to HandleAdminUserModifyUpdate")
+						handlers.HandleAdminUserModifyUpdate(store, w, r)
+						return
+					}
+
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminUserModify")
+				handlers.HandleAdminUserModifyDefault(w, r)
+				return
 			}
 		}
 
