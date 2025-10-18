@@ -82,7 +82,7 @@ func RefreshAssets(store *Store, storage *storage.B2Storage) {
 			defer func() { <-sem }()
 
 			prefix := fmt.Sprintf("recursos/%s/%s/", subjectName, grade)
-			assets, err := ListByPrefix[models.Asset](store, Buckets["assets"], subjectName, grade)
+			assets, err := ListByPrefix[models.Asset](store, Buckets["assets"], 200, subjectName, grade)
 			if err == nil {
 				for _, asset := range assets {
 					Delete(store, Buckets["assets"], fmt.Sprintf("%s:%s:%s", subjectName, grade, asset.Name))

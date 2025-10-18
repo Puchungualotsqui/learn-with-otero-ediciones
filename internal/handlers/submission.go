@@ -104,7 +104,7 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 		if !dateStatus.Past {
 			assignment = nil
 		} else {
-			submissions, err = database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], parts[0], parts[2])
+			submissions, err = database.ListByPrefix[models.Submission](store, database.Buckets["submissions"], 200, parts[0], parts[2])
 			if err != nil {
 				fmt.Println("Error fetching submissions: %w", err)
 				http.Error(w, "Server database error", http.StatusInternalServerError)

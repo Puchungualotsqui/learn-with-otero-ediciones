@@ -86,5 +86,5 @@ func GetSubmissionsByAssignment(s *Store, classId, assignmentId int) ([]*models.
 	}
 	key := strings.Join(keyParts, ":")
 
-	return ListByPrefix[models.Submission](s, Buckets["submissions"], key)
+	return ListByPrefix[models.Submission](s, Buckets["submissions"], 200, key)
 }

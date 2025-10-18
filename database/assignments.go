@@ -82,6 +82,7 @@ func ListAssignmentsOfClass(store *Store, classID int) []*models.Assignment {
 	assignments, err := ListByPrefix[models.Assignment](
 		store,
 		Buckets["assignments"],
+		200,
 		key,
 	)
 

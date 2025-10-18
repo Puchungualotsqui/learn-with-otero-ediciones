@@ -168,13 +168,17 @@ func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 	return found
 }
 
-func List[T any](s *Store, bucketName []byte) ([]*T, error) {
+func List[T any](s *Store, bucketName []byte, limit int) ([]*T, error) {
 	var out []*T
+	var stopErr = fmt.Errorf("stop iteration")
+
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucketName)
 		if b == nil {
 			return fmt.Errorf("bucket %s not found", bucketName)
 		}
+
+		count := 0
 		return b.ForEach(func(k, v []byte) error {
 			var u T
 			if err := json.Unmarshal(v, &u); err != nil {
@@ -182,13 +186,24 @@ func List[T any](s *Store, bucketName []byte) ([]*T, error) {
 			}
 			uCopy := u
 			out = append(out, &uCopy)
+
+			count++
+			if limit > 0 && count >= limit {
+				return stopErr // manually break out
+			}
 			return nil
 		})
 	})
+
+	// Ignore our manual stop signal
+	if err == stopErr {
+		err = nil
+	}
+
 	return out, err
 }
 
-func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]*T, error) {
+func ListByPrefix[T any](s *Store, bucket []byte, limit int, prefixes ...string) ([]*T, error) {
 	var results []*T
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
@@ -199,18 +214,31 @@ func ListByPrefix[T any](s *Store, bucket []byte, prefixes ...string) ([]*T, err
 
 		c := b.Cursor()
 
-		// join prefixes into one composite prefix
-		prefix := strings.Join(prefixes, ":") + ":"
+		// Build composite prefix (if none, list all)
+		prefix := ""
+		if len(prefixes) > 0 {
+			prefix = strings.Join(prefixes, ":") + ":"
+		}
 		p := []byte(prefix)
 
-		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
+		count := 0
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if prefix != "" && !bytes.HasPrefix(k, p) {
+				continue
+			}
+
 			var u T
 			if err := json.Unmarshal(v, &u); err != nil {
-				return err
+				return fmt.Errorf("unmarshal %q: %w", k, err)
 			}
-			// ensure a new pointer is appended each iteration
+
 			uCopy := u
 			results = append(results, &uCopy)
+
+			count++
+			if limit > 0 && count >= limit {
+				break
+			}
 		}
 		return nil
 	})

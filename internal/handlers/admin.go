@@ -15,8 +15,13 @@ import (
 	"frontend/templates/components/admin/adminMessage"
 	"frontend/templates/components/admin/adminUserModify"
 	"frontend/templates/components/admin/adminUserModifyForm"
+	"frontend/templates/components/admin/adminUserSearch"
+	"frontend/templates/components/admin/adminUserSearchResults"
 	"html"
 	"net/http"
+	"slices"
+	"strconv"
+	"strings"
 )
 
 var options []*dto.AdminOption = []*dto.AdminOption{
@@ -47,6 +52,10 @@ var options []*dto.AdminOption = []*dto.AdminOption{
 			&dto.AdminSubOptionSlot{
 				Title: "Crear",
 				Url:   "create",
+			},
+			&dto.AdminSubOptionSlot{
+				Title: "Modificar",
+				Url:   "modify",
 			},
 			&dto.AdminSubOptionSlot{
 				Title: "Buscar",
@@ -244,4 +253,58 @@ func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter,
 			value="%s"
 			readonly
 			class="input input-bordered bg-white text-gray-800 text-sm w-40 cursor-not-allowed" />`, safePassword)
+}
+
+func HandleAdminUserSearchDefault(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("📥 [HandleAdminUserSearchDefault] Request received")
+
+	render.RenderWithLayout(w, r, adminUserSearch.AdminUserSearch(), body.Home)
+	fmt.Println("  ✔ Render complete")
+}
+
+func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	role := r.URL.Query().Get("role")
+	grade := r.URL.Query().Get("grade")
+	school := strings.TrimSpace(r.URL.Query().Get("school"))
+	classID := r.URL.Query().Get("class")
+
+	users, err := database.List[models.User](store, database.Buckets["users"], 200)
+	if err != nil {
+		http.Error(w, "Error fetching users", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("users found were: ", len(users))
+
+	// Fuzzy filters
+	var results []*models.User
+	for _, u := range users {
+		if query != "" {
+			q := strings.ToLower(query)
+			if !strings.Contains(strings.ToLower(u.Username), q) &&
+				!strings.Contains(strings.ToLower(u.FirstName), q) &&
+				!strings.Contains(strings.ToLower(u.LastName), q) {
+				continue
+			}
+		}
+		if school != "" && !strings.Contains(strings.ToLower(u.School), strings.ToLower(school)) {
+			continue
+		}
+		if role != "" && u.Role != role {
+			continue
+		}
+		if grade != "" && u.Grade != grade {
+			continue
+		}
+		if classID != "" {
+			id, _ := strconv.Atoi(classID)
+			if !slices.Contains(u.Classes, id) {
+				continue
+			}
+		}
+		results = append(results, u)
+	}
+
+	adminUserSearchResults.AdminUserSearchResults(results).Render(r.Context(), w)
 }

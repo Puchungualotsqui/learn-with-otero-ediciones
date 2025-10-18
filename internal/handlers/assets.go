@@ -24,7 +24,7 @@ func HandleAssetsDefault(store *database.Store, w http.ResponseWriter, r *http.R
 		fmt.Printf("Error getting user: %v \n", err)
 	}
 
-	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], class.Subject, class.Grade)
+	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], 200, class.Subject, class.Grade)
 	if err != nil {
 		fmt.Printf("Error getting assets: %v \n", err)
 	}

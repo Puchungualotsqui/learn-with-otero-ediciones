@@ -1,32 +1,49 @@
 package adminUserModify
 
 templ AdminUserModify() {
-  <section class="bg-white rounded-lg shadow-sm p-6 space-y-4">
-    <h2 class="text-xl font-semibold text-gray-800 mb-2">Modificar Usuario</h2>
-    <p class="text-gray-600 text-sm mb-4">
-      Busca un usuario por su nombre de usuario para editar sus datos.
-    </p>
+<section class="bg-white rounded-lg shadow-md border border-gray-200 p-6 space-y-6 animate-fade-in">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-semibold text-black tracking-tight">
+      Modificar usuario
+    </h2>
+    <span class="text-sm text-gray-500 italic">Panel de administración</span>
+  </div>
 
-    <!-- Search User -->
-    <form
-      hx-get="/admin/user/modify/search"
-      hx-target="#user-edit-form"
-      hx-swap="innerHTML"
-      class="flex gap-2 items-center"
-    >
-      <input
-        type="text"
-        name="username"
-        placeholder="Nombre de usuario"
-        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm flex-1"
-        required
-      />
-      <button type="submit" class="btn bg-blue-600 text-white hover:bg-blue-700 text-sm">
+  <!-- Description -->
+  <p class="text-gray-600 text-sm">
+    Busca un usuario por su nombre de usuario para editar su información o asignar clases.
+  </p>
+
+  <!-- Search form -->
+  <form hx-get="/admin/user/modify/search"
+        hx-target="#user-edit-form"
+        hx-swap="innerHTML"
+        hx-trigger="submit"
+        class="flex flex-wrap items-end gap-4 border border-gray-200 bg-gray-50 rounded-lg px-5 py-4">
+
+    <!-- Username input -->
+    <div class="flex flex-col flex-grow min-w-[220px]">
+      <input type="text"
+             name="username"
+             placeholder="Ej. juanperez"
+             class="input input-bordered bg-white border-gray-300 text-sm text-black focus:border-red-600 focus:ring-0"
+             required />
+    </div>
+
+    <!-- Submit -->
+    <div class="flex items-end">
+      <button type="submit"
+              class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-8 shadow-sm border-none">
         Buscar
       </button>
-    </form>
+    </div>
+  </form>
 
-    <!-- Dynamic User Form -->
-    <div id="user-edit-form" class="mt-6"></div>
-  </section>
+
+  <!-- Dynamic user form container -->
+  <div id="user-edit-form">
+    <p class="text-gray-400 italic text-center">Sin usuario seleccionado</p>
+  </div>
+</section>
 }

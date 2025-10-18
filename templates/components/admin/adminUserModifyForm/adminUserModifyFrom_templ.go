@@ -44,78 +44,78 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`initExisting(%s)`, classesJSON))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 16, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 15, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3 animate-fade-in\"><h3 class=\"text-lg font-semibold text-gray-700 mb-3\">Editando: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-6 animate-fade-in max-w-5xl mx-auto\"><!-- Header --><div class=\"flex items-center justify-between\"><h3 class=\"text-2xl font-semibold text-black tracking-tight\">Editando usuario</h3><span class=\"text-sm text-gray-500 italic\">Usuario: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 20, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 23, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h3><form id=\"user-edit-form\" hx-post=\"/admin/user/modify/update\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\" hx-trigger=\"submit\" @submit=\"handleSubmit\" class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><input type=\"hidden\" name=\"username\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span></div><!-- Form --><form id=\"user-edit-form\" hx-post=\"/admin/user/modify/update\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\" hx-trigger=\"submit\" @submit=\"handleSubmit\" class=\"grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4\"><input type=\"hidden\" name=\"username\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 32, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 36, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><!-- Nombre --><div class=\"form-control\"><label class=\"label\"><span class=\"label-text text-gray-700\">Nombre</span></label> <input type=\"text\" name=\"first_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><!-- Nombre --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Nombre</label> <input type=\"text\" name=\"first_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 37, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 43, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required class=\"input input-bordered bg-white text-gray-800 text-sm\"></div><!-- Apellido --><div class=\"form-control\"><label class=\"label\"><span class=\"label-text text-gray-700\">Apellido</span></label> <input type=\"text\" name=\"last_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Apellido --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Apellido</label> <input type=\"text\" name=\"last_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(user.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 44, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 53, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required class=\"input input-bordered bg-white text-gray-800 text-sm\"></div><!-- Colegio --><div class=\"form-control\"><label class=\"label\"><span class=\"label-text text-gray-700\">Colegio</span></label> <input type=\"text\" name=\"school\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Colegio --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Colegio</label> <input type=\"text\" name=\"school\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.School)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 51, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 63, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"input input-bordered bg-white text-gray-800 text-sm\"></div><!-- Grado --><div class=\"form-control\"><label class=\"label\"><span class=\"label-text text-gray-700 font-medium\">Grado</span></label> <select name=\"grade\" required class=\"select select-bordered bg-white text-gray-800 text-sm\"><option disabled selected>Seleccionar grado...</option> <optgroup label=\"Primaria\"><option value=\"1primaria\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Grado --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Grado</label> <select name=\"grade\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option disabled selected>Seleccionar grado...</option> <optgroup label=\"Primaria\"><option value=\"1primaria\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -235,7 +235,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, ">6° de Secundaria</option></optgroup></select></div><!-- Rol --><div class=\"form-control\"><label class=\"label\"><span class=\"label-text text-gray-700\">Rol</span></label> <select name=\"role\" required class=\"select select-bordered bg-white text-gray-800 text-sm\"><option value=\"student\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, ">6° de Secundaria</option></optgroup></select></div><!-- Rol --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Rol</label> <select name=\"role\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option value=\"student\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -265,20 +265,20 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Administrador</option></select></div><!-- Clases --><div class=\"form-control md:col-span-2 space-y-2\"><label class=\"label p-0 mb-1\"><span class=\"label-text text-gray-700 text-sm font-medium\">Clases asignadas</span></label><div class=\"border rounded-md bg-white p-2 max-h-48 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b py-1 text-sm\"><span class=\"text-gray-900\"><b class=\"text-black\" x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-800\"></span></span> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'btn-warning' : 'btn-error'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-2 mt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered w-24\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"form-control md:col-span-2 w-fit\" x-data=\"{ visible: false }\"><label class=\"label p-0 mb-1\"><span class=\"label-text text-gray-700 text-sm font-medium\">Contraseña</span></label><div class=\"flex items-center gap-2\"><!-- Password input --><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white text-gray-800 text-sm w-40 cursor-not-allowed\"><!-- Toggle visibility --><button type=\"button\" class=\"btn btn-xs btn-outline\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button><!-- HTMX decryption button --><button type=\"button\" class=\"btn btn-xs bg-blue-600 text-white\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Administrador</option></select></div><!-- Clases --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Clases asignadas</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><span class=\"text-black\"><b x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-700\"></span></span> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"md:col-span-2 flex flex-col mt-4\" x-data=\"{ visible: false }\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Contraseña</label><div class=\"flex flex-wrap items-center gap-2\"><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none\"> <button type=\"button\" class=\"btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button> <button type=\"button\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/reveal-password?username=" + user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 151, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 167, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button><!-- Spinner indicator --><div id=\"decrypt-spinner\" class=\"htmx-indicator ml-2 text-gray-400 text-xs\">Descifrando...</div></div></div><!-- Guardar --><div class=\"md:col-span-2 flex justify-end mt-4\"><button type=\"submit\" class=\"btn bg-green-600 text-white hover:bg-green-700 text-sm px-6\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button><div id=\"decrypt-spinner\" class=\"htmx-indicator ml-2 text-gray-400 text-xs italic\">Descifrando...</div></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
