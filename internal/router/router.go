@@ -332,6 +332,19 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				fmt.Printf("📌 Routed to HandleAdminClassModifyDefault")
 				admin.HandleAdminClassModifyDefault(w, r)
 				return
+
+			case "search":
+				if len(parts) >= 4 {
+					if parts[3] == "look-up" {
+						fmt.Printf("📌 Routed to HandleAdminClassSearchLookUp")
+						admin.HandleAdminClassSearchLookUp(store, w, r)
+						return
+					}
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminClassSearchDefault")
+				admin.HandleAdminClassSearchDefault(store, w, r)
+				return
 			}
 		}
 

@@ -10,6 +10,8 @@ import (
 	"frontend/templates/components/admin/adminClassCreate"
 	"frontend/templates/components/admin/adminClassModify"
 	"frontend/templates/components/admin/adminClassModifyForm"
+	"frontend/templates/components/admin/adminClassSearch"
+	"frontend/templates/components/admin/adminClassSearchResults"
 	"frontend/templates/components/admin/adminMessage"
 	"net/http"
 	"strconv"
@@ -164,4 +166,76 @@ func HandleAdminClassModifyUpdate(store *database.Store, w http.ResponseWriter, 
 	message := fmt.Sprintf("Class: %s . Was modified", classId)
 
 	adminMessage.AdminMessage(message).Render(r.Context(), w)
+}
+
+func HandleAdminClassSearchDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("📥 [HandleAdminClassSearchDefault] Request received")
+
+	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 150)
+	if err != nil {
+		fmt.Printf("Materias no encontradas: %v\n", err)
+		http.Error(w, "Materias no encontradas", http.StatusNotFound)
+		return
+	}
+
+	subjectsArray := make([]string, len(subjects))
+	for i, subject := range subjects {
+		subjectsArray[i] = subject.Name
+	}
+
+	render.RenderWithLayout(w, r, adminClassSearch.AdminClassSearch(subjectsArray), body.Home)
+	fmt.Println("  ✔ Render complete")
+}
+
+func HandleAdminClassSearchLookUp(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("📥 [HandleAdminClassSearchLookUp] Request received")
+
+	idQuery := strings.TrimSpace(r.URL.Query().Get("id"))
+	nameQuery := strings.TrimSpace(r.URL.Query().Get("name"))
+	descQuery := strings.TrimSpace(r.URL.Query().Get("description"))
+	grade := r.URL.Query().Get("grade")
+	subject := strings.TrimSpace(r.URL.Query().Get("subject"))
+
+	classes, err := database.List[models.Class](store, database.Buckets["classes"], 200)
+	if err != nil {
+		http.Error(w, "Error fetching classes", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("classes found were: ", len(classes))
+
+	var results []*models.Class
+	for _, c := range classes {
+		// ID fuzzy search
+		if idQuery != "" {
+			idStr := strconv.Itoa(c.Id)
+			if !strings.Contains(idStr, idQuery) {
+				continue
+			}
+		}
+
+		// Name fuzzy search
+		if nameQuery != "" && !strings.Contains(strings.ToLower(c.Name), strings.ToLower(nameQuery)) {
+			continue
+		}
+
+		// Description fuzzy search
+		if descQuery != "" && !strings.Contains(strings.ToLower(c.Description), strings.ToLower(descQuery)) {
+			continue
+		}
+
+		// Grade exact
+		if grade != "" && c.Grade != grade {
+			continue
+		}
+
+		// Subject fuzzy
+		if subject != "" && !strings.Contains(strings.ToLower(c.Subject), strings.ToLower(subject)) {
+			continue
+		}
+
+		results = append(results, c)
+	}
+
+	adminClassSearchResults.AdminClassSearchResults(results).Render(r.Context(), w)
 }

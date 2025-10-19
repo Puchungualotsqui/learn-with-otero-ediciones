@@ -1,0 +1,111 @@
+package adminClassSearch
+
+templ AdminClassSearch(subjects []string) {
+<div class="p-6 space-y-6 bg-white rounded-lg shadow-md border border-gray-200 animate-fade-in">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-semibold text-black tracking-tight">
+      Buscar clases
+    </h2>
+    <span class="text-sm text-gray-500 italic">Panel de administración</span>
+  </div>
+
+  <!-- Search form -->
+  <form
+    hx-get="/admin/class/search/look-up"
+    hx-target="#search-results"
+    hx-swap="innerHTML"
+    hx-trigger="submit"
+    class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5 items-end border border-gray-200 bg-gray-50 rounded-lg p-6"
+  >
+    <!-- ID -->
+    <div class="flex flex-col md:col-span-2">
+      <label class="text-xs font-medium text-gray-700 mb-1">ID</label>
+      <input
+        name="id"
+        type="text"
+        placeholder="Ej. 12"
+        class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      />
+    </div>
+
+    <!-- Nombre -->
+    <div class="flex flex-col md:col-span-4">
+      <label class="text-xs font-medium text-gray-700 mb-1">Nombre</label>
+      <input
+        name="name"
+        type="text"
+        placeholder="Ej. Matemática Básica"
+        class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      />
+    </div>
+
+    <!-- Descripción -->
+    <div class="flex flex-col md:col-span-4">
+      <label class="text-xs font-medium text-gray-700 mb-1">Descripción</label>
+      <input
+        name="description"
+        type="text"
+        placeholder="Ej. Clase de álgebra y aritmética"
+        class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      />
+    </div>
+
+    <!-- Grado -->
+    <div class="flex flex-col md:col-span-2">
+      <label class="text-xs font-medium text-gray-700 mb-1">Grado</label>
+      <select
+        name="grade"
+        class="select select-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      >
+        <option value="">Cualquiera</option>
+        <optgroup label="Primaria">
+          <option value="1primaria">1°</option>
+          <option value="2primaria">2°</option>
+          <option value="3primaria">3°</option>
+          <option value="4primaria">4°</option>
+          <option value="5primaria">5°</option>
+          <option value="6primaria">6°</option>
+        </optgroup>
+        <optgroup label="Secundaria">
+          <option value="1secundaria">1°</option>
+          <option value="2secundaria">2°</option>
+          <option value="3secundaria">3°</option>
+          <option value="4secundaria">4°</option>
+          <option value="5secundaria">5°</option>
+          <option value="6secundaria">6°</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Asignatura -->
+    <div class="flex flex-col md:col-span-3">
+      <label class="text-xs font-medium text-gray-700 mb-1">Asignatura</label>
+      <select
+        name="subject"
+        class="select select-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      >
+        <option value="">Cualquiera</option>
+        for _, subj := range subjects {
+          <option value={ subj }>{ subj }</option>
+        }
+      </select>
+    </div>
+
+    <!-- Button -->
+    <div class="flex justify-end md:col-span-1">
+      <button
+        type="submit"
+        class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-6 shadow-sm border-none h-10 w-full md:w-auto"
+      >
+        Buscar
+      </button>
+    </div>
+  </form>
+
+  <!-- Results -->
+  <div id="search-results" class="mt-6 border border-gray-200 rounded-lg bg-white p-4">
+    <p class="text-gray-400 italic text-center">Sin resultados aún</p>
+  </div>
+</div>
+}
