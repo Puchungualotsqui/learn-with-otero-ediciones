@@ -6,7 +6,9 @@ import (
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/helper"
-	"frontend/internal/handlers"
+	"frontend/internal/handlers/admin"
+	"frontend/internal/handlers/commonUsers"
+	"frontend/internal/handlers/generics"
 	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
@@ -125,7 +127,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 
 		if user.Role == "admin" {
 			fmt.Println("📌 Routed to HandleAdminDefault")
-			handlers.HandleAdminDefault(w, r)
+			admin.HandleAdminDefault(w, r)
 			return
 		}
 
@@ -156,12 +158,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					switch parts[2] {
 					case "new":
 						fmt.Println("📌 Routed to NewAssignment (professor)")
-						handlers.HandleAssignmentNew(store, storage, w, r, classId, professor)
+						commonUsers.HandleAssignmentNew(store, storage, w, r, classId, professor)
 						return
 
 					case "delete":
 						fmt.Println("📌 Routed to DeleteAssignment (professor)")
-						handlers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
+						commonUsers.HandleAssignmentDelete(store, storage, w, r, classId, professor)
 						return
 					}
 
@@ -169,49 +171,49 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					switch parts[3] {
 					case "update":
 						fmt.Println("📌 Routed to UpdateAssignment (professor)")
-						handlers.HandleAssignmentUpdate(store, storage, w, r, classId, parts[2], professor)
+						commonUsers.HandleAssignmentUpdate(store, storage, w, r, classId, parts[2], professor)
 						return
 
 					case "submissions":
 						fmt.Println("📌 Routed to HandleAssignmentSubmissions")
-						handlers.HandleAssignmentSubmissions(store, w, r, professor)
+						commonUsers.HandleAssignmentSubmissions(store, w, r, professor)
 						return
 
 					case "details":
 						fmt.Println("📌 Routed to HandleAssignmentDetail")
-						handlers.HandleAssignmentDetail(store, w, r, classId, professor)
+						commonUsers.HandleAssignmentDetail(store, w, r, classId, professor)
 						return
 					}
 
 				case 5:
 					if parts[3] == "submission" && parts[4] == "update" {
 						fmt.Println("📌 Routed to HandleAssignmentSubmissionsUpdate")
-						handlers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username, professor)
+						commonUsers.HandleSubmissionUpdate(store, storage, w, r, classId, parts[2], username, professor)
 						return
 					}
 
 					if parts[3] == "submission" {
 						fmt.Println("📌 Routed to HandleAssignmentSubmissions")
-						handlers.HandleAssignmentSubmission(store, w, r, username, professor)
+						commonUsers.HandleAssignmentSubmission(store, w, r, username, professor)
 						return
 					}
 
 				case 6:
 					if parts[3] == "submission" && parts[5] == "grade" {
 						fmt.Println("📌 Routed to HandleAssignmentGrade")
-						handlers.HandleSubmissionGrade(store, w, r, classId, parts[4], professor)
+						commonUsers.HandleSubmissionGrade(store, w, r, classId, parts[4], professor)
 						return
 					}
 				}
 
 				fmt.Println("📌 Routed to HandleAssignmentDefault")
-				handlers.HandleAssignmentDefault(store, w, r, classId, professor, username)
+				commonUsers.HandleAssignmentDefault(store, w, r, classId, professor, username)
 				return
 
 			case "entregas":
 
 				fmt.Printf("📌 Routed to HandleSubmissionDefault")
-				handlers.HandleSubmissionDefault(store, w, r, classId, professor, username)
+				commonUsers.HandleSubmissionDefault(store, w, r, classId, professor, username)
 				return
 
 			case "recursos":
@@ -219,12 +221,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				case 4:
 					if parts[2] == "get-asset" {
 						fmt.Printf("📌 Routed to HandleGetAsset")
-						handlers.HandleGetAsset(store, storage, w, r, classId, parts[3])
+						generics.HandleGetAsset(store, storage, w, r, classId, parts[3])
 						return
 					}
 				}
 				fmt.Printf("📌 Routed to HandleAssetsDefault")
-				handlers.HandleAssetsDefault(store, w, r, classId)
+				generics.HandleAssetsDefault(store, w, r, classId)
 				return
 			}
 		}
@@ -250,12 +252,12 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				switch r.Method {
 				case http.MethodGet:
 					fmt.Printf("📌 Routed to HandleAdminUserCreate")
-					handlers.HandleAdminUserCreateDefault(w, r)
+					admin.HandleAdminUserCreateDefault(w, r)
 					return
 
 				case http.MethodPost:
 					fmt.Printf("📌 Routed to HandleAdminUserCreatePost")
-					handlers.HandleAdminUserCreatePost(store, w, r)
+					admin.HandleAdminUserCreatePost(store, w, r)
 					return
 				}
 
@@ -264,37 +266,53 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					switch parts[3] {
 					case "search":
 						fmt.Printf("📌 Routed to HandleAdminUsserModifySearch")
-						handlers.HandleAdminUserModifySearch(store, w, r)
+						admin.HandleAdminUserModifySearch(store, w, r)
 						return
 
 					case "reveal-password":
 						fmt.Printf("📌 Routed to HandleAdminUserRevealPassword")
-						handlers.HandleAdminUserRevealPassword(store, w, r)
+						admin.HandleAdminUserRevealPassword(store, w, r)
 						return
 
 					case "update":
 						fmt.Printf("📌 Routed to HandleAdminUserModifyUpdate")
-						handlers.HandleAdminUserModifyUpdate(store, w, r)
+						admin.HandleAdminUserModifyUpdate(store, w, r)
 						return
 					}
 				}
 
 				fmt.Printf("📌 Routed to HandleAdminUserModify")
-				handlers.HandleAdminUserModifyDefault(w, r)
+				admin.HandleAdminUserModifyDefault(w, r)
 				return
 
 			case "search":
 				if len(parts) >= 4 {
 					if parts[3] == "look-up" {
 						fmt.Printf("📌 Routed to HandleAdminUserSearchLookUp")
-						handlers.HandleAdminUserSearchLookUp(store, w, r)
+						admin.HandleAdminUserSearchLookUp(store, w, r)
 						return
 					}
 				}
 
 				fmt.Printf("📌 Routed to HandleAdminUserSearchDefault")
-				handlers.HandleAdminUserSearchDefault(w, r)
+				admin.HandleAdminUserSearchDefault(w, r)
 				return
+			}
+
+		case "class":
+			switch parts[2] {
+			case "create":
+				switch r.Method {
+				case http.MethodGet:
+					fmt.Printf("📌 Routed to HandleAdminClassCreateDefault")
+					admin.HandleAdminClassCreateDefault(store, w, r)
+					return
+
+				case http.MethodPost:
+					fmt.Printf("📌 Routed to HandleAdminClassCreatePost")
+					admin.HandleAdminClassCreatePost(store, w, r)
+					return
+				}
 			}
 		}
 

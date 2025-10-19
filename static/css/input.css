@@ -55,3 +55,27 @@
         box-shadow: 0 0 0 1px rgb(248 113 113); /* red ring */
     }
 }
+
+@layer base {
+    input,
+    select,
+    textarea {
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-color: white !important;
+        color: rgb(31 41 55) !important; /* gray-800 */
+    }
+
+    input:placeholder-shown,
+    textarea:placeholder-shown,
+    input:-moz-placeholder-shown,
+    textarea:-moz-placeholder-shown {
+        background-color: white !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: rgb(156 163 175);
+        opacity: 1;
+    }
+}
