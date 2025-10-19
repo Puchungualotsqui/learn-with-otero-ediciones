@@ -9,14 +9,14 @@ import (
 
 func AddUserToClass(s *Store, classId int, username string) error {
 	if err := UpdateWithPrefix(s, Buckets["classes"], func(t *models.Class) error {
-		t.Users = append(t.Users, username)
+		t.Users = helper.AddUnique(t.Users, username)
 		return nil
 	}, strconv.Itoa(classId)); err != nil {
 		return fmt.Errorf("Error updating Class: %w", err)
 	}
 
 	if err := UpdateWithPrefix(s, Buckets["users"], func(t *models.User) error {
-		t.Classes = append(t.Classes, classId)
+		t.Classes = helper.AddUnique(t.Classes, classId)
 		return nil
 	}, username); err != nil {
 		return fmt.Errorf("Error updating user: %w", err)

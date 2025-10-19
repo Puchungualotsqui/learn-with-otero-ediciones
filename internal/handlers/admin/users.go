@@ -147,6 +147,10 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 		database.AddUserToClass(store, id, username)
 	}
 
+	for _, id := range payload.Keep {
+		database.AddUserToClass(store, id, username)
+	}
+
 	for _, id := range payload.Del {
 		database.RemoveUserFromClass(store, id, username)
 	}

@@ -51,3 +51,11 @@ func RemoveElement[T comparable](slice []T, target T) []T {
 	}
 	return slice
 }
+
+// AddUnique appends val to slice only if it's not already present.
+func AddUnique[T comparable](slice []T, val T) []T {
+	if slices.Contains(slice, val) {
+		return slice
+	}
+	return append(slice, val)
+}

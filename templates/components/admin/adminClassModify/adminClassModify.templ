@@ -1,0 +1,48 @@
+package adminClassModify
+
+templ AdminClassModify() {
+<section class="bg-white rounded-lg shadow-md border border-gray-200 p-6 space-y-6 animate-fade-in">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-semibold text-black tracking-tight">
+      Modificar clase
+    </h2>
+    <span class="text-sm text-gray-500 italic">Panel de administración</span>
+  </div>
+
+  <!-- Description -->
+  <p class="text-gray-600 text-sm">
+    Busca una clase por su ID o nombre para editar su información o gestionar usuarios.
+  </p>
+
+  <!-- Search form -->
+  <form hx-get="/admin/class/modify/search"
+        hx-target="#class-edit-form"
+        hx-swap="innerHTML"
+        hx-trigger="submit"
+        class="flex flex-wrap items-end gap-4 border border-gray-200 bg-gray-50 rounded-lg px-5 py-4">
+
+    <!-- Class input -->
+    <div class="flex flex-col flex-grow min-w-[220px]">
+      <input type="text"
+             name="class_id"
+             placeholder="Ej. 12"
+             class="input input-bordered bg-white border-gray-300 text-sm text-black focus:border-red-600 focus:ring-0"
+             required />
+    </div>
+
+    <!-- Submit -->
+    <div class="flex items-end">
+      <button type="submit"
+              class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-8 shadow-sm border-none">
+        Buscar
+      </button>
+    </div>
+  </form>
+
+  <!-- Dynamic class form container -->
+  <div id="class-edit-form">
+    <p class="text-gray-400 italic text-center">Sin clase seleccionada</p>
+  </div>
+</section>
+}

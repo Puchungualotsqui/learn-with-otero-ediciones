@@ -162,6 +162,86 @@ function classManager() {
 }
 </script>
 
+<script>
+function userManager() {
+  return {
+    // { "juanperez": { username:"juanperez", role:"student" }, ... }
+    users: {},
+    toDelete: {},
+
+    initExisting(raw) {
+      let list = raw;
+      if (typeof raw === 'string') {
+        try { list = JSON.parse(raw); } catch { return; }
+      }
+      if (!Array.isArray(list) || list.length === 0) return;
+
+      list.forEach(u => {
+        // Accept either full user objects or plain strings
+        const username = typeof u === 'string'
+          ? u
+          : (u.username ?? u.Username ?? '').trim();
+        if (!username) return;
+
+        const role = typeof u === 'string'
+          ? 'Desconocido'
+          : (u.role ?? u.Role ?? 'Desconocido');
+
+        this.users[username] = { username, role };
+      });
+    },
+
+    // convenient list for x-for
+    userList() { return Object.values(this.users); },
+
+    addUser(username) {
+      username = (username || '').trim();
+      if (!username || this.users[username]) return;
+      this.users[username] = { username, role: 'Pendiente' };
+    },
+
+    markForDeletion(username) {
+      if (this.users[username]) this.toDelete[username] = true;
+    },
+
+    restore(username) {
+      delete this.toDelete[username];
+    },
+
+    finalizeDeletions() {
+      for (const username in this.toDelete) delete this.users[username];
+      this.toDelete = {};
+    },
+
+    getPayload() {
+      const keep = [];
+      const del  = [];
+
+      for (const username in this.users) {
+        if (!this.toDelete[username]) keep.push(username);
+      }
+      for (const username in this.toDelete) del.push(username);
+
+      // add[] is empty here because “adding” is also represented
+      // by being present in keep[] and not present server-side yet.
+      return JSON.stringify({ add: [], keep, del });
+    },
+
+    handleSubmit(e) {
+      const form = e.target;
+      let hidden = form.querySelector('input[name="user_data"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'user_data';
+        form.appendChild(hidden);
+      }
+      hidden.value = this.getPayload();
+    }
+  };
+}
+</script>
+
 
 <script type="module">
   // Load pdf.js (module build) and point to the worker file

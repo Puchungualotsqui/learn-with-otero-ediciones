@@ -313,6 +313,25 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					admin.HandleAdminClassCreatePost(store, w, r)
 					return
 				}
+
+			case "modify":
+				if len(parts) >= 4 {
+					switch parts[3] {
+					case "search":
+						fmt.Printf("📌 Routed to HandleAdminClassModifySearch")
+						admin.HandleAdminClassModifySearch(store, w, r)
+						return
+
+					case "update":
+						fmt.Printf("📌 Routed to HandleAdminClassModifyUpdate")
+						admin.HandleAdminClassModifyUpdate(store, w, r)
+						return
+					}
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminClassModifyDefault")
+				admin.HandleAdminClassModifyDefault(w, r)
+				return
 			}
 		}
 
