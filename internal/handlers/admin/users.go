@@ -44,9 +44,11 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 	role := r.FormValue("role")
 	school := r.FormValue("school")
 	grade := r.FormValue("grade")
+	email := r.FormValue("email")
+	phoneNumber := r.FormValue("phone")
 
 	// --- Input validation
-	if firstName == "" || lastName == "" || role == "" || school == "" || grade == "" {
+	if firstName == "" || lastName == "" || role == "" || school == "" || grade == "" || email == "" || phoneNumber == "" {
 		fmt.Printf("⚠️ [AdminUserCreatePost] Missing required fields — firstName=%q, lastName=%q, role=%q, school=%q, grade=%q\n",
 			firstName, lastName, role, school, grade)
 		http.Error(w, "Nombre, apellido, rol, colegio y grado son obligatorios", http.StatusBadRequest)
@@ -57,7 +59,7 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 		firstName, lastName, role, school, grade)
 
 	// --- Attempt creation
-	user, err := database.CreateUser(store, "", "", firstName, lastName, role, school, grade)
+	user, err := database.CreateUser(store, "", "", firstName, lastName, role, school, grade, email, phoneNumber)
 	if err != nil {
 		fmt.Printf("❌ [AdminUserCreatePost] Error creating user: %v\n", err)
 		http.Error(w, fmt.Sprintf("Error creando usuario: %v", err), http.StatusInternalServerError)
@@ -127,8 +129,10 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 	role := r.FormValue("role")
 	school := r.FormValue("school")
 	grade := r.FormValue("grade")
+	phone := r.FormValue("phone")
+	email := r.FormValue("email")
 
-	if username == "" || first == "" || last == "" || role == "" || school == "" || grade == "" {
+	if username == "" || first == "" || last == "" || role == "" || school == "" || grade == "" || phone == "" || email == "" {
 		http.Error(w, "Missing field", http.StatusBadRequest)
 		return
 	}
@@ -139,6 +143,8 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 		t.Role = role
 		t.School = school
 		t.Grade = grade
+		t.PhoneNumber = phone
+		t.Email = email
 
 		return nil
 	}, username)
@@ -199,6 +205,8 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 	role := r.URL.Query().Get("role")
 	grade := r.URL.Query().Get("grade")
 	school := strings.TrimSpace(r.URL.Query().Get("school"))
+	email := strings.TrimSpace(r.URL.Query().Get("email"))
+	phone := strings.TrimSpace(r.URL.Query().Get("phone"))
 	classID := r.URL.Query().Get("class")
 
 	users, err := database.List[models.User](store, database.Buckets["users"], 200)
@@ -207,11 +215,11 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 		return
 	}
 
-	fmt.Println("users found were: ", len(users))
+	fmt.Println("users found were:", len(users))
 
-	// Fuzzy filters
 	var results []*models.User
 	for _, u := range users {
+		// Fuzzy match: name or username
 		if query != "" {
 			q := strings.ToLower(query)
 			if !strings.Contains(strings.ToLower(u.Username), q) &&
@@ -220,21 +228,43 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 				continue
 			}
 		}
+
+		// School fuzzy
 		if school != "" && !strings.Contains(strings.ToLower(u.School), strings.ToLower(school)) {
 			continue
 		}
+
+		// Role exact
 		if role != "" && u.Role != role {
 			continue
 		}
+
+		// Grade exact
 		if grade != "" && u.Grade != grade {
 			continue
 		}
+
+		// Email exact
+		if email != "" && !strings.EqualFold(u.Email, email) {
+			continue
+		}
+
+		// Phone exact
+		if phone != "" {
+			phoneNum := u.PhoneNumber
+			if phoneNum != phone {
+				continue
+			}
+		}
+
+		// Class ID filter
 		if classID != "" {
 			id, _ := strconv.Atoi(classID)
 			if !slices.Contains(u.Classes, id) {
 				continue
 			}
 		}
+
 		results = append(results, u)
 	}
 

@@ -19,7 +19,7 @@ templ AdminUserSearch() {
     class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5 items-end border border-gray-200 bg-gray-50 rounded-lg p-6"
   >
     <!-- Nombre o usuario -->
-    <div class="flex flex-col md:col-span-4">
+    <div class="flex flex-col md:col-span-3">
       <label class="text-xs font-medium text-gray-700 mb-1">Nombre o usuario</label>
       <input
         name="q"
@@ -36,6 +36,28 @@ templ AdminUserSearch() {
         name="school"
         type="text"
         placeholder="Ej. Alemán"
+        class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      />
+    </div>
+
+    <!-- Correo -->
+    <div class="flex flex-col md:col-span-3">
+      <label class="text-xs font-medium text-gray-700 mb-1">Correo electrónico</label>
+      <input
+        name="email"
+        type="email"
+        placeholder="Ej. juanperez@gmail.com"
+        class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
+      />
+    </div>
+
+    <!-- Teléfono -->
+    <div class="flex flex-col md:col-span-3">
+      <label class="text-xs font-medium text-gray-700 mb-1">Teléfono</label>
+      <input
+        name="phone"
+        type="number"
+        placeholder="Ej. 72123456"
         class="input input-bordered bg-white text-sm text-black border-gray-300 focus:border-red-600 focus:ring-0 h-10"
       />
     </div>
@@ -91,8 +113,6 @@ templ AdminUserSearch() {
       </button>
     </div>
   </form>
-
-
 
   <!-- Results -->
   <div id="search-results" class="mt-6 border border-gray-200 rounded-lg bg-white p-4">

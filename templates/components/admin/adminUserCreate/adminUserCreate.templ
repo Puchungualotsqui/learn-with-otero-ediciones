@@ -1,125 +1,148 @@
 package adminUserCreate
 
 templ AdminCreateUser() {
-	<section class="bg-white rounded-lg shadow-sm p-6 space-y-4">
-	    <h2 class="text-xl font-semibold text-gray-800 mb-2">Crear Usuario</h2>
-	    <p class="text-gray-600 text-sm mb-4">
-	      Completa los datos del nuevo usuario. El nombre de usuario y la contraseña se generarán automáticamente.
-	    </p>
+<section class="bg-white rounded-lg shadow-sm p-6 space-y-4">
+  <h2 class="text-xl font-semibold text-gray-800 mb-2">Crear Usuario</h2>
+  <p class="text-gray-600 text-sm mb-4">
+    Completa los datos del nuevo usuario. El nombre de usuario y la contraseña se generarán automáticamente.
+  </p>
 
+  <form
+    hx-post="/admin/user/create"
+    hx-target="#create-user-feedback"
+    hx-swap="outerHTML"
+    hx-on="htmx:afterSwap: this.reset()"
+    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+  >
 
+    <!-- Nombre -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Nombre</span>
+      </label>
+      <input
+        type="text"
+        name="first_name"
+        placeholder="Ej: Juan"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
+        required
+      />
+    </div>
 
-	    <form
-		  hx-post="/admin/user/create"
-		  hx-target="#create-user-feedback"
-		  hx-swap="outerHTML"
-		  hx-on="htmx:afterSwap: this.reset()"
-		  class="grid grid-cols-1 md:grid-cols-2 gap-4"
-		>
+    <!-- Apellido -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Apellido</span>
+      </label>
+      <input
+        type="text"
+        name="last_name"
+        placeholder="Ej: Pérez"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
+        required
+      />
+    </div>
 
+    <!-- Rol -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Rol</span>
+      </label>
+      <select
+        name="role"
+        class="select select-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm"
+        required
+      >
+        <option disabled selected>Seleccionar rol...</option>
+        <option value="student">Estudiante</option>
+        <option value="professor">Profesor</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
 
-	      <!-- Nombre -->
-	      <div class="form-control">
-	        <label class="label">
-	          <span class="label-text text-gray-700 font-medium">Nombre</span>
-	        </label>
-	        <input
-	          type="text"
-	          name="first_name"
-	          placeholder="Ej: Juan"
-	          class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
-	          required
-	        />
-	      </div>
+    <!-- Colegio -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Colegio</span>
+      </label>
+      <input
+        type="text"
+        name="school"
+        placeholder="Ej: Colegio Alemán"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
+      />
+    </div>
 
-	      <!-- Apellido -->
-	      <div class="form-control">
-	        <label class="label">
-	          <span class="label-text text-gray-700 font-medium">Apellido</span>
-	        </label>
-	        <input
-	          type="text"
-	          name="last_name"
-	          placeholder="Ej: Pérez"
-	          class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
-	          required
-	        />
-	      </div>
+    <!-- Email -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Correo electrónico</span>
+      </label>
+      <input
+        type="email"
+        name="email"
+        placeholder="Ej: juanperez@gmail.com"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
+        required
+      />
+    </div>
 
-	      <!-- Rol -->
-	      <div class="form-control">
-	        <label class="label">
-	          <span class="label-text text-gray-700 font-medium">Rol</span>
-	        </label>
-	        <select
-	          name="role"
-	          class="select select-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm"
-	          required
-	        >
-	          <option disabled selected>Seleccionar rol...</option>
-	          <option value="student">Estudiante</option>
-	          <option value="professor">Profesor</option>
-	          <option value="admin">Administrador</option>
-	        </select>
-	      </div>
+    <!-- Teléfono -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Teléfono</span>
+      </label>
+      <input
+        type="number"
+        name="phone"
+        placeholder="Ej: 72123456"
+        class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
+        required
+      />
+    </div>
 
-	      <!-- Colegio -->
-	      <div class="form-control">
-	        <label class="label">
-	          <span class="label-text text-gray-700 font-medium">Colegio</span>
-	        </label>
-	        <input
-	          type="text"
-	          name="school"
-	          placeholder="Ej: Colegio Alemán"
-	          class="input input-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder-gray-400 text-sm"
-	        />
-	      </div>
+    <!-- Grado -->
+    <div class="form-control md:col-span-2">
+      <label class="label">
+        <span class="label-text text-gray-700 font-medium">Grado</span>
+      </label>
+      <select
+        name="grade"
+        class="select select-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm"
+        required
+      >
+        <option disabled selected>Seleccionar grado...</option>
+        <optgroup label="Primaria">
+          <option value="1primaria">1° de Primaria</option>
+          <option value="2primaria">2° de Primaria</option>
+          <option value="3primaria">3° de Primaria</option>
+          <option value="4primaria">4° de Primaria</option>
+          <option value="5primaria">5° de Primaria</option>
+          <option value="6primaria">6° de Primaria</option>
+        </optgroup>
+        <optgroup label="Secundaria">
+          <option value="1secundaria">1° de Secundaria</option>
+          <option value="2secundaria">2° de Secundaria</option>
+          <option value="3secundaria">3° de Secundaria</option>
+          <option value="4secundaria">4° de Secundaria</option>
+          <option value="5secundaria">5° de Secundaria</option>
+          <option value="6secundaria">6° de Secundaria</option>
+        </optgroup>
+      </select>
+    </div>
 
-	      <!-- Grado -->
-	      <div class="form-control md:col-span-2">
-	        <label class="label">
-	          <span class="label-text text-gray-700 font-medium">Grado</span>
-	        </label>
-	        <select
-	          name="grade"
-	          class="select select-bordered bg-white border-gray-300 text-gray-800 focus:border-red-400 focus:ring-1 focus:ring-red-400 text-sm"
-	          required
-	        >
-	          <option disabled selected>Seleccionar grado...</option>
-	          <optgroup label="Primaria">
-	            <option value="1primaria">1° de Primaria</option>
-	            <option value="2primaria">2° de Primaria</option>
-	            <option value="3primaria">3° de Primaria</option>
-	            <option value="4primaria">4° de Primaria</option>
-	            <option value="5primaria">5° de Primaria</option>
-	            <option value="6primaria">6° de Primaria</option>
-	          </optgroup>
-	          <optgroup label="Secundaria">
-	            <option value="1secundaria">1° de Secundaria</option>
-	            <option value="2secundaria">2° de Secundaria</option>
-	            <option value="3secundaria">3° de Secundaria</option>
-	            <option value="4secundaria">4° de Secundaria</option>
-	            <option value="5secundaria">5° de Secundaria</option>
-	            <option value="6secundaria">6° de Secundaria</option>
-	          </optgroup>
-	        </select>
-	      </div>
+    <!-- Botón -->
+    <div class="md:col-span-2 flex justify-end">
+      <button
+        type="submit"
+        class="btn bg-red-600 text-white hover:bg-red-700 text-sm px-6"
+      >
+        Crear Usuario
+      </button>
+    </div>
+  </form>
 
-	      <!-- Botón -->
-	      <div class="md:col-span-2 flex justify-end">
-	        <button
-	          type="submit"
-	          class="btn bg-red-600 text-white hover:bg-red-700 text-sm px-6"
-	        >
-	          Crear Usuario
-	        </button>
-	      </div>
-	    </form>
-
-		<!-- Success message area -->
-	    <div id="create-user-feedback"></div>
-
-
-	  </section>
+  <!-- Success message area -->
+  <div id="create-user-feedback"></div>
+</section>
 }

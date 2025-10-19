@@ -102,183 +102,209 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Colegio --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Colegio</label> <input type=\"text\" name=\"school\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Email --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Correo electrónico</label> <input type=\"email\" name=\"email\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.School)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 63, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 63, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Grado --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Grado</label> <select name=\"grade\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option disabled selected>Seleccionar grado...</option> <optgroup label=\"Primaria\"><option value=\"1primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "1primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, ">1° de Primaria</option> <option value=\"2primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "2primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ">2° de Primaria</option> <option value=\"3primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "3primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, ">3° de Primaria</option> <option value=\"4primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "4primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, ">4° de Primaria</option> <option value=\"5primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "5primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">5° de Primaria</option> <option value=\"6primaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "6primaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">6° de Primaria</option></optgroup> <optgroup label=\"Secundaria\"><option value=\"1secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "1secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">1° de Secundaria</option> <option value=\"2secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "2secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, ">2° de Secundaria</option> <option value=\"3secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "3secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, ">3° de Secundaria</option> <option value=\"4secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "4secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, ">4° de Secundaria</option> <option value=\"5secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "5secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, ">5° de Secundaria</option> <option value=\"6secundaria\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Grade == "6secundaria" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, ">6° de Secundaria</option></optgroup></select></div><!-- Rol --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Rol</label> <select name=\"role\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option value=\"student\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Role == "student" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, ">Estudiante</option> <option value=\"professor\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Role == "professor" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, ">Profesor</option> <option value=\"admin\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if user.Role == "admin" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Administrador</option></select></div><!-- Clases --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Clases asignadas</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><span class=\"text-black\"><b x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-700\"></span></span> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"md:col-span-2 flex flex-col mt-4\" x-data=\"{ visible: false }\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Contraseña</label><div class=\"flex flex-wrap items-center gap-2\"><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none\"> <button type=\"button\" class=\"btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button> <button type=\"button\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400\"></div><!-- Teléfono --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Teléfono</label> <input type=\"number\" name=\"phone\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/reveal-password?username=" + user.Username)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(user.PhoneNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 167, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 73, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button><div id=\"decrypt-spinner\" class=\"htmx-indicator ml-2 text-gray-400 text-xs italic\">Descifrando...</div></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" required class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400\"></div><!-- Colegio --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Colegio</label> <input type=\"text\" name=\"school\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(user.School)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 83, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"></div><!-- Grado --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Grado</label> <select name=\"grade\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option disabled selected>Seleccionar grado...</option> <optgroup label=\"Primaria\"><option value=\"1primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "1primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ">1° de Primaria</option> <option value=\"2primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "2primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, ">2° de Primaria</option> <option value=\"3primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "3primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, ">3° de Primaria</option> <option value=\"4primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "4primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">4° de Primaria</option> <option value=\"5primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "5primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">5° de Primaria</option> <option value=\"6primaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "6primaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">6° de Primaria</option></optgroup> <optgroup label=\"Secundaria\"><option value=\"1secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "1secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, ">1° de Secundaria</option> <option value=\"2secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "2secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, ">2° de Secundaria</option> <option value=\"3secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "3secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, ">3° de Secundaria</option> <option value=\"4secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "4secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, ">4° de Secundaria</option> <option value=\"5secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "5secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, ">5° de Secundaria</option> <option value=\"6secundaria\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Grade == "6secundaria" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, ">6° de Secundaria</option></optgroup></select></div><!-- Rol --><div class=\"flex flex-col\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Rol</label> <select name=\"role\" required class=\"select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0\"><option value=\"student\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Role == "student" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, ">Estudiante</option> <option value=\"professor\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Role == "professor" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Profesor</option> <option value=\"admin\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if user.Role == "admin" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, ">Administrador</option></select></div><!-- Clases --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Clases asignadas</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><span class=\"text-black\"><b x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-700\"></span></span> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"md:col-span-2 flex flex-col mt-4\" x-data=\"{ visible: false }\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Contraseña</label><div class=\"flex flex-wrap items-center gap-2\"><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none\"> <button type=\"button\" class=\"btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button> <button type=\"button\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/reveal-password?username=" + user.Username)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 186, Col: 87}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button><div id=\"decrypt-spinner\" class=\"htmx-indicator ml-2 text-gray-400 text-xs italic\">Descifrando...</div></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

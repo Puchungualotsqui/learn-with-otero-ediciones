@@ -9,6 +9,8 @@ type User struct {
 	School            string `json:"school"`
 	Grade             string `json:"grade"`
 	Role              string `json:"role"`
+	PhoneNumber       string `json:"phone_number"`
+	Email             string `json:"email"`
 	Classes           []int  `json:"classes"`
 }
 
