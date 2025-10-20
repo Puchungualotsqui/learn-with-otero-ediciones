@@ -346,6 +346,37 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				admin.HandleAdminClassSearchDefault(store, w, r)
 				return
 			}
+
+		case "subject":
+			switch parts[2] {
+			case "manage":
+				if len(parts) >= 4 {
+					switch parts[3] {
+					case "update":
+						fmt.Printf("📌 Routed to HandleAdminSubjectUpdate")
+						admin.HandleAdminSubjectManagerUpdate(store, w, r)
+						return
+					}
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminSubjectsDefault")
+				admin.HandleAdminSubjectsManagerDefault(store, w, r)
+				return
+
+			case "rename":
+				if len(parts) >= 4 {
+					switch parts[3] {
+					case "update":
+						fmt.Printf("📌 Routed to HandleAdminSubjectRenameUpdate")
+						admin.HandleAdminSubjectRenameUpdate(store, w, r)
+						return
+					}
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminSubjectsDefault")
+				admin.HandleAdminSubjectRenameDefault(store, w, r)
+				return
+			}
 		}
 
 	default:

@@ -343,6 +343,112 @@ function userManager() {
   });
 </script>
 
+<script>
+function subjectManager() {
+  return {
+    subjects: [],
+    original: [],
+    toDelete: {},
+    newName: '',
+
+    initExisting(raw) {
+      let list = raw;
+      if (typeof raw === 'string') {
+        try { list = JSON.parse(raw); } catch { return; }
+      }
+      if (!Array.isArray(list)) return;
+      this.subjects = list.slice();
+      this.original = list.slice();
+    },
+
+    addSubject() {
+      const name = (this.newName || '').trim();
+      if (!name || this.subjects.includes(name)) return;
+      this.subjects.push(name);
+      this.newName = '';
+    },
+
+    markForDeletion(name) {
+      if (this.subjects.includes(name)) this.toDelete[name] = true;
+    },
+
+    restore(name) {
+      delete this.toDelete[name];
+    },
+
+    getPayload() {
+      const add = [];
+      const del = [];
+
+      // Added
+      for (const s of this.subjects) {
+        if (!this.original.includes(s)) add.push(s);
+      }
+
+      // Deleted
+      for (const o of this.original) {
+        if (this.toDelete[o] || !this.subjects.includes(o)) del.push(o);
+      }
+
+      return JSON.stringify({ add, del });
+    },
+
+    handleSubmit(e) {
+      const form = e.target;
+      let hidden = form.querySelector('input[name="subject_data"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'subject_data';
+        form.appendChild(hidden);
+      }
+      hidden.value = this.getPayload();
+    }
+  };
+}
+</script>
+
+<script>
+function renameManager() {
+  return {
+    renameList: [],
+
+    initExisting(raw) {
+      let list = raw;
+      if (typeof raw === 'string') {
+        try { list = JSON.parse(raw); } catch { return; }
+      }
+      if (!Array.isArray(list)) return;
+      this.renameList = list.map(s => ({ old: s, new: s }));
+    },
+
+    getPayload() {
+      const rename = this.renameList
+        .filter(item => item.new.trim() && item.new !== item.old)
+        .map(item => ({ old: item.old, new: item.new.trim() }));
+      return JSON.stringify({ rename });
+    },
+
+    handleSubmit(e) {
+      const form = e.target;
+      let hidden = form.querySelector('input[name="subject_data"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'subject_data';
+        form.appendChild(hidden);
+      }
+      hidden.value = this.getPayload();
+    }
+  };
+}
+</script>
+
+
+
+
+
+
 
 </body>
 </html>

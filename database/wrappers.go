@@ -48,6 +48,30 @@ func Save[T any](s *Store, bucket []byte, key string, value T) error {
 	})
 }
 
+func SaveMany[T any](s *Store, bucket []byte, items map[string]T) error {
+	if len(items) == 0 {
+		return nil // nothing to save
+	}
+
+	return s.db.Update(func(tx *bbolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists(bucket)
+		if err != nil {
+			return fmt.Errorf("creating bucket %s: %w", bucket, err)
+		}
+
+		for key, value := range items {
+			data, err := json.Marshal(value)
+			if err != nil {
+				return fmt.Errorf("failed to marshal key %q: %w", key, err)
+			}
+			if err := b.Put([]byte(key), data); err != nil {
+				return fmt.Errorf("failed to save key %q: %w", key, err)
+			}
+		}
+		return nil
+	})
+}
+
 func Get[T any](s *Store, bucket []byte, key string) (*T, error) {
 	var out T
 	err := s.db.View(func(tx *bbolt.Tx) error {
@@ -147,6 +171,29 @@ func Exists(s *Store, bucket []byte, key string) (bool, error) {
 	return found, err
 }
 
+func ExistsMany(s *Store, bucket []byte, keys []string) (map[string]bool, error) {
+	results := make(map[string]bool, len(keys))
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		for _, key := range keys {
+			if key == "" {
+				results[key] = false
+				continue
+			}
+			v := b.Get([]byte(key))
+			results[key] = v != nil
+		}
+		return nil
+	})
+
+	return results, err
+}
+
 func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 	var found bool
 	_ = s.db.View(func(tx *bbolt.Tx) error {
@@ -170,7 +217,7 @@ func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 
 func List[T any](s *Store, bucketName []byte, limit int) ([]*T, error) {
 	var out []*T
-	var stopErr = fmt.Errorf("stop iteration")
+	stopErr := fmt.Errorf("stop iteration")
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucketName)
@@ -180,22 +227,24 @@ func List[T any](s *Store, bucketName []byte, limit int) ([]*T, error) {
 
 		count := 0
 		return b.ForEach(func(k, v []byte) error {
-			var u T
-			if err := json.Unmarshal(v, &u); err != nil {
+			var item T
+			if err := json.Unmarshal(v, &item); err != nil {
 				return err
 			}
-			uCopy := u
-			out = append(out, &uCopy)
+			copy := item
+			out = append(out, &copy)
 
-			count++
-			if limit > 0 && count >= limit {
-				return stopErr // manually break out
+			if limit >= 0 { // only enforce when non-negative
+				count++
+				if count >= limit {
+					return stopErr // stop iteration manually
+				}
 			}
 			return nil
 		})
 	})
 
-	// Ignore our manual stop signal
+	// ignore the manual stop signal
 	if err == stopErr {
 		err = nil
 	}
@@ -256,6 +305,26 @@ func Delete(s *Store, bucketName []byte, key string) error {
 	})
 }
 
+func DeleteMany(s *Store, bucketName []byte, keys []string) error {
+	if len(keys) == 0 {
+		return nil // nothing to delete
+	}
+
+	return s.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucketName)
+		}
+
+		for _, key := range keys {
+			if err := b.Delete([]byte(key)); err != nil {
+				return fmt.Errorf("failed to delete key %q: %w", key, err)
+			}
+		}
+		return nil
+	})
+}
+
 func UpdateWithPrefix[T any](s *Store, bucket []byte, updater func(*T) error, id string, prefixes ...string) error {
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucket)
@@ -289,6 +358,50 @@ func UpdateWithPrefix[T any](s *Store, bucket []byte, updater func(*T) error, id
 
 		if err := b.Put(key, data); err != nil {
 			return fmt.Errorf("failed to update record: %w", err)
+		}
+
+		return nil
+	})
+}
+
+func UpdateManyWithPrefix[T any](s *Store, bucket []byte, updater func(*T) error, ids []string, prefixes ...string) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	return s.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		for _, id := range ids {
+			parts := append(prefixes, id)
+			key := []byte(strings.Join(parts, ":"))
+
+			v := b.Get(key)
+			if v == nil {
+				fmt.Printf("⚠️ record not found for key %s, skipping\n", key)
+				continue
+			}
+
+			var obj T
+			if err := json.Unmarshal(v, &obj); err != nil {
+				return fmt.Errorf("failed to unmarshal %s: %w", key, err)
+			}
+
+			if err := updater(&obj); err != nil {
+				return fmt.Errorf("updater error for %s: %w", key, err)
+			}
+
+			data, err := json.Marshal(obj)
+			if err != nil {
+				return fmt.Errorf("failed to marshal %s: %w", key, err)
+			}
+
+			if err := b.Put(key, data); err != nil {
+				return fmt.Errorf("failed to save %s: %w", key, err)
+			}
 		}
 
 		return nil

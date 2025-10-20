@@ -51,11 +51,15 @@ var options []*dto.AdminOption = []*dto.AdminOption{
 	&dto.AdminOption{
 		Title:       "Gestión de Materias",
 		Description: "Crear, editar y administrar información de materias",
-		SubUrl:      "user",
+		SubUrl:      "subject",
 		SubOptions: []*dto.AdminSubOptionSlot{
 			&dto.AdminSubOptionSlot{
 				Title: "Administrar",
 				Url:   "manage",
+			},
+			&dto.AdminSubOptionSlot{
+				Title: "Renombrar",
+				Url:   "rename",
 			},
 		},
 	},
