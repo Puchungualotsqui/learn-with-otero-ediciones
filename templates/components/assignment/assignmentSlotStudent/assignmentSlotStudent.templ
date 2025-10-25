@@ -7,7 +7,7 @@ import (
 	"frontend/helper"
 )
 
-templ AssignmentSlotStudent(classId int, a *models.Assignment, username, grade string) {
+templ AssignmentSlotStudent(classId int, a *models.Assignment, username, grade, className string) {
 	{{
 		status, err := helper.GetDateStatus(a.DueDate)
 		if err != nil {
@@ -50,23 +50,34 @@ templ AssignmentSlotStudent(classId int, a *models.Assignment, username, grade s
 		}
 	}}
 
-	<li id={"assignment-slot-" + strconv.Itoa(a.Id)} class="bg-gray-100 mb-2 rounded-md shadow-sm">
+	<li id={"assignment-slot-" + strconv.Itoa(a.Id)} class="bg-gray-100 mb-2 rounded-md shadow-sm hover:bg-gray-150 transition">
 		<button
 			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/submission/" + username}
 			hx-target="#submission-detail"
 			hx-swap="outerHTML"
 			class={textColor, "w-full text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-150 transition cursor-pointer"}>
+
 			<div class="flex justify-between items-center">
-				<span>{ a.Title }</span>
-				if status.Past {
-					if grade == "" {
-						<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
-					} else {
-						<span class={gradeClass}>{ grade }</span>
+				<!-- Left: class name + title -->
+				<div class="flex flex-col flex-1 truncate">
+					if className != "" {
+						<span class="text-xs text-gray-500 truncate">{ className }</span>
 					}
-				} else {
-					<span class="text-xs">{ a.DueDate }</span>
-				}
+					<span class="truncate">{ a.Title }</span>
+				</div>
+
+				<!-- Right: due date or grade -->
+				<div class="shrink-0 flex items-center">
+					if status.Past {
+						if grade == "" {
+							<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
+						} else {
+							<span class={gradeClass}>{ grade }</span>
+						}
+					} else {
+						<span class="text-xs">{ a.DueDate }</span>
+					}
+				</div>
 			</div>
 		</button>
 	</li>

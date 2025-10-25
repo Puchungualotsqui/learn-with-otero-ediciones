@@ -64,7 +64,7 @@ func StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission) 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"bg-gray-100 mb-2 rounded-md shadow-sm\"><button hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"flex justify-between items-center w-full text-left px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition cursor-pointer\"><button hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

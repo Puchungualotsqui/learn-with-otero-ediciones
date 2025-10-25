@@ -33,7 +33,7 @@ func CalendarWrapper(month int, monthToDisplay string, year int, body templ.Comp
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section id=\"calendar-wrapper\" class=\"flex flex-col flex-1 h-[calc(100vh-5rem)] bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden\"><!-- Top bar --><div class=\"flex items-center justify-between bg-gray-50 border-b border-gray-200 p-4\"><button class=\"text-gray-600 hover:text-red-600 text-lg font-bold\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section id=\"calendar-wrapper\" class=\"flex flex-col flex-1 h-[calc(100vh-5rem)] bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden\"><!-- Top bar --><div class=\"flex items-center justify-between bg-gray-50 border-b border-gray-200 p-4\"><button class=\"text-gray-600 hover:text-red-600 text-lg font-bold cursor-pointer\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -72,7 +72,7 @@ func CalendarWrapper(month int, monthToDisplay string, year int, body templ.Comp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h2><button class=\"text-gray-600 hover:text-red-600 text-lg font-bold\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h2><button class=\"text-gray-600 hover:text-red-600 text-lg font-bold cursor-pointer\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -5,7 +5,7 @@ import (
 	"frontend/templates/components/assignment/assignmentSlotProfessor"
 )
 
-templ CalendarListProfessor(assignments []*models.Assignment, classIds []int) {
+templ CalendarListProfessor(assignments []*models.Assignment, classIds []int, classNames []string) {
 	<aside
 		class="bg-white border-r border-gray-200 flex flex-col flex-1 min-h-0 lg:w-1/3 p-4"
 	>
@@ -19,7 +19,7 @@ templ CalendarListProfessor(assignments []*models.Assignment, classIds []int) {
 				</li>
 			} else {
 				for i, a := range assignments {
-					@assignmentSlotProfessor.AssignmentSlotProfessor(classIds[i], a, false)
+					@assignmentSlotProfessor.AssignmentSlotProfessor(classIds[i], a, false, classNames[i])
 				}
 			}
 		</ul>

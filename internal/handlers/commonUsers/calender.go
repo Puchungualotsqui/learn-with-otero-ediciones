@@ -15,6 +15,7 @@ import (
 	"frontend/templates/components/calendarWrapper"
 	"frontend/templates/components/panelsContent"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -91,7 +92,18 @@ func HandleCalendarStudentDefault(store *database.Store, w http.ResponseWriter, 
 				classIdsFiltered = append(classIdsFiltered, i)
 			}
 		}
+	}
 
+	classes, err := database.GetMany[models.Class](store, database.Buckets["classes"], classIdsFiltered...)
+	if err != nil {
+		fmt.Printf("Error getting classes %v\n", err)
+		http.Error(w, "Error fetching classes", http.StatusInternalServerError)
+		return
+	}
+
+	classNames := make([]string, len(classIdsFiltered))
+	for i, class := range classes {
+		classNames[i] = class.Name
 	}
 
 	submissionKeys := make([]string, len(assignmentsFiltered))
@@ -115,21 +127,58 @@ func HandleCalendarStudentDefault(store *database.Store, w http.ResponseWriter, 
 			grades[i] = ""
 		}
 	}
+
+	// Bundle all related data before sorting to keep them aligned
+	type AssignmentBundle struct {
+		Assignment *models.Assignment
+		ClassID    string
+		ClassName  string
+		Grade      string
+	}
+
+	bundles := make([]AssignmentBundle, len(assignmentsFiltered))
+	for i := range assignmentsFiltered {
+		bundles[i] = AssignmentBundle{
+			Assignment: assignmentsFiltered[i],
+			ClassID:    classIdsFiltered[i],
+			ClassName:  classNames[i],
+			Grade:      grades[i],
+		}
+	}
+
+	// Sort by date (newest first)
+	sort.Slice(bundles, func(i, j int) bool {
+		t1, err1 := time.Parse("02/01/2006", bundles[i].Assignment.DueDate)
+		t2, err2 := time.Parse("02/01/2006", bundles[j].Assignment.DueDate)
+		if err1 != nil || err2 != nil {
+			return false
+		}
+		return t1.After(t2)
+	})
+
+	// Unpack back into your slices
+	for i := range bundles {
+		assignmentsFiltered[i] = bundles[i].Assignment
+		classIdsFiltered[i] = bundles[i].ClassID
+		classNames[i] = bundles[i].ClassName
+		grades[i] = bundles[i].Grade
+	}
+
 	parts := make([]templ.Component, 3)
-	if !professor {
-		parts[0] = calendarListStudent.CalendarListStudent(assignmentsFiltered, username, grades)
-		parts[1] = assignmentDetail.AssignmentDetail(nil, true)
-		parts[2] = submissionEditor.SubmissionEditor(nil, 0, 0, "")
-	} else {
+	if professor {
 		classIdsFilteredInts, err := helper.StringsToInts(classIdsFiltered...)
 		if err != nil {
 			fmt.Printf("Error converting Ids %v\n", err)
 			http.Error(w, "Error converting Ids", http.StatusInternalServerError)
 			return
 		}
-		parts[0] = calendarListProfessor.CalendarListProfessor(assignmentsFiltered, classIdsFilteredInts)
+		parts[0] = calendarListProfessor.CalendarListProfessor(assignmentsFiltered, classIdsFilteredInts, classNames)
 		parts[1] = assignmentDetail.AssignmentDetail(nil, true)
 		parts[2] = submissionDetail.SubmissionDetail(nil, "", "", true, true)
+	} else {
+		parts[0] = calendarListStudent.CalendarListStudent(assignmentsFiltered, username, grades, classNames)
+		parts[1] = assignmentDetail.AssignmentDetail(nil, true)
+		parts[2] = submissionEditor.SubmissionEditor(nil, 0, 0, "")
 	}
 
 	panels := panelsContent.PanelsContent(parts...)

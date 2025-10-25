@@ -71,12 +71,12 @@ func AssignmentList(classId int, assignments []*models.Assignment, grades []stri
 		} else {
 			for i, a := range assignments {
 				if professor {
-					templ_7745c5c3_Err = assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton, "").Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(classId, a, username, grades[i]).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(classId, a, username, grades[i], "").Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

@@ -167,7 +167,7 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 
 	// 3. Render updated slot list
 	fmt.Fprintf(w, `<div hx-swap-oob="beforeend:#assignments-list">`)
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, newAssignment, true).Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, newAssignment, true, "").Render(r.Context(), w)
 	fmt.Fprint(w, `</div>`)
 
 	// 4. Render editor into #assignment-detail
@@ -321,7 +321,7 @@ func HandleAssignmentUpdate(store *database.Store, storage *storage.B2Storage, w
 	// 5. Re-render editor
 	fmt.Println("📤 Rendering updated slot")
 
-	assignmentSlotProfessor.AssignmentSlotProfessor(classId, assignmentModel, true).Render(r.Context(), w)
+	assignmentSlotProfessor.AssignmentSlotProfessor(classId, assignmentModel, true, "").Render(r.Context(), w)
 	assignmentEditor.AssignmentEditor(assignmentModel, classId, false).Render(r.Context(), w)
 	fmt.Println("✔ Render complete")
 }

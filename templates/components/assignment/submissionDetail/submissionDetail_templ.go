@@ -170,13 +170,13 @@ func SubmissionDetail(s *models.Submission, classId, assignmentId string, gradin
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(gradeValue)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 79, Col: 28}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/submissionDetail/submissionDetail.templ`, Line: 79, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\n\t\t\t\t\t\t\t\t\t\t[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none\" oninput=\"this.value=this.value.replace(/[^0-9]/g,'');\n\t\t\t\t\t\t\t\t\t             if(this.value>100) this.value=100;\n\t\t\t\t\t\t\t\t\t             if(this.value<0) this.value=0;\n\t\t\t\t\t\t\t\t\t             document.getElementById('gradeInput').value=this.value;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.previousElementSibling.stepUp();\n\t\t\t\t\t\t\t\t\t             document.getElementById('gradeInput').value=this.previousElementSibling.value;\">&gt;</button></div><form hx-post=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-24 h-12 text-center border border-gray-300 rounded-lg text-xl font-semibold text-gray-900 bg-white\" oninput=\"this.value=this.value.replace(/[^0-9]/g,'');\n\t\t\t\t\t\t\t\t\t           if(this.value>100) this.value=100;\n\t\t\t\t\t\t\t\t\t           if(this.value<0) this.value=0;\n\t\t\t\t\t\t\t\t\t           document.getElementById('gradeInput').value=this.value;\"> <button type=\"button\" class=\"w-12 h-12 flex items-center justify-center border border-gray-300 rounded-lg text-xl font-bold hover:bg-gray-100 text-gray-700 cursor-pointer\" onclick=\"this.previousElementSibling.stepUp();\n\t\t\t\t\t\t\t\t\t             document.getElementById('gradeInput').value=this.previousElementSibling.value;\">&gt;</button></div><form hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

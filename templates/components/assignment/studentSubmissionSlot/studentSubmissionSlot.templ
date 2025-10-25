@@ -25,7 +25,7 @@ templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission)
 		}
 	}}
 
-	<li id={"submission-slot-" + s.Username} class="bg-gray-100 mb-2 rounded-md shadow-sm">
+	<li id={"submission-slot-" + s.Username} class="flex justify-between items-center w-full text-left px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition cursor-pointer">
 		<button
 			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username}
 			hx-target="#submission-detail"

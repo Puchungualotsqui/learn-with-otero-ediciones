@@ -33,9 +33,9 @@ templ AssignmentList(classId int, assignments []*models.Assignment, grades []str
 			} else {
 				for i, a := range assignments {
 					if professor {
-						@assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton)
+						@assignmentSlotProfessor.AssignmentSlotProfessor(classId, a, deleteButton, "")
 					} else {
-						@assignmentSlotStudent.AssignmentSlotStudent(classId, a, username, grades[i])
+						@assignmentSlotStudent.AssignmentSlotStudent(classId, a, username, grades[i], "")
 					}
 				}
 			}
