@@ -34,7 +34,7 @@ func Home(content templ.Component) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/calender")
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/calendar")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/body/home.templ`, Line: 25, Col: 23}
 		}

@@ -12,9 +12,10 @@ import (
 	"frontend/templates/components/assignment/submissionEditor"
 	"frontend/templates/components/calendarListProfessor"
 	"frontend/templates/components/calendarListStudent"
-	"frontend/templates/components/calendarWrapperStudent"
+	"frontend/templates/components/calendarWrapper"
 	"frontend/templates/components/panelsContent"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -23,10 +24,33 @@ import (
 func HandleCalendarStudentDefault(store *database.Store, w http.ResponseWriter, r *http.Request, username string, professor bool) {
 	fmt.Println("📅 [HandleCalendarStudent] Rendering student calendar")
 
-	// Get current month
+	monthStr := r.URL.Query().Get("month")
+	yearStr := r.URL.Query().Get("year")
+
+	// Provide defaults if missing
 	now := time.Now()
-	year := now.Year()
 	month := int(now.Month())
+	year := now.Year()
+
+	if monthStr != "" {
+		if m, err := strconv.Atoi(monthStr); err == nil {
+			month = m
+		}
+	}
+	if yearStr != "" {
+		if y, err := strconv.Atoi(yearStr); err == nil {
+			year = y
+		}
+	}
+
+	// Optional: handle wrap-around (e.g., month = 0 → previous year)
+	if month < 1 {
+		month = 12
+		year--
+	} else if month > 12 {
+		month = 1
+		year++
+	}
 
 	user, err := database.Get[models.User](store, database.Buckets["users"], username)
 	if err != nil {
@@ -110,9 +134,10 @@ func HandleCalendarStudentDefault(store *database.Store, w http.ResponseWriter, 
 
 	panels := panelsContent.PanelsContent(parts...)
 
+	monthName := helper.MonthNameES(month)
 	render.RenderWithLayout(
 		w, r,
-		calendarWrapperStudent.CalendarWrapperStudent(month, year, panels),
+		calendarWrapper.CalendarWrapper(month, monthName, year, panels),
 		body.Home,
 	)
 }

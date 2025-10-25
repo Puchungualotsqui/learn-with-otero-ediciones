@@ -1,0 +1,40 @@
+package calendarWrapper
+
+import (
+	"strconv"
+)
+
+templ CalendarWrapper(month int, monthToDisplay string, year int, body templ.Component) {
+	<section
+		id="calendar-wrapper"
+		class="flex flex-col flex-1 h-[calc(100vh-5rem)] bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden"
+	>
+		<!-- Top bar -->
+		<div class="flex items-center justify-between bg-gray-50 border-b border-gray-200 p-4">
+			<button
+				class="text-gray-600 hover:text-red-600 text-lg font-bold"
+				hx-get={"/calendar/?month=" + strconv.Itoa(month-1) + "&year=" + strconv.Itoa(year)}
+				hx-target="#calendar-wrapper"
+				hx-swap="outerHTML"
+			>
+				←
+			</button>
+
+			<h2 class="text-xl font-semibold text-gray-900 text-center">
+				{ monthToDisplay } { year }
+			</h2>
+
+			<button
+				class="text-gray-600 hover:text-red-600 text-lg font-bold"
+				hx-get={"/calendar/?month=" + strconv.Itoa(month+1) + "&year=" + strconv.Itoa(year)}
+				hx-target="#calendar-wrapper"
+				hx-swap="outerHTML"
+			>
+				→
+			</button>
+		</div>
+
+		<!-- Panels -->
+		@body
+	</section>
+}

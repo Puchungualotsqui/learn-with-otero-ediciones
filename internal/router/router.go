@@ -134,7 +134,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		render.RenderWithLayout(w, r, home.Home(classes, professor), body.Home)
 		return
 
-	case parts[0] == "calender":
+	case parts[0] == "calendar":
 		professor, err := isProfessor(store, username)
 		if err != nil {
 			http.Error(w, "Internal error", http.StatusInternalServerError)
