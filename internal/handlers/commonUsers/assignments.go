@@ -29,8 +29,7 @@ func HandleAssignmentDefault(
 	r *http.Request,
 	classId int,
 	professor bool,
-	username string,
-) {
+	username string) {
 	fmt.Println("📥 [HandleAssignmentDefault] Request received")
 
 	assignments := database.ListAssignmentsOfClass(store, classId)

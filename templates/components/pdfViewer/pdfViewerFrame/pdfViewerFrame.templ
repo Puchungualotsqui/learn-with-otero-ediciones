@@ -1,8 +1,8 @@
 package pdfViewerFrame
 
 templ PdfViewerFrame(currentPDF string) {
-  <div class="flex-1 flex flex-col bg-gray-100 relative min-h-0">
-    <div id="pdf-viewer-frame" class="flex-1 relative bg-gray-200 min-h-0">
+  <div id="pdf-viewer-frame" class="flex-1 flex flex-col bg-gray-100 relative min-h-0">
+    <div  class="flex-1 relative bg-gray-200 min-h-0">
       if currentPDF == "" {
         <div class="absolute inset-0 flex items-center justify-center">
           <p class="text-gray-500 italic text-center px-4">

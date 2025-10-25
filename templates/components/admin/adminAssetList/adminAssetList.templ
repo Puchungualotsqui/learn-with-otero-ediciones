@@ -1,0 +1,146 @@
+package adminAssetList
+
+import (
+	"fmt"
+	"frontend/database/models"
+)
+
+templ AdminAssetList(assets []*models.Asset, subject, grade string) {
+<div
+  x-data="fileManager()"
+  x-init="initExisting([])"
+  class="space-y-6"
+>
+  <form
+    hx-post="/admin/asset/manage/upload"
+    hx-target="#asset-list"
+    hx-swap="innerHTML"
+    hx-encoding="multipart/form-data"
+    @submit="uploading = true; finalizeDeletions()"
+    class="space-y-4"
+  >
+    <input type="hidden" name="subject" value={ subject } />
+    <input type="hidden" name="grade" value={ grade } />
+
+    <!-- Dropzone -->
+    <div
+      class="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition"
+      @dragover.prevent
+      @drop.prevent="addFiles($event.dataTransfer.files)"
+      @click="$refs.uploadPicker.click()"
+    >
+      <p>Arrastra archivos PDF aquí o haz clic para seleccionarlos</p>
+      <input
+        type="file"
+        x-ref="uploadPicker"
+        multiple
+        accept="application/pdf"
+        class="hidden"
+        @change="addFiles($event.target.files)"
+      />
+    </div>
+
+    <input type="file" name="uploads" x-ref="uploads" class="hidden" multiple>
+
+    <!-- Table -->
+    <div id="asset-list" class="border border-gray-200 rounded-lg mt-4 overflow-hidden">
+      <table class="table table-sm w-full">
+        <thead class="bg-gray-100 text-gray-700 text-sm">
+          <tr>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th>Enlace</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Files in progress -->
+          <template x-for="(value, name) in files" :key="name">
+            <tr class="hover:bg-gray-50 text-sm" :class="{'opacity-50 italic': toDelete[name]}">
+              <td class="truncate" x-text="name"></td>
+              <td>
+                <template x-if="value instanceof File">
+                  <span x-text="uploading ? 'Subiendo...' : 'Listo para subir'"></span>
+                </template>
+                <template x-if="typeof value === 'string'">
+                  <span>Subido</span>
+                </template>
+              </td>
+              <td>
+                <template x-if="value instanceof File"><span>-</span></template>
+                <template x-if="typeof value === 'string'">
+                  <a :href="value" target="_blank" class="text-red-600 underline">Ver PDF</a>
+                </template>
+              </td>
+              <td class="text-center">
+                <template x-if="!toDelete[name]">
+                  <button
+                    type="button"
+                    @click="markForDeletion(name)"
+                    class="btn btn-xs bg-red-600 hover:bg-red-700 text-white"
+                  >Eliminar</button>
+                </template>
+                <template x-if="toDelete[name]">
+                  <button
+                    type="button"
+                    @click="restore(name)"
+                    class="btn btn-xs bg-yellow-400 text-black"
+                  >Restaurar</button>
+                </template>
+              </td>
+            </tr>
+          </template>
+
+          <!-- Existing assets -->
+          if len(assets) == 0 {
+            <tr>
+              <td colspan="4" class="text-center text-gray-400 italic py-2">
+                No hay archivos subidos
+              </td>
+            </tr>
+          } else {
+            for _, a := range assets {
+              <tr class="hover:bg-gray-50 text-sm">
+                <td>{ a.OriginalName }</td>
+                <td>Subido</td>
+                <td>
+                  <a
+                    hx-get={ fmt.Sprintf("/admin/asset/view?subject=%s&grade=%s&name=%s", subject, grade, a.Name) }
+                    hx-target="#pdf-viewer-frame"
+                    hx-swap="outerHTML"
+                    class="text-red-600 underline cursor-pointer"
+                  >
+                    Ver PDF
+                  </a>
+                </td>
+                <td class="text-center flex justify-center gap-2">
+                  <button
+                    type="button"
+                    hx-post="/admin/asset/manage/delete"
+                    hx-vals={ fmt.Sprintf(`js:{ name: "%s", subject: "%s", grade: "%s" }`, a.Name, subject, grade) }
+                    hx-target="#asset-list"
+                    hx-swap="innerHTML"
+                    class="btn btn-xs bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Save -->
+    <div class="flex justify-end pt-4 border-t border-gray-100">
+      <button
+        type="submit"
+        class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-8"
+        :disabled="uploading"
+        x-text="uploading ? 'Subiendo...' : 'Guardar cambios'"
+      ></button>
+    </div>
+  </form>
+</div>
+}

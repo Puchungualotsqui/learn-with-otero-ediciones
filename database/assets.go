@@ -1,10 +1,14 @@
 package database
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"frontend/database/models"
+	"frontend/helper"
 	"frontend/storage"
+	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -14,45 +18,83 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func CreateAsset(s *Store, subject, grade, name, url string) (*models.Asset, error) {
-	var sub *models.Asset
+func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, file io.Reader) (*models.Asset, error) {
+	// Step 1. Apply watermark
+	watermarkedPath, err := helper.AddWatermarkToPDF(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to watermark PDF: %w", err)
+	}
+	defer os.Remove(watermarkedPath)
+
+	// Step 2. Reopen the processed (watermarked) file
+	f, err := os.Open(watermarkedPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open watermarked PDF: %w", err)
+	}
+	defer f.Close()
+
+	// Step 3. Normalize and ensure correct naming
+	safeName := helper.NormalizeFilename(fileName)
+	if slash := strings.LastIndex(safeName, "/"); slash != -1 {
+		safeName = safeName[slash+1:]
+	}
+	if !strings.HasSuffix(strings.ToLower(safeName), ".pdf") {
+		safeName += ".pdf"
+	}
+
+	// Step 4. Compose storage and database keys
+	storageKey := fmt.Sprintf("recursos/%s/%s/%s", subject, grade, safeName)
+	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, strings.TrimSuffix(safeName, ".pdf"))
+	originalName := storageKey // keep path for future temporary links
+
+	// ✅ Step 5. Upload the *watermarked* file, not the original
+	url, err := storage.UploadPrivateFile(context.Background(), storageKey, f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload asset to storage: %w", err)
+	}
+
+	// Step 6. Save metadata
+	asset := &models.Asset{
+		Name:         strings.TrimSuffix(safeName, ".pdf"),
+		OriginalName: originalName,
+		Url:          url,
+	}
+
+	err = s.db.Update(func(tx *bbolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists(Buckets["assets"])
+		if err != nil {
+			return err
+		}
+		data, err := json.Marshal(asset)
+		if err != nil {
+			return err
+		}
+		return b.Put([]byte(dbKey), data)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to save asset metadata: %w", err)
+	}
+
+	fmt.Printf("✅ Asset uploaded and registered: %s (%s/%s)\n", asset.OriginalName, subject, grade)
+	return asset, nil
+}
+
+func CreateAssetFromURL(s *Store, subject, grade, name, url string) (*models.Asset, error) {
+	asset := &models.Asset{Name: name, OriginalName: name, Url: url}
+	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, name)
 
 	err := s.db.Update(func(tx *bbolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(Buckets["assets"])
 		if err != nil {
 			return err
 		}
-
-		originalName := name
-
-		if slash := strings.LastIndex(name, "/"); slash != -1 {
-			name = name[slash+1:]
-		}
-		if dot := strings.LastIndex(name, "."); dot != -1 {
-			name = name[:dot]
-		}
-
-		// Composite key: classId:assignmentId:username
-		key := fmt.Sprintf("%s:%s:%s", subject, grade, name)
-
-		sub = &models.Asset{
-			Name:         name,
-			OriginalName: originalName,
-			Url:          url,
-		}
-
-		data, err := json.Marshal(sub)
+		data, err := json.Marshal(asset)
 		if err != nil {
 			return err
 		}
-
-		return b.Put([]byte(key), data)
+		return b.Put([]byte(dbKey), data)
 	})
-
-	if err != nil {
-		return nil, err
-	}
-	return sub, nil
+	return asset, err
 }
 
 func RefreshAssets(store *Store, storage *storage.B2Storage) {
@@ -94,7 +136,7 @@ func RefreshAssets(store *Store, storage *storage.B2Storage) {
 				fmt.Printf("⚠️ [%s/%s] failed to list files: %v\n", subjectName, grade, err)
 			} else {
 				for _, f := range files {
-					if _, err := CreateAsset(store, subjectName, grade, f.FileName, f.DownloadURL); err != nil {
+					if _, err := CreateAssetFromURL(store, subjectName, grade, f.FileName, f.DownloadURL); err != nil {
 						fmt.Printf("⚠️ [%s/%s] failed to create asset %s: %v\n", subjectName, grade, f.FileName, err)
 					}
 				}

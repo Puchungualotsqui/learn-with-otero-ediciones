@@ -377,6 +377,43 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				admin.HandleAdminSubjectRenameDefault(store, w, r)
 				return
 			}
+
+		case "asset":
+			switch parts[2] {
+			case "manage":
+				if len(parts) >= 4 {
+					switch parts[3] {
+					case "list":
+						fmt.Printf("📌 Routed to HandleAdminAssetList")
+						admin.HandleAdminAssetList(store, w, r)
+						return
+
+					case "upload":
+						fmt.Printf("📌 Routed to HandleAdminAssetManageUpload")
+						admin.HandleAdminAssetManageUpload(store, storage, w, r)
+						return
+
+					case "delete":
+						fmt.Printf("📌 Routed to HandleAdminAssetManageDelete")
+						admin.HandleAdminAssetManageDelete(store, storage, w, r)
+						return
+					}
+				}
+
+				fmt.Printf("📌 Routed to HandleAdminSubjectsDefault")
+				admin.HandleAdminAssetManagerDefault(store, w, r)
+				return
+
+			case "view":
+				fmt.Printf("📌 Routed to HandleAdminAssetView")
+				admin.HandleAdminAssetView(store, storage, w, r)
+				return
+
+			case "refresh":
+				fmt.Printf("📌 Routed to HandleAdminAssetRefresh")
+				admin.HandleAdminAssetRefresh(store, storage, w, r)
+				return
+			}
 		}
 
 	default:

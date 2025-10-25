@@ -66,7 +66,7 @@ var options []*dto.AdminOption = []*dto.AdminOption{
 	&dto.AdminOption{
 		Title:       "Recursos",
 		Description: "Agregar y eliminar materiales y archivos",
-		SubUrl:      "class",
+		SubUrl:      "asset",
 		SubOptions: []*dto.AdminSubOptionSlot{
 			&dto.AdminSubOptionSlot{
 				Title: "Administrar",

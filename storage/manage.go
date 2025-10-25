@@ -28,6 +28,20 @@ func (s *B2Storage) UploadFile(ctx context.Context, key string, r io.Reader) (st
 	return fmt.Sprintf("https://%s/file/%s/%s", s.BaseUrl, s.PublicBucket.Name(), key), nil
 }
 
+func (s *B2Storage) UploadPrivateFile(ctx context.Context, key string, r io.Reader) (string, error) {
+	obj := s.PrivateBucket.Object(key)
+	w := obj.NewWriter(ctx)
+
+	if _, err := io.Copy(w, r); err != nil {
+		return "", fmt.Errorf("failed to write object: %w", err)
+	}
+	if err := w.Close(); err != nil {
+		return "", fmt.Errorf("failed to close writer: %w", err)
+	}
+
+	return fmt.Sprintf("https://%s/file/%s/%s", s.BaseUrl, s.PrivateBucket.Name(), key), nil
+}
+
 func (s *B2Storage) DownloadFile(ctx context.Context, key string, w io.Writer) error {
 	obj := s.PublicBucket.Object(key)
 	r := obj.NewReader(ctx)
