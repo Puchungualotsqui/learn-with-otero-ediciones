@@ -134,6 +134,17 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		render.RenderWithLayout(w, r, home.Home(classes, professor), body.Home)
 		return
 
+	case parts[0] == "calender":
+		professor, err := isProfessor(store, username)
+		if err != nil {
+			http.Error(w, "Internal error", http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println("📌 Routed to HandleCalendarStudentDefault")
+		commonUsers.HandleCalendarStudentDefault(store, w, r, username, professor)
+		return
+
 	case isClassValid(store, username, parts[0]):
 		fmt.Println("🔎 Router parts:", parts)
 

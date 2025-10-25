@@ -29,7 +29,20 @@ func Home(content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Background --><div class=\"absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-200\"></div><!-- Main container --><div class=\"relative z-10 w-full h-full flex flex-col\"><!-- Header bar --><header class=\"w-full bg-white border-b border-gray-200 shadow-sm px-4 py-1 flex items-center justify-between\"><!-- Left: Back to root --><div class=\"flex items-center gap-2 cursor-pointer\"><a href=\"/\" class=\"flex items-center gap-2\"><img src=\"/static/assets/SmallLogo.png\" alt=\"Editorial logo\" class=\"w-8 h-8\"></a></div><!-- Right: Actions --><div class=\"flex gap-2\"><button class=\"px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer\">Asignaciones</button> <button class=\"px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer\" hx-get=\"/logout\" hx-redirect=\"/login\">Cerrar sesión</button></div></header><main id=\"content\" class=\"flex-1 px-4 py-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Background --><div class=\"absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-200\"></div><!-- Main container --><div class=\"relative z-10 w-full h-full flex flex-col\"><!-- Header bar --><header class=\"w-full bg-white border-b border-gray-200 shadow-sm px-4 py-1 flex items-center justify-between\"><!-- Left: Back to root --><div class=\"flex items-center gap-2 cursor-pointer\"><a href=\"/\" class=\"flex items-center gap-2\"><img src=\"/static/assets/SmallLogo.png\" alt=\"Editorial logo\" class=\"w-8 h-8\"></a></div><!-- Right: Actions --><div class=\"flex gap-2\"><button class=\"px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer\" hx-push-url=\"true\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/calender")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/body/home.templ`, Line: 25, Col: 23}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"#content\">Asignaciones</button> <button class=\"px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer\" hx-get=\"/logout\" hx-redirect=\"/login\">Cerrar sesión</button></div></header><main id=\"content\" class=\"flex-1 px-4 py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -37,7 +50,7 @@ func Home(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</main></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

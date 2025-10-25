@@ -91,6 +91,37 @@ func Get[T any](s *Store, bucket []byte, key string) (*T, error) {
 	return &out, nil
 }
 
+func GetMany[T any](s *Store, bucket []byte, keys ...string) ([]*T, error) {
+	results := make([]*T, 0, len(keys))
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		for _, key := range keys {
+			v := b.Get([]byte(key))
+			if v == nil {
+				// skip silently or log
+				continue
+			}
+
+			var obj T
+			if err := json.Unmarshal(v, &obj); err != nil {
+				return fmt.Errorf("unmarshal %q: %w", key, err)
+			}
+
+			objCopy := obj
+			results = append(results, &objCopy)
+		}
+
+		return nil
+	})
+
+	return results, err
+}
+
 func GetWithPrefix[T any](s *Store, bucket []byte, id string, prefixes ...string) (*T, error) {
 	var result *T
 
@@ -289,6 +320,65 @@ func ListByPrefix[T any](s *Store, bucket []byte, limit int, prefixes ...string)
 				break
 			}
 		}
+		return nil
+	})
+
+	return results, err
+}
+
+func ListByManyPrefix[T any](s *Store, bucket []byte, limit int, prefixes ...[]string) (map[string][]*T, error) {
+	results := make(map[string][]*T)
+
+	err := s.db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("bucket %s not found", bucket)
+		}
+
+		c := b.Cursor()
+		count := 0
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			keyStr := string(k)
+			matchedPrefix := ""
+
+			// Match key against all prefix groups
+			for _, group := range prefixes {
+				prefix := strings.Join(group, ":")
+				if bytes.HasPrefix(k, []byte(prefix)) {
+					// Check if exact match (no colon needed)
+					// or if the next char is ":" to avoid partial matches
+					if len(k) == len(prefix) || k[len(prefix)] == ':' {
+						matchedPrefix = prefix
+						break
+					}
+				}
+			}
+
+			// If no prefix list provided, everything matches
+			if matchedPrefix == "" && len(prefixes) > 0 {
+				continue
+			}
+			if matchedPrefix == "" {
+				// Use base key (up to first ':') or full key if none
+				parts := strings.SplitN(keyStr, ":", 2)
+				matchedPrefix = parts[0]
+			}
+
+			var u T
+			if err := json.Unmarshal(v, &u); err != nil {
+				return fmt.Errorf("unmarshal %q: %w", k, err)
+			}
+
+			uCopy := u
+			results[matchedPrefix] = append(results[matchedPrefix], &uCopy)
+
+			count++
+			if limit > 0 && count >= limit {
+				break
+			}
+		}
+
 		return nil
 	})
 
