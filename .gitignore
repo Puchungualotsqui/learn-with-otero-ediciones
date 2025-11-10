@@ -1,2 +1,3 @@
 .venv
 static/css/tailwindcss
+redeploy.sh

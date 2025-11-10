@@ -1,0 +1,5 @@
+node_modules
+*.templ
+.git
+tailwind.config.js
+input.css
