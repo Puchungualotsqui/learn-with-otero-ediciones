@@ -125,13 +125,20 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 					<input type="file" name="uploads" x-ref="uploads" class="hidden" multiple>
 
 					<!-- Submit -->
-					<div class="mt-auto pt-6 flex justify-end">
-				        <button type="submit"
-				            class="btn bg-red-600 hover:bg-red-700 text-white px-6 transition-all duration-200"
-				            :class="isDirty ? 'ring-2 ring-red-300 shadow-lg' : ''">
-				            <span x-text="isDirty ? 'Guardar cambios' : 'Guardar'"></span>
-				        </button>
-				    </div>
+					<div class="mt-auto pt-6 flex justify-end h-16"> <button
+					        type="submit"
+					        x-show="isDirty"
+					        x-transition:enter="transition ease-out duration-200"
+					        x-transition:enter-start="opacity-0 translate-y-2"
+					        x-transition:enter-end="opacity-100 translate-y-0"
+					        x-transition:leave="transition ease-in duration-150"
+					        x-transition:leave-start="opacity-100 translate-y-0"
+					        x-transition:leave-end="opacity-0 translate-y-2"
+					        class="btn bg-red-600 hover:bg-red-700 text-white px-6 shadow-lg ring-2 ring-red-300 transition-all duration-200"
+					    >
+					        <span x-text="Object.keys(files).length > 0 ? 'Guardar cambios' : 'Entregar tarea'"></span>
+					    </button>
+					</div>
 				</form>
 			}
 		</div>
