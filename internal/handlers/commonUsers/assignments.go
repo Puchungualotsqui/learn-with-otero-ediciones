@@ -156,7 +156,7 @@ func HandleAssignmentNew(store *database.Store, storage *storage.B2Storage, w ht
 		store,
 		classId,
 		"Nuevo título",
-		"Agrega la descripción aquí...",
+		"",
 		time.Now().Format("02/01/2006"),
 	)
 	if err != nil {

@@ -29,14 +29,14 @@ func Home(content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Background --><div class=\"absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-200\"></div><!-- Main container --><div class=\"relative z-10 w-full h-full flex flex-col\"><!-- Header bar --><header class=\"w-full bg-white border-b border-gray-200 shadow-sm px-4 py-1 flex items-center justify-between\"><!-- Left: Back to root --><div class=\"flex items-center gap-2 cursor-pointer\"><a href=\"/\" class=\"flex items-center gap-2\"><img src=\"/static/assets/SmallLogo.png\" alt=\"Editorial logo\" class=\"w-8 h-8\"></a></div><!-- Right: Actions --><div class=\"flex gap-2\"><button class=\"px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer\" hx-push-url=\"true\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Background --><div class=\"absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-200\"></div><!-- Main container --><div class=\"relative z-10 w-full h-full flex flex-col\"><!-- Header bar --><header class=\"w-full bg-white border-b border-gray-200 shadow-sm px-4 py-1 flex items-center justify-between\"><!-- Left: Back to root --><div class=\"flex items-center gap-2 cursor-pointer\"><a href=\"/\" class=\"flex items-center gap-2 group\"><img src=\"/static/assets/SmallLogo.png\" alt=\"Editorial logo\" class=\"w-8 h-8\"><div class=\"flex flex-col leading-tight\"><span class=\"text-xs text-gray-400\">Volver al</span> <span class=\"text-sm font-semibold text-gray-700 group-hover:text-red-500\">Inicio</span></div></a></div><!-- Right: Actions --><div class=\"flex gap-2\"><button class=\"px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition cursor-pointer\" hx-push-url=\"true\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/calendar")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/body/home.templ`, Line: 25, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/body/home.templ`, Line: 29, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {

@@ -167,23 +167,28 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 }
 
 func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("🧾 HandleAdminUserRevealPassword triggered")
 	username := r.URL.Query().Get("username")
 	key := r.Header.Get("HX-Prompt") // from hx-prompt
 
 	// Validate admin password here (compare hash, or session role == admin)
 	user, err := database.Get[models.User](store, database.Buckets["users"], username)
 	if err != nil {
+		println("Usuario no encontrado")
 		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 		return
 	}
 
 	plain, err := auth.Decrypt([]byte(key), user.PasswordNotHashed)
 	if err != nil {
+		println("Error al descifrar la contrasena: ", err)
 		http.Error(w, "Error al descifrar contraseña", http.StatusInternalServerError)
 		return
 	}
 
 	safePassword := html.EscapeString(plain)
+
+	println("safe password: ", safePassword)
 
 	// Return a new input field that HTMX swaps in
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

@@ -1,3 +1,5 @@
 .venv
 static/css/tailwindcss
 redeploy.sh
+cors_rules.json
+.updatecors

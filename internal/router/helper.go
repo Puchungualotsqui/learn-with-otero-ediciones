@@ -31,5 +31,6 @@ func isClassValid(store *database.Store, username, class string) bool {
 		fmt.Println("Invalid class Id")
 		return false
 	}
+
 	return slices.Contains(user.Classes, classId)
 }
