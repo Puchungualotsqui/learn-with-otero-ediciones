@@ -45,16 +45,39 @@ function fileManager() {
     originalDescription: '',
     isDirty: false,
 
+    init() {
+      this.$watch('isDirty', value => this.toggleWarning(value));
+      this.$watch('uploading', value => this.toggleWarning(value));
+    },
+
+    toggleWarning(condition) {
+      if (condition) {
+        window.addEventListener('beforeunload', this.beforeUnloadHandler);
+      } else {
+        window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+      }
+    },
+
+    beforeUnloadHandler(e) {
+      e.preventDefault();
+      e.returnValue = "Hay cambios sin guardar o archivos subiéndose. ¿Estás seguro de que quieres salir?";
+      return e.returnValue;
+    },
+
     checkDirty() {
       const hasPendingDeletions = Object.keys(this.toDelete).length > 0;
-
-      // Check if any file in 'this.files' is a new File object
       const hasNewFiles = Object.values(this.files).some(v => v instanceof File);
-
-      // Check if description changed
-      const descChanged = this.$refs.descriptionField.value !== this.originalDescription;
+      // Ensure the ref exists before checking
+      const descField = this.$refs.descriptionField;
+      const descChanged = descField ? descField.value !== this.originalDescription : false;
 
       this.isDirty = hasPendingDeletions || hasNewFiles || descChanged;
+    },
+
+    resetState() {
+      this.isDirty = false;
+      this.uploading = false;
+      this.toggleWarning(false);
     },
 
     initExisting(urls) {

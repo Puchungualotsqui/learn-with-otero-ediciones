@@ -32,6 +32,8 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 					x-data="fileManager()"
 					x-init={ "initExisting(" + filesJSON + "); originalDescription = `" + s.Description + "`" }
 					@submit="uploading = true; finalizeDeletions()"
+					@htmx:before-request="if(uploading) { /* show global loader if you want */ }"
+					@htmx:after-request="resetState()"
 					class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
 				>
 					<!-- Header -->
