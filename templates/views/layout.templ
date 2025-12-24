@@ -40,8 +40,22 @@ templ Layout(body templ.Component) {
 function fileManager() {
   return {
     files: {},
-    toDelete: {}, // 🆕 track files marked for deletion
+    toDelete: {},
     uploading: false,
+    originalDescription: '',
+    isDirty: false,
+
+    checkDirty() {
+      const hasPendingDeletions = Object.keys(this.toDelete).length > 0;
+
+      // Check if any file in 'this.files' is a new File object
+      const hasNewFiles = Object.values(this.files).some(v => v instanceof File);
+
+      // Check if description changed
+      const descChanged = this.$refs.descriptionField.value !== this.originalDescription;
+
+      this.isDirty = hasPendingDeletions || hasNewFiles || descChanged;
+    },
 
     initExisting(urls) {
       if (!urls) return;
@@ -50,6 +64,7 @@ function fileManager() {
         this.files[name] = url;
       });
       this.syncUploads();
+      this.checkDirty();
     },
 
     addFiles(list) {
@@ -57,6 +72,7 @@ function fileManager() {
         this.files[f.name] = f;
       });
       this.syncUploads();
+      this.checkDirty();
     },
 
     markForDeletion(name) {
@@ -64,11 +80,13 @@ function fileManager() {
       if (this.files[name]) {
         this.toDelete[name] = true;
       }
+      this.checkDirty();
     },
 
     restore(name) {
       // allow user to undo delete (optional)
       delete this.toDelete[name];
+      this.checkDirty();
     },
 
     finalizeDeletions() {

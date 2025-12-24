@@ -3,3 +3,5 @@ static/css/tailwindcss
 redeploy.sh
 cors_rules.json
 .updatecors
+data/
+bin/

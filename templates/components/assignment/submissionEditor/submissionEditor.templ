@@ -30,7 +30,7 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 					hx-target="#submission-detail"
 					hx-swap="outerHTML"
 					x-data="fileManager()"
-					x-init={"initExisting(" + filesJSON + ")"}
+					x-init={ "initExisting(" + filesJSON + "); originalDescription = `" + s.Description + "`" }
 					@submit="uploading = true; finalizeDeletions()"
 					class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
 				>
@@ -44,11 +44,13 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 
 					<!-- Description -->
 					<div class="flex-1 flex flex-col mb-6">
-						<label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-						<textarea name="description"
-							placeholder="Buenos días, profesor(a)"
-							class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500">{ s.Description }</textarea>
-					</div>
+				        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+				        <textarea name="description"
+				            x-ref="descriptionField"
+				            @input="checkDirty()"
+				            placeholder="Buenos días, profesor(a)"
+				            class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500">{ s.Description }</textarea>
+				    </div>
 
 					<!-- Files section -->
 					<div class="mb-6">
@@ -123,10 +125,12 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 
 					<!-- Submit -->
 					<div class="mt-auto pt-6 flex justify-end">
-						<button type="submit" class="btn bg-red-600 hover:bg-red-700 text-white px-6">
-							Guardar
-						</button>
-					</div>
+				        <button type="submit"
+				            class="btn bg-red-600 hover:bg-red-700 text-white px-6 transition-all duration-200"
+				            :class="isDirty ? 'ring-2 ring-red-300 shadow-lg' : ''">
+				            <span x-text="isDirty ? 'Guardar cambios' : 'Guardar'"></span>
+				        </button>
+				    </div>
 				</form>
 			}
 		</div>
