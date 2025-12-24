@@ -71,7 +71,7 @@ func AssignmentEditor(a *models.Assignment, classId int, firstRender bool) templ
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/update")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 31, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 31, Col: 100}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -84,7 +84,7 @@ func AssignmentEditor(a *models.Assignment, classId int, firstRender bool) templ
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("#assignment-slot-" + strconv.Itoa(a.Id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 32, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 32, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -95,54 +95,54 @@ func AssignmentEditor(a *models.Assignment, classId int, firstRender bool) templ
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("initExisting(" + filesJSON + ")")
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("initExisting(" + filesJSON + "); originalDescription = `" + a.Description + "`; originalTitle = `" + a.Title + "`; originalDate = `" + a.DueDate + "`;")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 36, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 36, Col: 173}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" @submit=\"uploading = true; finalizeDeletions()\" class=\"flex flex-col flex-1 min-h-0 overflow-y-auto px-4\"><!-- Title --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Título</label> <input type=\"text\" name=\"title\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" @submit=\"uploading = true; finalizeDeletions()\" @htmx:after-request=\"resetState()\" class=\"flex flex-col flex-1 min-h-0 overflow-y-auto px-4\"><!-- Title --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Título</label> <input type=\"text\" name=\"title\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(a.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 44, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 45, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:border-red-500\"></div><!-- Description --><div class=\"flex-1 flex flex-col mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Descripción</label> <textarea name=\"description\" placeholder=\"Agrega la descripción de la asignación\" class=\"flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" x-ref=\"titleField\" @input=\"checkDirty()\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:border-red-500\"></div><!-- Description --><div class=\"flex-1 flex flex-col mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Descripción</label> <textarea name=\"description\" x-ref=\"descriptionField\" @input=\"checkDirty()\" placeholder=\"Agrega la descripción de la asignación\" class=\"flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(a.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 54, Col: 173}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 59, Col: 173}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</textarea></div><!-- Due date --><div class=\"mb-8\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Fecha de entrega</label> <input id=\"due-date\" type=\"text\" name=\"due_date\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</textarea></div><!-- Due date --><div class=\"mb-8\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Fecha de entrega</label> <input id=\"due-date\" type=\"text\" name=\"due_date\" x-ref=\"dateField\" @change=\"checkDirty()\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(a.DueDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 63, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/assignment/assignmentEditor/assignmentEditor.templ`, Line: 70, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" placeholder=\"Selecciona fecha\" class=\"w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:border-red-500\"></div><!-- Files section --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Archivos o enlaces</label><ul class=\"space-y-2 mb-4\"><template x-for=\"(value, name) in files\" :key=\"name\"><li class=\"flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200\" :class=\"{'opacity-50 italic': toDelete[name]}\"><!-- Already uploaded (URL) --><template x-if=\"typeof value === 'string'\"><div class=\"flex-1 flex justify-between gap-2\"><a :href=\"value\" target=\"_blank\" class=\"truncate text-red-600 hover:underline\" x-text=\"name\"></a><!-- Only send keep[] if not marked for deletion --><template x-if=\"!toDelete[name]\"><input type=\"hidden\" name=\"keep[]\" :value=\"value\"></template></div></template><!-- Pending upload (File) --><template x-if=\"value instanceof File\"><div class=\"flex-1 flex justify-between gap-2 items-center\"><span class=\"truncate text-gray-800\" x-text=\"name\"></span><template x-if=\"uploading\"><span class=\"text-gray-500 text-xs italic\">Subiendo...</span></template></div></template><!-- Action buttons --><div class=\"ml-2 flex items-center gap-2\"><template x-if=\"!toDelete[name]\"><button type=\"button\" @click=\"markForDeletion(name)\" class=\"text-red-600 hover:text-red-800 cursor-pointer\">✕</button></template><template x-if=\"toDelete[name]\"><button type=\"button\" @click=\"restore(name)\" class=\"text-gray-500 hover:text-gray-700 text-xs cursor-pointer\">↩️</button></template></div></li></template></ul></div><!-- Dropzone --><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.picker.click()\"><p>Arrastra archivos aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"picker\" multiple class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><!-- Hidden input that HTMX will actually send --><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><div class=\"mt-4 flex justify-end\"><button type=\"submit\" class=\"btn bg-red-600 text-white\">Guardar</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" placeholder=\"Selecciona fecha\" class=\"w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:border-red-500\"></div><!-- Files section --><div class=\"mb-6\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Archivos o enlaces</label><ul class=\"space-y-2 mb-4\"><template x-for=\"(value, name) in files\" :key=\"name\"><li class=\"flex items-center justify-between px-3 py-2 rounded bg-gray-50 text-sm text-gray-800 border border-gray-200\" :class=\"{'opacity-50 italic': toDelete[name]}\"><!-- Already uploaded (URL) --><template x-if=\"typeof value === 'string'\"><div class=\"flex-1 flex justify-between gap-2\"><a :href=\"value\" target=\"_blank\" class=\"truncate text-red-600 hover:underline\" x-text=\"name\"></a><!-- Only send keep[] if not marked for deletion --><template x-if=\"!toDelete[name]\"><input type=\"hidden\" name=\"keep[]\" :value=\"value\"></template></div></template><!-- Pending upload (File) --><template x-if=\"value instanceof File\"><div class=\"flex-1 flex justify-between gap-2 items-center\"><span class=\"truncate text-gray-800\" x-text=\"name\"></span><template x-if=\"uploading\"><span class=\"text-gray-500 text-xs italic\">Subiendo...</span></template></div></template><!-- Action buttons --><div class=\"ml-2 flex items-center gap-2\"><template x-if=\"!toDelete[name]\"><button type=\"button\" @click=\"markForDeletion(name)\" class=\"text-red-600 hover:text-red-800 cursor-pointer\">✕</button></template><template x-if=\"toDelete[name]\"><button type=\"button\" @click=\"restore(name)\" class=\"text-gray-500 hover:text-gray-700 text-xs cursor-pointer\">↩️</button></template></div></li></template></ul></div><!-- Dropzone --><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.picker.click()\"><p>Arrastra archivos aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"picker\" multiple class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><!-- Hidden input that HTMX will actually send --><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><div class=\"mt-4 flex justify-end\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white px-6 transition-all duration-200\" :class=\"isDirty ? 'ring-2 ring-red-300 shadow-lg' : ''\"><span x-text=\"isDirty ? 'Guardar cambios' : 'Guardar'\"></span></button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

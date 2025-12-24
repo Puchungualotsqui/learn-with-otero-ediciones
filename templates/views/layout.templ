@@ -42,8 +42,10 @@ function fileManager() {
     files: {},
     toDelete: {},
     uploading: false,
-    originalDescription: '',
     isDirty: false,
+    originalDescription: '',
+    originalTitle: '',
+    originalDate: '',
 
     init() {
       this.$watch('isDirty', value => this.toggleWarning(value));
@@ -67,11 +69,18 @@ function fileManager() {
     checkDirty() {
       const hasPendingDeletions = Object.keys(this.toDelete).length > 0;
       const hasNewFiles = Object.values(this.files).some(v => v instanceof File);
-      // Ensure the ref exists before checking
+
+      // Check Description
       const descField = this.$refs.descriptionField;
       const descChanged = descField ? descField.value !== this.originalDescription : false;
 
-      this.isDirty = hasPendingDeletions || hasNewFiles || descChanged;
+      const titleField = this.$refs.titleField;
+      const titleChanged = titleField ? titleField.value !== this.originalTitle : false;
+
+      const dateField = this.$refs.dateField;
+      const dateChanged = dateField ? dateField.value !== this.originalDate : false;
+
+      this.isDirty = hasPendingDeletions || hasNewFiles || descChanged || titleChanged || dateChanged;
     },
 
     resetState() {

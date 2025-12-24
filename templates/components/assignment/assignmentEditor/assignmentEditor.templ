@@ -28,42 +28,49 @@ templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
                 </p>
             } else {
         <form
-		  hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/update"}
-		  hx-target={"#assignment-slot-" + strconv.Itoa(a.Id)}
-		  hx-swap="outerHTML"
-		  enctype="multipart/form-data"
-		  x-data="fileManager()"
-		  x-init={"initExisting(" + filesJSON + ")"}
-		  @submit="uploading = true; finalizeDeletions()"
-		  class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
-		>
+            hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(a.Id) + "/update"}
+            hx-target={"#assignment-slot-" + strconv.Itoa(a.Id)}
+            hx-swap="outerHTML"
+            enctype="multipart/form-data"
+            x-data="fileManager()"
+            x-init={ "initExisting(" + filesJSON + "); originalDescription = `" + a.Description + "`; originalTitle = `" + a.Title + "`; originalDate = `" + a.DueDate + "`;" }
+            @submit="uploading = true; finalizeDeletions()"
+            @htmx:after-request="resetState()"
+            class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
+        >
 
 		<!-- Title -->
 		<div class="mb-6">
-			<label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
-			<input type="text" name="title" value={a.Title}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:border-red-500"/>
-		</div>
+		    <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+		    <input type="text" name="title" value={a.Title}
+		        x-ref="titleField"
+		        @input="checkDirty()"
+		        class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:border-red-500"/>
+		  </div>
 
 		<!-- Description -->
 		<div class="flex-1 flex flex-col mb-6">
 		    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
 		    <textarea
 		        name="description"
+		        x-ref="descriptionField"
+		        @input="checkDirty()"
 		        placeholder="Agrega la descripción de la asignación"
 		        class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 resize-none overflow-y-auto focus:outline-none focus:border-red-500">{ a.Description }</textarea>
-		</div>
+		  </div>
 
 		<!-- Due date -->
 		<div class="mb-8">
-			<label class="block text-sm font-medium text-gray-700 mb-1">Fecha de entrega</label>
-			<input id="due-date"
-			       type="text"
-			       name="due_date"
-			       value={a.DueDate}
-			       placeholder="Selecciona fecha"
-			       class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:border-red-500" />
-		</div>
+		    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de entrega</label>
+		    <input id="due-date"
+		           type="text"
+		           name="due_date"
+		           x-ref="dateField"
+		           @change="checkDirty()"
+		           value={a.DueDate}
+		           placeholder="Selecciona fecha"
+		           class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:border-red-500" />
+		  </div>
 
 		<!-- Files section -->
 		<div class="mb-6">
@@ -135,9 +142,13 @@ templ AssignmentEditor(a *models.Assignment, classId int, firstRender bool) {
 			  <!-- Hidden input that HTMX will actually send -->
 			  <input type="file" name="uploads" x-ref="uploads" class="hidden" multiple>
 
-			  <div class="mt-4 flex justify-end">
-			    <button type="submit" class="btn bg-red-600 text-white">Guardar</button>
-			  </div>
+				  <div class="mt-4 flex justify-end">
+				    <button type="submit"
+				        class="btn bg-red-600 hover:bg-red-700 text-white px-6 transition-all duration-200"
+				        :class="isDirty ? 'ring-2 ring-red-300 shadow-lg' : ''">
+				        <span x-text="isDirty ? 'Guardar cambios' : 'Guardar'"></span>
+				    </button>
+				  </div>
 			</form>
             }
         </div>
