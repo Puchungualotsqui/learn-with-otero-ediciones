@@ -44,7 +44,9 @@ type Submission struct {
 }
 
 type Asset struct {
-	Name         string `json:"name"`
-	OriginalName string `json:"original_name"`
-	Url          string `json:"url"`
+	Name                string `json:"name"`
+	OriginalName        string `json:"original_name"`
+	Url                 string `json:"url"`
+	StudentVisibility   bool   `json:"student_visibility"`
+	ProfessorVisibility bool   `json:"professor_visibility"`
 }

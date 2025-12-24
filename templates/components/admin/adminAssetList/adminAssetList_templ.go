@@ -34,14 +34,14 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"fileManager()\" x-init=\"initExisting([])\" class=\"space-y-6\"><form hx-post=\"/admin/asset/manage/upload\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\" @submit=\"uploading = true; finalizeDeletions()\" class=\"space-y-4\"><input type=\"hidden\" name=\"subject\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"fileManager()\" x-init=\"initExisting([])\" class=\"space-y-6\"><form hx-post=\"/admin/asset/manage/upload\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\" @submit=\"uploading = true; finalizeDeletions()\" @htmx:after-request=\"resetState()\" class=\"space-y-4\"><input type=\"hidden\" name=\"subject\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(subject)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 22, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 23, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -54,69 +54,115 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(grade)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 23, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 24, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><!-- Dropzone --><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.uploadPicker.click()\"><p>Arrastra archivos PDF aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"uploadPicker\" multiple accept=\"application/pdf\" class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><!-- Table --><div id=\"asset-list\" class=\"border border-gray-200 rounded-lg mt-4 overflow-hidden\"><table class=\"table table-sm w-full\"><thead class=\"bg-gray-100 text-gray-700 text-sm\"><tr><th>Nombre</th><th>Estado</th><th>Enlace</th><th class=\"text-center\">Acciones</th></tr></thead> <tbody><!-- Files in progress --><template x-for=\"(value, name) in files\" :key=\"name\"><tr class=\"hover:bg-gray-50 text-sm\" :class=\"{'opacity-50 italic': toDelete[name]}\"><td class=\"truncate\" x-text=\"name\"></td><td><template x-if=\"value instanceof File\"><span x-text=\"uploading ? 'Subiendo...' : 'Listo para subir'\"></span></template><template x-if=\"typeof value === 'string'\"><span>Subido</span></template></td><td><template x-if=\"value instanceof File\"><span>-</span></template><template x-if=\"typeof value === 'string'\"><a :href=\"value\" target=\"_blank\" class=\"text-red-600 underline\">Ver PDF</a></template></td><td class=\"text-center\"><template x-if=\"!toDelete[name]\"><button type=\"button\" @click=\"markForDeletion(name)\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\">Eliminar</button></template><template x-if=\"toDelete[name]\"><button type=\"button\" @click=\"restore(name)\" class=\"btn btn-xs bg-yellow-400 text-black\">Restaurar</button></template></td></tr></template><!-- Existing assets -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 cursor-pointer hover:border-red-400 hover:bg-red-50 transition\" @dragover.prevent @drop.prevent=\"addFiles($event.dataTransfer.files)\" @click=\"$refs.uploadPicker.click()\"><p>Arrastra archivos PDF aquí o haz clic para seleccionarlos</p><input type=\"file\" x-ref=\"uploadPicker\" multiple accept=\"application/pdf\" class=\"hidden\" @change=\"addFiles($event.target.files)\"></div><input type=\"file\" name=\"uploads\" x-ref=\"uploads\" class=\"hidden\" multiple><div id=\"asset-list\" class=\"border border-gray-200 rounded-lg mt-4 overflow-hidden bg-white\"><table class=\"w-full border-collapse\"><thead class=\"bg-gray-100 text-gray-700 text-xs uppercase tracking-wider\"><tr><th class=\"px-4 py-3 text-left font-semibold\">Nombre</th><th class=\"px-2 py-3 text-center font-semibold\">Vis. Estudiante</th><th class=\"px-2 py-3 text-center font-semibold\">Vis. Profesor</th><th class=\"px-4 py-3 text-left font-semibold\">Enlace</th><th class=\"px-4 py-3 text-center font-semibold\">Acciones</th></tr></thead> <tbody class=\"divide-y divide-gray-200\"><template x-for=\"(value, name) in files\" :key=\"name\"><tr class=\"hover:bg-gray-50 transition-colors\" :class=\"{'opacity-50 italic': toDelete[name]}\"><td class=\"px-4 py-3 text-sm truncate max-w-xs\" x-text=\"name\"></td><td colspan=\"2\" class=\"px-4 py-3 text-center text-xs text-gray-400 italic\"><span x-text=\"uploading ? 'Subiendo...' : 'Pendiente de subida'\"></span></td><td class=\"px-4 py-3 text-sm text-gray-400\">-</td><td class=\"px-4 py-3 text-center\"><button type=\"button\" @click=\"markForDeletion(name)\" class=\"text-red-600 hover:text-red-800 text-sm font-medium\">Eliminar</button></td></tr></template>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(assets) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr><td colspan=\"4\" class=\"text-center text-gray-400 italic py-2\">No hay archivos subidos</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr x-show=\"Object.keys(files).length === 0\"><td colspan=\"5\" class=\"px-4 py-8 text-center text-gray-400 italic text-sm\">No hay archivos subidos</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
 			for _, a := range assets {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"hover:bg-gray-50 text-sm\"><td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"hover:bg-gray-50 transition-colors\"><td class=\"px-4 py-3 text-sm font-medium text-gray-900 truncate max-w-xs\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(a.OriginalName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 104, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 70, Col: 116}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td>Subido</td><td><a hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td class=\"px-2 py-3\"><div class=\"flex items-center justify-center\"><input type=\"checkbox\" class=\"checkbox checkbox-error checkbox-sm\" @change=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/admin/asset/view?subject=%s&grade=%s&name=%s", subject, grade, a.Name))
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("fetch('/admin/asset/manage/visibility?name=%s&subject=%s&grade=%s&target=student&value=' + $el.checked, {method: 'POST'})", a.Name, subject, grade))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 108, Col: 113}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 76, Col: 186}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-target=\"#pdf-viewer-frame\" hx-swap=\"outerHTML\" class=\"text-red-600 underline cursor-pointer\">Ver PDF</a></td><td class=\"text-center flex justify-center gap-2\"><button type=\"button\" hx-post=\"/admin/asset/manage/delete\" hx-vals=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if a.StudentVisibility {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " checked")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "></div></td><td class=\"px-2 py-3\"><div class=\"flex items-center justify-center\"><input type=\"checkbox\" class=\"checkbox checkbox-error checkbox-sm\" @change=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`js:{ name: "%s", subject: "%s", grade: "%s" }`, a.Name, subject, grade))
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("fetch('/admin/asset/manage/visibility?name=%s&subject=%s&grade=%s&target=professor&value=' + $el.checked, {method: 'POST'})", a.Name, subject, grade))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 120, Col: 114}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 85, Col: 188}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\">Eliminar</button></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if a.ProfessorVisibility {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " checked")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "></div></td><td class=\"px-4 py-3 text-sm\"><a hx-get=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/admin/asset/view?subject=%s&grade=%s&name=%s", subject, grade, a.Name))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 91, Col: 126}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-target=\"#pdf-viewer-frame\" hx-swap=\"outerHTML\" class=\"text-red-600 hover:text-red-800 font-medium underline cursor-pointer\">Ver PDF</a></td><td class=\"px-4 py-3 text-center\"><button type=\"button\" hx-post=\"/admin/asset/manage/delete\" hx-confirm=\"¿Estás seguro de eliminar este archivo?\" hx-vals=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var8 string
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`js:{ name: "%s", subject: "%s", grade: "%s" }`, a.Name, subject, grade))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 99, Col: 132}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" class=\"p-2 text-gray-400 hover:text-red-600 transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" class=\"w-5 h-5\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0\"></path></svg></button></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</tbody></table></div><!-- Save --><div class=\"flex justify-end pt-4 border-t border-gray-100\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white text-sm px-8\" :disabled=\"uploading\" x-text=\"uploading ? 'Subiendo...' : 'Guardar cambios'\"></button></div></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div><div class=\"flex justify-end pt-4 h-16\"><button type=\"submit\" x-show=\"isDirty\" x-transition class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md\" :disabled=\"uploading\"><span x-text=\"uploading ? 'Subiendo...' : 'Subir Archivos'\"></span></button></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -18,7 +18,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, file io.Reader) (*models.Asset, error) {
+func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, studentVisibility, ProfessorVisibility bool, file io.Reader) (*models.Asset, error) {
 	// Step 1. Apply watermark
 	watermarkedPath, err := helper.AddWatermarkToPDF(file)
 	if err != nil {
@@ -55,9 +55,11 @@ func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName 
 
 	// Step 6. Save metadata
 	asset := &models.Asset{
-		Name:         strings.TrimSuffix(safeName, ".pdf"),
-		OriginalName: originalName,
-		Url:          url,
+		Name:                strings.TrimSuffix(safeName, ".pdf"),
+		OriginalName:        originalName,
+		Url:                 url,
+		StudentVisibility:   studentVisibility,
+		ProfessorVisibility: ProfessorVisibility,
 	}
 
 	err = s.db.Update(func(tx *bbolt.Tx) error {
@@ -79,8 +81,8 @@ func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName 
 	return asset, nil
 }
 
-func CreateAssetFromURL(s *Store, subject, grade, name, url string) (*models.Asset, error) {
-	asset := &models.Asset{Name: name, OriginalName: name, Url: url}
+func CreateAssetFromURL(s *Store, subject, grade, name, url string, studentVisibility, professorVisibility bool) (*models.Asset, error) {
+	asset := &models.Asset{Name: name, OriginalName: name, Url: url, StudentVisibility: studentVisibility, ProfessorVisibility: professorVisibility}
 	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, name)
 
 	err := s.db.Update(func(tx *bbolt.Tx) error {
@@ -95,6 +97,52 @@ func CreateAssetFromURL(s *Store, subject, grade, name, url string) (*models.Ass
 		return b.Put([]byte(dbKey), data)
 	})
 	return asset, err
+}
+
+func UpdateAssetVisibility(s *Store, subject, grade, name, target string, isVisible bool) error {
+	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, name)
+
+	return s.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(Buckets["assets"])
+		if b == nil {
+			println("assets bucket not found")
+			return fmt.Errorf("assets bucket not found")
+		}
+
+		// 1. Get existing data
+		data := b.Get([]byte(dbKey))
+		if data == nil {
+			println("asset not found %s", dbKey)
+			return fmt.Errorf("asset not found: %s", dbKey)
+		}
+
+		// 2. Unmarshal into struct
+		var asset models.Asset
+		if err := json.Unmarshal(data, &asset); err != nil {
+			println("failed to unmarshal asset: %w", err)
+			return fmt.Errorf("failed to unmarshal asset: %w", err)
+		}
+
+		// 3. Modify the specific target
+		switch target {
+		case "student":
+			asset.StudentVisibility = isVisible
+		case "professor":
+			asset.ProfessorVisibility = isVisible
+		default:
+			println("invalid visibility target: %q", target)
+			return fmt.Errorf("invalid visibility target: %q", target)
+		}
+
+		// 4. Marshal and Save back
+		updatedData, err := json.Marshal(asset)
+		if err != nil {
+			println("failed to marshal updated asset: %w", err)
+			return fmt.Errorf("failed to marshal updated asset: %w", err)
+		}
+
+		return b.Put([]byte(dbKey), updatedData)
+	})
 }
 
 func RefreshAssets(store *Store, storage *storage.B2Storage) {
@@ -136,7 +184,7 @@ func RefreshAssets(store *Store, storage *storage.B2Storage) {
 				fmt.Printf("⚠️ [%s/%s] failed to list files: %v\n", subjectName, grade, err)
 			} else {
 				for _, f := range files {
-					if _, err := CreateAssetFromURL(store, subjectName, grade, f.FileName, f.DownloadURL); err != nil {
+					if _, err := CreateAssetFromURL(store, subjectName, grade, f.FileName, f.DownloadURL, false, false); err != nil {
 						fmt.Printf("⚠️ [%s/%s] failed to create asset %s: %v\n", subjectName, grade, f.FileName, err)
 					}
 				}
@@ -177,7 +225,7 @@ func FixNames(assets []*models.Asset) []*models.Asset {
 			name = name[:dot]
 		}
 
-		fixed[i] = &models.Asset{Name: name, Url: asset.Url}
+		fixed[i] = &models.Asset{Name: name, Url: asset.Url, StudentVisibility: asset.StudentVisibility, ProfessorVisibility: asset.ProfessorVisibility}
 	}
 
 	return fixed

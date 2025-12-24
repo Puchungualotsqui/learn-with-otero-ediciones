@@ -81,15 +81,21 @@
 }
 
 @layer base {
-    /* Remove number input arrows globally */
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+    /* Target all inputs EXCEPT checkboxes and radios */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-color: white !important;
+        color: rgb(31 41 55) !important;
     }
 
-    input[type="number"] {
-        -moz-appearance: textfield; /* Firefox */
-        appearance: textfield; /* Standard */
+    /* Specifically styling checkboxes so they look good with your red theme */
+    input[type="checkbox"] {
+        appearance: checkbox !important; /* Restore standard rendering */
+        -webkit-appearance: checkbox !important;
+        accent-color: #dc2626; /* This forces the checkmark to be your Red-600 */
+        cursor: pointer;
     }
 }

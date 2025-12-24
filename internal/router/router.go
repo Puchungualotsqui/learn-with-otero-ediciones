@@ -408,6 +408,13 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 						fmt.Printf("📌 Routed to HandleAdminAssetManageDelete")
 						admin.HandleAdminAssetManageDelete(store, storage, w, r)
 						return
+
+					case "visibility":
+						if r.Method == http.MethodPost {
+							fmt.Printf("📌 Routed to HandleAdminAssetManageVisibility")
+							admin.HandleAdminAssetManageVisibility(store, w, r)
+							return
+						}
 					}
 				}
 

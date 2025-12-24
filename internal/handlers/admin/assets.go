@@ -50,16 +50,16 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 		return
 	}
 
+	for _, asset := range assets {
+		println("Visibilityprof: ", asset.ProfessorVisibility)
+		println("visibilitystudent: ", asset.StudentVisibility)
+	}
+
 	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
 }
 
 func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminAssetManageUpload] Upload request received")
-
-	fmt.Println("✅ Multipart parsed")
-	fmt.Printf("Subject: %q\n", r.FormValue("subject"))
-	fmt.Printf("Grade: %q\n", r.FormValue("grade"))
-	fmt.Printf("Uploads: %+v\n", r.MultipartForm.File["uploads"])
 
 	if err := r.ParseMultipartForm(64 << 20); err != nil {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
@@ -68,6 +68,8 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 
 	subject := r.FormValue("subject")
 	grade := r.FormValue("grade")
+	studentVisibility := r.FormValue("studentVisibility") == "on" || r.FormValue("studentVisibility") == "true"
+	professorVisibility := r.FormValue("professorVisibility") == "on" || r.FormValue("professorVisibility") == "true"
 	files := r.MultipartForm.File["uploads"]
 
 	if subject == "" || grade == "" {
@@ -84,7 +86,7 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 		}
 		defer file.Close()
 
-		if _, err := database.CreateAsset(store, storage, subject, grade, f.Filename, file); err != nil {
+		if _, err := database.CreateAsset(store, storage, subject, grade, f.Filename, studentVisibility, professorVisibility, file); err != nil {
 			fmt.Printf("❌ Failed to create asset: %v\n", err)
 			http.Error(w, "Failed to create asset", http.StatusInternalServerError)
 			return
@@ -118,6 +120,25 @@ func HandleAdminAssetManageDelete(store *database.Store, storage *storage.B2Stor
 	_ = database.Delete(store, database.Buckets["assets"], key)
 
 	HandleAdminAssetList(store, w, r)
+}
+
+func HandleAdminAssetManageVisibility(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	subject := r.URL.Query().Get("subject")
+	grade := r.URL.Query().Get("grade")
+	target := r.URL.Query().Get("target")
+
+	// This is the part that was failing; fetch() will now send "?value=true"
+	isVisible := r.URL.Query().Get("value") == "true"
+
+	fmt.Printf("📥 Visibility Update: Name=%s, Target=%s, Visible=%t\n", name, target, isVisible)
+
+	err := database.UpdateAssetVisibility(store, subject, grade, name, target, isVisible)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func HandleAdminAssetView(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
