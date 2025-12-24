@@ -70,19 +70,16 @@ function fileManager() {
       const hasPendingDeletions = Object.keys(this.toDelete).length > 0;
       const hasNewFiles = Object.values(this.files).some(v => v instanceof File);
 
-      // Check Description (exists in both)
+      // Use .trim() to prevent extra spaces/newlines from triggering a dirty state
       const descField = this.$refs.descriptionField;
-      const descChanged = descField ? descField.value !== this.originalDescription : false;
+      const descChanged = descField ? descField.value.trim() !== this.originalDescription.trim() : false;
 
-      // Check Title (only in Assignment Editor)
       const titleField = this.$refs.titleField;
-      const titleChanged = titleField ? titleField.value !== this.originalTitle : false;
+      const titleChanged = titleField ? titleField.value.trim() !== this.originalTitle.trim() : false;
 
-      // Check Due Date (only in Assignment Editor)
       const dateField = this.$refs.dateField;
-      const dateChanged = dateField ? dateField.value !== this.originalDate : false;
+      const dateChanged = dateField ? dateField.value.trim() !== this.originalDate.trim() : false;
 
-      // Final check
       this.isDirty = hasPendingDeletions || hasNewFiles || descChanged || titleChanged || dateChanged;
     },
 
