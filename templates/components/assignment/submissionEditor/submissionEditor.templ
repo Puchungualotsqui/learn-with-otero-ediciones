@@ -25,16 +25,15 @@ templ SubmissionEditor(s *models.Submission, classId, assignmentId int, assignme
 				<p class="text-gray-500 text-center">Selecciona una asignación.</p>
 			} else {
 				<form
-					hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/update"}
-					enctype="multipart/form-data"
-					hx-target="#submission-detail"
-					hx-swap="outerHTML"
-					x-data="fileManager()"
-					x-init={ "initExisting(" + filesJSON + "); originalDescription = `" + s.Description + "`" }
-					@submit="uploading = true; finalizeDeletions()"
-					@htmx:before-request="if(uploading) { /* show global loader if you want */ }"
-					@htmx:after-request="resetState()"
-					class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
+				    hx-post={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/update"}
+				    enctype="multipart/form-data"
+				    hx-target="#submission-detail"
+				    hx-swap="outerHTML"
+				    x-data="fileManager()"
+				    x-init={ "originalDescription = `" + s.Description + "`; originalTitle = ''; originalDate = ''; initExisting(" + filesJSON + ");" }
+				    @submit="uploading = true; finalizeDeletions()"
+				    @htmx:after-request="resetState()"
+				    class="flex flex-col flex-1 min-h-0 overflow-y-auto px-4"
 				>
 					<!-- Header -->
 					<div class="mb-6">
