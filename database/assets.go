@@ -199,13 +199,21 @@ func RefreshAssets(store *Store, storage *storage.B2Storage) {
 	wg.Wait()
 }
 
-func FilterInvalidAssets(assets []*models.Asset) []*models.Asset {
+func FilterInvalidAssets(assets []*models.Asset, isProfessor bool) []*models.Asset {
 	var validExtensions = []string{".pdf"}
 	filtered := make([]*models.Asset, 0, len(assets))
 
 	for _, asset := range assets {
 		ext := strings.ToLower(filepath.Ext(asset.OriginalName))
-		if slices.Contains(validExtensions, ext) {
+
+		// Check extension first
+		if !slices.Contains(validExtensions, ext) {
+			continue
+		}
+
+		isVisible := (isProfessor && asset.ProfessorVisibility) || (!isProfessor && asset.StudentVisibility)
+
+		if isVisible {
 			filtered = append(filtered, asset)
 		}
 	}

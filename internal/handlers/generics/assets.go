@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func HandleAssetsDefault(store *database.Store, w http.ResponseWriter, r *http.Request, classId int) {
+func HandleAssetsDefault(store *database.Store, w http.ResponseWriter, r *http.Request, classId int, professor bool) {
 	fmt.Println("📥 [HandleAssetsDefault] Request received")
 
 	classIdString := strconv.Itoa(classId)
@@ -29,7 +29,7 @@ func HandleAssetsDefault(store *database.Store, w http.ResponseWriter, r *http.R
 		fmt.Printf("Error getting assets: %v \n", err)
 	}
 
-	assets = database.FilterInvalidAssets(assets)
+	assets = database.FilterInvalidAssets(assets, professor)
 
 	render.RenderWithLayout(w, r, panelsContent.PanelsContent(pdfViewer.PdfViewer("", assets, classIdString)), body.Home)
 }

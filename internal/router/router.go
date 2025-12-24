@@ -237,7 +237,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 					}
 				}
 				fmt.Printf("📌 Routed to HandleAssetsDefault")
-				generics.HandleAssetsDefault(store, w, r, classId)
+				generics.HandleAssetsDefault(store, w, r, classId, professor)
 				return
 			}
 		}
