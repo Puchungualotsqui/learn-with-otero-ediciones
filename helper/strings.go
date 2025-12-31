@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// normalizeFilename ensures only safe characters remain
+// NormalizeFilename ensures only safe characters remain
 func NormalizeFilename(name string) string {
 	ext := filepath.Ext(name)
 	base := strings.TrimSuffix(name, ext)
@@ -31,4 +31,16 @@ func IntsToStrings(ii ...int) []string {
 		out[i] = strconv.Itoa(n)
 	}
 	return out
+}
+
+func UniqueStrings(input []string) []string {
+	keys := make(map[string]bool)
+	var list []string
+	for _, entry := range input {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }

@@ -11,9 +11,10 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"frontend/database/models"
 	"frontend/templates/components/assignment/assignmentSlotStudent"
+	"strconv"
 )
 
-func CalendarListStudent(assignments []*models.Assignment, username string, grades []string, classNames []string) templ.Component {
+func CalendarListStudent(assignments []*models.Assignment, classIds []string, username string, grades []string, classNames []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -45,7 +46,9 @@ func CalendarListStudent(assignments []*models.Assignment, username string, grad
 			}
 		} else {
 			for i, a := range assignments {
-				templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(a.Id, a, username, grades[i], classNames[i]).Render(ctx, templ_7745c5c3_Buffer)
+
+				id, _ := strconv.Atoi(classIds[i])
+				templ_7745c5c3_Err = assignmentSlotStudent.AssignmentSlotStudent(id, a, username, grades[i], classNames[i]).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
