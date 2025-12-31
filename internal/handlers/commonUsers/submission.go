@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/a-h/templ"
 )
@@ -60,6 +61,7 @@ func HandleSubmissionDefault(
 				nil,
 				nil,
 				false,
+				[]string{},
 			),
 			submissionDetail.SubmissionDetail(
 				nil,
@@ -112,8 +114,26 @@ func HandleAssignmentSubmissions(store *database.Store, w http.ResponseWriter, r
 			}
 		}
 
+		fullNameStudents := make([]string, len(submissions))
+		usernames := make([]string, len(submissions))
+		users := make([]*models.User, len(submissions))
+
+		for i, submission := range submissions {
+			usernames[i] = submission.Username
+		}
+
+		users, err = database.GetMany[models.User](store, database.Buckets["users"], usernames...)
+		if err != nil {
+			fmt.Printf("Error retrieving user: %v\n", err)
+			return
+		}
+
+		for i, user := range users {
+			fullNameStudents[i] = strings.TrimRightFunc(user.FirstName, unicode.IsSpace) + " " + user.LastName
+		}
+
 		fmt.Println("→ Rendering professor submissions list")
-		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignment, submissions, dateStatus.Past).Render(r.Context(), w)
+		assignmentDetailProfessor.AssignmentDetailProfessor(classIdInt, assignment, submissions, dateStatus.Past, fullNameStudents).Render(r.Context(), w)
 		submissionDetail.SubmissionDetail(nil, "", "", false, false).Render(r.Context(), w)
 		fmt.Println("✔ Render complete")
 		return
@@ -214,8 +234,16 @@ func HandleSubmissionGrade(store *database.Store, w http.ResponseWriter, r *http
 		return
 	}
 
+	user, err := database.Get[models.User](store, database.Buckets["users"], submission.Username)
+	if err != nil {
+		fmt.Printf("Error retrieving user: %v\n", err)
+		return
+	}
+
+	fullName := strings.TrimRightFunc(user.FirstName, unicode.IsSpace) + " " + user.LastName
+
 	fmt.Println("→ Rendering Student Submission Slot")
-	studentSubmissionSlot.StudentSubmissionSlot(classId, assignmentId, submission).Render(r.Context(), w)
+	studentSubmissionSlot.StudentSubmissionSlot(classId, assignmentId, submission, fullName).Render(r.Context(), w)
 	fmt.Println("✔ Render complete")
 }
 

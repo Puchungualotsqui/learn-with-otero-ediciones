@@ -5,7 +5,7 @@ import (
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 )
 
-templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission, pastDate bool) {
+templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission, pastDate bool, fullNameStudents []string) {
 	<section id="assignment-detail"
 		class="bg-white border border-gray-300 shadow rounded-lg p-4
               flex flex-col flex-1 min-h-0 lg:w-1/3">
@@ -24,8 +24,8 @@ templ AssignmentDetailProfessor(classId int, a *models.Assignment, submissions [
                 if len(submissions) == 0 {
                     <p class="text-gray-500 text-sm col-span-full">No hay entregas aún.</p>
                 } else {
-                    for _, s := range submissions {
-                        @studentSubmissionSlot.StudentSubmissionSlot(classId, a.Id, s)
+                    for i, s := range submissions {
+                        @studentSubmissionSlot.StudentSubmissionSlot(classId, a.Id, s, fullNameStudents[i])
                     }
                 }
             </div>

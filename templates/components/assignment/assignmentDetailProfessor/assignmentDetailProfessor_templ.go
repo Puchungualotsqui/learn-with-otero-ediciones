@@ -13,7 +13,7 @@ import (
 	"frontend/templates/components/assignment/studentSubmissionSlot"
 )
 
-func AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission, pastDate bool) templ.Component {
+func AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []*models.Submission, pastDate bool, fullNameStudents []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -77,8 +77,8 @@ func AssignmentDetailProfessor(classId int, a *models.Assignment, submissions []
 					return templ_7745c5c3_Err
 				}
 			} else {
-				for _, s := range submissions {
-					templ_7745c5c3_Err = studentSubmissionSlot.StudentSubmissionSlot(classId, a.Id, s).Render(ctx, templ_7745c5c3_Buffer)
+				for i, s := range submissions {
+					templ_7745c5c3_Err = studentSubmissionSlot.StudentSubmissionSlot(classId, a.Id, s, fullNameStudents[i]).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

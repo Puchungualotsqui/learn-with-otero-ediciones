@@ -42,7 +42,7 @@ func Home(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"#content\">Asignaciones</button> <button class=\"px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer\" hx-get=\"/logout\" hx-redirect=\"/login\">Cerrar sesión</button></div></header><main id=\"content\" class=\"flex-1 px-4 py-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"#content\">Calendario</button> <button class=\"px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition cursor-pointer\" hx-get=\"/logout\" hx-redirect=\"/login\">Cerrar sesión</button></div></header><main id=\"content\" class=\"flex-1 px-4 py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

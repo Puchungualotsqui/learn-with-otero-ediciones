@@ -5,3 +5,6 @@ cors_rules.json
 .updatecors
 data/
 bin/
+otero-platform.tar.gz
+.gitignore
+.idea/

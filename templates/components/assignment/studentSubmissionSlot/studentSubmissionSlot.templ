@@ -5,7 +5,7 @@ import (
 	"frontend/database/models"
 )
 
-templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission) {
+templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission, FullName string) {
 	{{
 		// Grade badge color (same logic pattern)
 		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"
@@ -33,7 +33,7 @@ templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission)
 			class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-150 transition cursor-pointer"
 		>
 			<div class="flex justify-between items-center">
-				<span class="truncate text-gray-900">{ s.Username }</span>
+				<span class="truncate text-gray-900">{ FullName }</span>
 
 				if s.Grade == "" {
 					<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
