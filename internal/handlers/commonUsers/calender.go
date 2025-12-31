@@ -23,7 +23,7 @@ import (
 )
 
 func HandleCalendarStudentDefault(store *database.Store, w http.ResponseWriter, r *http.Request, username string, professor bool) {
-	fmt.Println("📅 [HandleCalendarStudent] Rendering student calendar (Rebuilt)")
+	fmt.Println("📅 [HandleCalendarStudent] Rendering student calendar")
 
 	// --- 1. Date Parsing ---
 	now := time.Now()

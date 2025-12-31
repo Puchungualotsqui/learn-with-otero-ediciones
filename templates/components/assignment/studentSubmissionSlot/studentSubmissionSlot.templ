@@ -7,38 +7,52 @@ import (
 
 templ StudentSubmissionSlot(classId int, assignmentId int, s *models.Submission, FullName string) {
 	{{
-		// Grade badge color (same logic pattern)
-		gradeClass := "px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"
+		// Grade badge color logic
+		gradeClass := "px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500"
 		if s.Grade != "" {
 			if g, err := strconv.Atoi(s.Grade); err == nil {
 				switch {
 				case g >= 90:
-					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700"
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700"
 				case g >= 70:
-					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700"
 				case g >= 50:
-					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700"
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"
 				default:
-					gradeClass = "px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
+					gradeClass = "px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700"
 				}
 			}
 		}
 	}}
 
-	<li id={"submission-slot-" + s.Username} class="flex justify-between items-center w-full text-left px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition cursor-pointer">
+	<li
+		id={ "submission-slot-" + s.Username }
+		class="bg-gray-100 mb-2 rounded-md shadow-sm hover:bg-gray-200 transition list-none"
+	>
 		<button
-			hx-get={"/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username}
+			hx-get={ "/" + strconv.Itoa(classId) + "/asignaciones/" + strconv.Itoa(assignmentId) + "/submission/" + s.Username }
 			hx-target="#submission-detail"
 			hx-swap="outerHTML"
-			class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-150 transition cursor-pointer"
+			class="w-full text-left px-4 py-3 rounded-md flex items-center justify-between group cursor-pointer"
 		>
-			<div class="flex justify-between items-center">
-				<span class="truncate text-gray-900">{ FullName }</span>
+			<div class="flex flex-col truncate">
+				<span class="text-sm font-semibold text-gray-900 truncate group-hover:text-black">
+					{ FullName }
+				</span>
+				<span class="text-xs text-gray-500">
+					{ s.Username }
+				</span>
+			</div>
 
+			<div class="shrink-0 ml-4">
 				if s.Grade == "" {
-					<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">–</span>
+					<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-white text-gray-400 border border-gray-200">
+						-
+					</span>
 				} else {
-					<span class={gradeClass}>{ s.Grade }</span>
+					<span class={ gradeClass }>
+						{ s.Grade }
+					</span>
 				}
 			</div>
 		</button>

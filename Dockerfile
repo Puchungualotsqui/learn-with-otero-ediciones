@@ -12,13 +12,12 @@ RUN go build -o main .
 FROM alpine:latest
 WORKDIR /app
 RUN apk add --no-cache tzdata
+
+RUN mkdir -p /app/data
+
 COPY --from=builder /app/main .
 COPY static ./static
-
-# copy environment file too
 COPY .venv ./.venv
-
-# only copy final compiled tailwind file
 COPY static/css/output.css ./static/css/output.css
 
 EXPOSE 3000
