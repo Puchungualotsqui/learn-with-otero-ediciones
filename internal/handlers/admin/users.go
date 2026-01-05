@@ -72,7 +72,7 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 	fullName := strings.TrimRightFunc(user.FirstName, unicode.IsSpace) + " " + user.LastName
 
 	go func() {
-		err := mail.SendWelcomeEmail(user.Email, fullName, user.PasswordNotHashed)
+		err := mail.SendWelcomeEmail(user.Email, user.Username, fullName, user.PasswordNotHashed)
 		if err != nil {
 			fmt.Printf("❌ Error enviando email de bienvenida a %s: %v\n", user.Email, err)
 		}

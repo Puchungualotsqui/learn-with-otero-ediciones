@@ -11,10 +11,11 @@ const (
 	smtpHost          = "smtp.mail.yahoo.com"
 	smtpPort          = "587"
 	registeredSubject = "Bienvenido a Aprendiendo con Otero Ediciones"
+	rememberSubject   = "Recuperación de contraseña - Otero Ediciones"
 )
 
-func SendWelcomeEmail(toEmail, fullName, password string) error {
-	// Pull from environment
+// SendWelcomeEmail sends the initial registration email
+func SendWelcomeEmail(toEmail, username, fullName, password string) error {
 	from := os.Getenv("EMAIL_FROM")
 	appPass := os.Getenv("EMAIL_PASSWORD")
 
@@ -22,16 +23,23 @@ func SendWelcomeEmail(toEmail, fullName, password string) error {
 		return fmt.Errorf("email configuration missing in environment")
 	}
 
+	// RFC 1342 Encoding for Subject accents
+	utf8Subject := fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(registeredSubject)))
+
 	body := fmt.Sprintf(
-		"Hola %s,\n\nTu cuenta ha sido creada con éxito.\n\nUsuario: %s\nPassword: %s\n\nPuedes ingresar aquí: https://www.aprendiendoconoteroediciones.com/login",
-		fullName, toEmail, password,
+		"Hola %s,\n\nTu cuenta en nuestra plataforma ha sido creada con éxito.\n\n"+
+			"Usuario: %s\n"+
+			"Password: %s\n\n"+
+			"Puedes ingresar aquí: https://www.aprendiendoconoteroediciones.com/login",
+		fullName, username, password,
 	)
 
-	message := []byte("Subject: " + registeredSubject + "\r\n" +
+	message := []byte("Subject: " + utf8Subject + "\r\n" +
 		"To: " + toEmail + "\r\n" +
 		"From: " + from + "\r\n" +
 		"MIME-version: 1.0;\r\n" +
 		"Content-Type: text/plain; charset=\"UTF-8\";\r\n" +
+		"Content-Transfer-Encoding: 8bit;\r\n" +
 		"\r\n" +
 		body)
 
@@ -39,13 +47,11 @@ func SendWelcomeEmail(toEmail, fullName, password string) error {
 
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{toEmail}, message)
 	if err != nil {
-		return fmt.Errorf("failed to send email: %w", err)
+		return fmt.Errorf("failed to send welcome email: %w", err)
 	}
 
 	return nil
 }
-
-const rememberSubject string = "Recuperación de contraseña - Otero Ediciones"
 
 func SendRememberPasswordEmail(toEmail, username, fullName, plainPassword string) error {
 	from := os.Getenv("EMAIL_FROM")
