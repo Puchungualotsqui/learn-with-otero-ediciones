@@ -7,9 +7,15 @@ import (
 	"frontend/storage"
 	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(".venv"); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
 	storage, err := storage.Init()
 	if err != nil {
 		log.Fatalf("Error initializing storage: %v", err)

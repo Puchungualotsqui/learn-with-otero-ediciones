@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/joho/godotenv"
 	"go.etcd.io/bbolt"
 )
 
@@ -57,11 +56,6 @@ func Init(path string) (*Store, error) {
 
 	if newDB {
 		log.Println("🌱 Seeding database with test data...")
-
-		err := godotenv.Load(".venv") // use ".env" if you renamed it
-		if err != nil {
-			log.Fatal("Error loading .venv file")
-		}
 
 		adminPassword := os.Getenv("ADMIN_PASSWORD")
 
