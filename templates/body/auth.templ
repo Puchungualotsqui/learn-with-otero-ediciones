@@ -2,9 +2,12 @@ package body
 
 templ Auth() {
 	<!-- Background -->
-  <div class="absolute inset-0">
-    <img src="/static/assets/log-background.jpg" alt="Background"
-         class="w-full h-full object-cover">
+   <div class="absolute inset-0">
+	<picture>
+	  <source srcset="/static/assets/log-background-desktop.jpg" media="(min-width: 1024px)">
+	  <source srcset="/static/assets/log-background-tablet.jpg" media="(min-width: 640px)">
+	  <img src="/static/assets/log-background-mobile.jpg" alt="Background" class="w-full h-full object-cover">
+	</picture>
   </div>
   <!-- Gradient overlay -->
   <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></div>
