@@ -88,7 +88,9 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 func HandleAdminUserModifyDefault(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminUserModifyDefault] Request received")
 
-	render.RenderWithLayout(w, r, adminUserModify.AdminUserModify(), body.Home)
+	username := r.URL.Query().Get("username")
+
+	render.RenderWithLayout(w, r, adminUserModify.AdminUserModify(username), body.Home)
 	fmt.Println("  ✔ Render complete")
 }
 
