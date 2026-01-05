@@ -304,7 +304,20 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button><div id=\"decrypt-spinner\" class=\"htmx-indicator ml-2 text-gray-400 text-xs italic\">Descifrando...</div></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" hx-prompt=\"Ingrese la clave de desencriptación:\" hx-target=\"#password-field\" hx-swap=\"outerHTML\" hx-indicator=\"#decrypt-spinner\">Desencriptar</button> <button type=\"button\" class=\"btn btn-xs bg-blue-600 hover:bg-blue-700 text-white\" hx-post=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/send-remember-email?username=" + user.Username)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 196, Col: 87}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\">Enviar Recordatorio</button></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

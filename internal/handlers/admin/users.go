@@ -7,6 +7,7 @@ import (
 	"frontend/database"
 	"frontend/database/models"
 	"frontend/helper"
+	"frontend/internal/mail"
 	"frontend/internal/render"
 	"frontend/templates/body"
 	"frontend/templates/components/admin/adminMessage"
@@ -17,9 +18,11 @@ import (
 	"frontend/templates/components/admin/adminUserSearchResults"
 	"html"
 	"net/http"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 func HandleAdminUserCreateDefault(w http.ResponseWriter, r *http.Request) {
@@ -66,12 +69,19 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 		return
 	}
 
+	fullName := strings.TrimRightFunc(user.FirstName, unicode.IsSpace) + " " + user.LastName
+
+	go func() {
+		err := mail.SendWelcomeEmail(user.Email, fullName, user.PasswordNotHashed)
+		if err != nil {
+			fmt.Printf("❌ Error enviando email de bienvenida a %s: %v\n", user.Email, err)
+		}
+	}()
 	message := fmt.Sprintf("Nombre de usuario: %s Contraseña: %s",
 		user.Username, user.PasswordNotHashed)
 
 	adminMessage.AdminMessage(message).Render(r.Context(), w)
 
-	fmt.Printf("✅ [AdminUserCreatePost] User created successfully — Username=%s | Role=%s\n", user.Username, role)
 	fmt.Println("  ✔ Render complete")
 }
 
@@ -196,6 +206,37 @@ func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter,
 			value="%s"
 			readonly
 			class="input input-bordered bg-white text-gray-800 text-sm w-40 cursor-not-allowed" />`, safePassword)
+}
+
+func HandleAdminUserRememberPassword(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("🧾 HandleAdminUserRememberPassword triggered")
+	username := r.URL.Query().Get("username")
+	key := os.Getenv("ENC_KEY")
+
+	// Validate admin password here (compare hash, or session role == admin)
+	user, err := database.Get[models.User](store, database.Buckets["users"], username)
+	if err != nil {
+		println("Usuario no encontrado")
+		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+		return
+	}
+
+	plain, err := auth.Decrypt([]byte(key), user.PasswordNotHashed)
+	if err != nil {
+		println("Error al descifrar la contrasena: ", err)
+		http.Error(w, "Error al descifrar contraseña", http.StatusInternalServerError)
+		return
+	}
+
+	fullName := strings.TrimRightFunc(user.FirstName, unicode.IsSpace) + " " + user.LastName
+	go func() {
+		err := mail.SendRememberPasswordEmail(user.Email, user.Username, fullName, plain)
+		if err != nil {
+			fmt.Printf("❌ Error enviando recordatorio a %s: %v\n", user.Email, err)
+		}
+	}()
+
+	adminMessage.AdminMessage("Se ha enviado un correo con tu contraseña.").Render(r.Context(), w)
 }
 
 func HandleAdminUserSearchDefault(w http.ResponseWriter, r *http.Request) {

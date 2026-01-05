@@ -191,10 +191,13 @@ templ AdminUserModifyForm(user *models.User, classes []*models.Class) {
 	          Desencriptar
 	        </button>
 
-	        <div id="decrypt-spinner"
-	             class="htmx-indicator ml-2 text-gray-400 text-xs italic">
-	          Descifrando...
-	        </div>
+			<button type="button"
+			        class="btn btn-xs bg-blue-600 hover:bg-blue-700 text-white"
+			        hx-post={ "/admin/user/modify/send-remember-email?username=" + user.Username }
+				    hx-target="#create-user-feedback"
+				    hx-swap="innerHTML">
+			    Enviar Recordatorio
+			</button>
 	      </div>
 	    </div>
 
