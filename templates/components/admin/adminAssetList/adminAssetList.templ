@@ -16,8 +16,14 @@ templ AdminAssetList(assets []*models.Asset, subject, grade string) {
 		hx-target="#asset-list"
 		hx-swap="innerHTML"
 		hx-encoding="multipart/form-data"
+		@htmx:xhr:progress="
+        let percent = Math.round(($event.detail.loaded / $event.detail.total) * 100);
+        document.getElementById('upload-progress-bar').style.width = percent + '%';
+        document.getElementById('upload-progress-text').innerText = percent + '%';
+    	"
 		@submit="uploading = true; finalizeDeletions()"
 		@htmx:after-request="resetState()"
+		hx-request='{"timeout": 300000}'
 		class="space-y-4"
 	>
 		<input type="hidden" name="subject" value={ subject } />
@@ -67,7 +73,7 @@ templ AdminAssetList(assets []*models.Asset, subject, grade string) {
 		            } else {
 		                for _, a := range assets {
 		                    <tr class="hover:bg-gray-50 transition-colors">
-		                        <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate max-w-xs">{ a.OriginalName }</td>
+		                        <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate max-w-xs">{ a.Name }</td>
 
 		                        <td class="px-2 py-3">
 								    <div class="flex items-center justify-center">
@@ -113,6 +119,16 @@ templ AdminAssetList(assets []*models.Asset, subject, grade string) {
 		</div>
 
 		<div class="flex justify-end pt-4 h-16">
+			<div x-show="uploading" x-transition class="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden relative">
+			    <div id="upload-progress-bar"
+			         class="bg-red-600 h-full transition-all duration-300 ease-out"
+			         style="width: 0%">
+			    </div>
+			    <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white mix-blend-difference">
+			        <span id="upload-progress-text">0%</span>
+			    </div>
+			</div>
+
 			<button type="submit" x-show="isDirty" x-transition
 				class="btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md"
 				:disabled="uploading">

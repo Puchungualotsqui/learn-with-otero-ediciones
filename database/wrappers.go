@@ -247,39 +247,33 @@ func ExistsWithPrefix(s *Store, bucket []byte, prefixes ...string) bool {
 }
 
 func List[T any](s *Store, bucketName []byte, limit int) ([]*T, error) {
-	var out []*T
-	stopErr := fmt.Errorf("stop iteration")
+	// Pre-allocate capacity if limit is known to reduce append re-allocations
+	capacity := 0
+	if limit > 0 {
+		capacity = limit
+	}
+	out := make([]*T, 0, capacity)
 
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(bucketName)
 		if b == nil {
-			return fmt.Errorf("bucket %s not found", bucketName)
+			return nil
 		}
+		c := b.Cursor()
 
-		count := 0
-		return b.ForEach(func(k, v []byte) error {
+		for k, v := c.First(); k != nil; k, v = c.Next() {
 			var item T
 			if err := json.Unmarshal(v, &item); err != nil {
 				return err
 			}
-			copy := item
-			out = append(out, &copy)
+			out = append(out, &item)
 
-			if limit >= 0 { // only enforce when non-negative
-				count++
-				if count >= limit {
-					return stopErr // stop iteration manually
-				}
+			if limit > 0 && len(out) >= limit {
+				break
 			}
-			return nil
-		})
+		}
+		return nil
 	})
-
-	// ignore the manual stop signal
-	if err == stopErr {
-		err = nil
-	}
-
 	return out, err
 }
 
@@ -302,14 +296,11 @@ func ListByPrefix[T any](s *Store, bucket []byte, limit int, prefixes ...string)
 		p := []byte(prefix)
 
 		count := 0
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			if prefix != "" && !bytes.HasPrefix(k, p) {
-				continue
-			}
 
+		for k, v := c.Seek(p); k != nil && bytes.HasPrefix(k, p); k, v = c.Next() {
 			var u T
 			if err := json.Unmarshal(v, &u); err != nil {
-				return fmt.Errorf("unmarshal %q: %w", k, err)
+				return err
 			}
 
 			uCopy := u
@@ -338,44 +329,56 @@ func ListByManyPrefix[T any](s *Store, bucket []byte, limit int, prefixes ...[]s
 		c := b.Cursor()
 		count := 0
 
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			keyStr := string(k)
-			matchedPrefix := ""
+		// CASE 1: No prefixes provided - List everything (optimized scan)
+		if len(prefixes) == 0 {
+			for k, v := c.First(); k != nil; k, v = c.Next() {
+				keyStr := string(k)
+				// Extract the base key (up to first ':') as the map key
+				parts := strings.SplitN(keyStr, ":", 2)
+				matchedPrefix := parts[0]
 
-			// Match key against all prefix groups
-			for _, group := range prefixes {
-				prefix := strings.Join(group, ":")
-				if bytes.HasPrefix(k, []byte(prefix)) {
-					// Check if exact match (no colon needed)
-					// or if the next char is ":" to avoid partial matches
-					if len(k) == len(prefix) || k[len(prefix)] == ':' {
-						matchedPrefix = prefix
-						break
-					}
+				var u T
+				if err := json.Unmarshal(v, &u); err != nil {
+					return err
+				}
+				results[matchedPrefix] = append(results[matchedPrefix], &u)
+
+				count++
+				if limit > 0 && count >= limit {
+					break
 				}
 			}
+			return nil
+		}
 
-			// If no prefix list provided, everything matches
-			if matchedPrefix == "" && len(prefixes) > 0 {
-				continue
-			}
-			if matchedPrefix == "" {
-				// Use base key (up to first ':') or full key if none
-				parts := strings.SplitN(keyStr, ":", 2)
-				matchedPrefix = parts[0]
-			}
+		// CASE 2: Specific prefixes provided - Use Seek to jump to data
+		for _, group := range prefixes {
+			prefixStr := strings.Join(group, ":")
+			p := []byte(prefixStr)
 
-			var u T
-			if err := json.Unmarshal(v, &u); err != nil {
-				return fmt.Errorf("unmarshal %q: %w", k, err)
-			}
+			// We use Seek to find the first key >= prefix
+			for k, v := c.Seek(p); k != nil; k, v = c.Next() {
+				// Stop if we left the prefix range
+				if !bytes.HasPrefix(k, p) {
+					break
+				}
 
-			uCopy := u
-			results[matchedPrefix] = append(results[matchedPrefix], &uCopy)
+				// Check to avoid partial matches (e.g., prefix "cat" matching key "category")
+				if len(k) > len(p) && k[len(p)] != ':' {
+					continue
+				}
 
-			count++
-			if limit > 0 && count >= limit {
-				break
+				var u T
+				if err := json.Unmarshal(v, &u); err != nil {
+					return err
+				}
+
+				results[prefixStr] = append(results[prefixStr], &u)
+
+				count++
+				if limit > 0 && count >= limit {
+					return nil // Stop everything if global limit reached
+				}
 			}
 		}
 

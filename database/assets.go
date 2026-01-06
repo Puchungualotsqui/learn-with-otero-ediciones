@@ -20,10 +20,12 @@ import (
 
 func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, studentVisibility, ProfessorVisibility bool, file io.Reader) (*models.Asset, error) {
 	// Step 1. Apply watermark
+	fmt.Printf("Applying watermark\n")
 	watermarkedPath, err := helper.AddWatermarkToPDF(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to watermark PDF: %w", err)
 	}
+	fmt.Printf("Watermark applied\n")
 	defer os.Remove(watermarkedPath)
 
 	// Step 2. Reopen the processed (watermarked) file

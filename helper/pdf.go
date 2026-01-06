@@ -3,7 +3,6 @@ package helper
 import (
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"time"
@@ -31,8 +30,8 @@ func AddWatermarkToPDF(input io.Reader) (string, error) {
 	onTop := true
 	update := false
 
-	rot := rand.Intn(60) - 30 // between -30 and +30
-	desc := fmt.Sprintf("font:Courier, points:48, col:1 0 0, rot:%d, scale:0.9 abs, op:.1", rot)
+	rot := 45
+	desc := fmt.Sprintf("font:Courier, points:48, col:1 0 0, rot:%d, scale:1.5 abs, op:.35", rot)
 
 	wm, err := api.TextWatermark("NO A LA PIRATERIA", desc, onTop, update, types.POINTS)
 	if err != nil {

@@ -34,14 +34,14 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"fileManager()\" x-init=\"initExisting([])\" class=\"space-y-6\"><form hx-post=\"/admin/asset/manage/upload\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\" @submit=\"uploading = true; finalizeDeletions()\" @htmx:after-request=\"resetState()\" class=\"space-y-4\"><input type=\"hidden\" name=\"subject\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"fileManager()\" x-init=\"initExisting([])\" class=\"space-y-6\"><form hx-post=\"/admin/asset/manage/upload\" hx-target=\"#asset-list\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\" @htmx:xhr:progress=\"\n        let percent = Math.round(($event.detail.loaded / $event.detail.total) * 100);\n        document.getElementById('upload-progress-bar').style.width = percent + '%';\n        document.getElementById('upload-progress-text').innerText = percent + '%';\n    \t\" @submit=\"uploading = true; finalizeDeletions()\" @htmx:after-request=\"resetState()\" hx-request='{\"timeout\": 300000}' class=\"space-y-4\"><input type=\"hidden\" name=\"subject\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(subject)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 23, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 29, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -54,7 +54,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(grade)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 24, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 30, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -76,9 +76,9 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(a.OriginalName)
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(a.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 70, Col: 116}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 76, Col: 108}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -91,7 +91,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("fetch('/admin/asset/manage/visibility?name=%s&subject=%s&grade=%s&target=student&value=' + $el.checked, {method: 'POST'})", a.Name, subject, grade))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 76, Col: 186}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 82, Col: 186}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -114,7 +114,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("fetch('/admin/asset/manage/visibility?name=%s&subject=%s&grade=%s&target=professor&value=' + $el.checked, {method: 'POST'})", a.Name, subject, grade))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 85, Col: 188}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 91, Col: 188}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -137,7 +137,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/admin/asset/view?subject=%s&grade=%s&name=%s", subject, grade, a.Name))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 91, Col: 126}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 97, Col: 126}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -150,7 +150,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`js:{ name: "%s", subject: "%s", grade: "%s" }`, a.Name, subject, grade))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 99, Col: 132}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminAssetList/adminAssetList.templ`, Line: 105, Col: 132}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -162,7 +162,7 @@ func AdminAssetList(assets []*models.Asset, subject, grade string) templ.Compone
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div><div class=\"flex justify-end pt-4 h-16\"><button type=\"submit\" x-show=\"isDirty\" x-transition class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md\" :disabled=\"uploading\"><span x-text=\"uploading ? 'Subiendo...' : 'Subir Archivos'\"></span></button></div></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div><div class=\"flex justify-end pt-4 h-16\"><div x-show=\"uploading\" x-transition class=\"w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden relative\"><div id=\"upload-progress-bar\" class=\"bg-red-600 h-full transition-all duration-300 ease-out\" style=\"width: 0%\"></div><div class=\"absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white mix-blend-difference\"><span id=\"upload-progress-text\">0%</span></div></div><button type=\"submit\" x-show=\"isDirty\" x-transition class=\"btn bg-red-600 hover:bg-red-700 text-white px-8 shadow-md\" :disabled=\"uploading\"><span x-text=\"uploading ? 'Subiendo...' : 'Subir Archivos'\"></span></button></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

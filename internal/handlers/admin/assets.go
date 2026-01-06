@@ -11,7 +11,9 @@ import (
 	"frontend/templates/components/admin/adminAssetManager"
 	"frontend/templates/components/panelsContent"
 	"frontend/templates/components/pdfViewer/pdfViewerFrame"
+	"mime/multipart"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -34,7 +36,7 @@ func HandleAdminAssetManagerDefault(store *database.Store, w http.ResponseWriter
 }
 
 func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("📥 [HandleAdminAssetList] Upload request received")
+	fmt.Println("📥 [HandleAdminAssetList]")
 
 	subject := r.URL.Query().Get("subject")
 	grade := r.URL.Query().Get("grade")
@@ -59,12 +61,15 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 }
 
 func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("📥 [HandleAdminAssetManageUpload] Upload request received")
+	fmt.Printf("📥 [START] Upload request received. Total Content-Length: %v\n", r.Header.Get("Content-Length"))
 
-	if err := r.ParseMultipartForm(64 << 20); err != nil {
+	// Step 1: Parse Form
+	if err := r.ParseMultipartForm(100 << 20); err != nil {
+		fmt.Printf("❌ [ERROR] ParseMultipartForm: %v\n", err)
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
+	fmt.Println("✅ [STEP] Form parsed successfully")
 
 	subject := r.FormValue("subject")
 	grade := r.FormValue("grade")
@@ -72,34 +77,68 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 	professorVisibility := r.FormValue("professorVisibility") == "on" || r.FormValue("professorVisibility") == "true"
 	files := r.MultipartForm.File["uploads"]
 
+	fmt.Printf("📋 [INFO] Metadata: Subject=%s, Grade=%s, Files Count=%d\n", subject, grade, len(files))
+
 	if subject == "" || grade == "" {
+		fmt.Printf("❌ [ERROR] Missing subject or grade\n")
 		http.Error(w, "Missing subject or grade", http.StatusBadRequest)
-		fmt.Printf("Missing subject or grade\n")
 		return
 	}
 
-	for _, f := range files {
-		file, err := f.Open()
-		if err != nil {
-			http.Error(w, "Error opening file", http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
+	errChan := make(chan error, len(files))
+	var wg sync.WaitGroup
 
-		if _, err := database.CreateAsset(store, storage, subject, grade, f.Filename, studentVisibility, professorVisibility, file); err != nil {
-			fmt.Printf("❌ Failed to create asset: %v\n", err)
-			http.Error(w, "Failed to create asset", http.StatusInternalServerError)
-			return
-		}
+	for i, f := range files {
+		wg.Add(1)
+		fmt.Printf("🚀 [FILE-%d] Starting processing: %s (%d bytes)\n", i, f.Filename, f.Size)
+
+		go func(index int, fileHeader *multipart.FileHeader) {
+			defer wg.Done()
+
+			file, err := fileHeader.Open()
+			if err != nil {
+				fmt.Printf("❌ [FILE-%d] Error opening: %v\n", index, err)
+				errChan <- err
+				return
+			}
+			defer file.Close()
+
+			// This is the slow part (Network call to Backblaze B2)
+			fmt.Printf("☁️  [FILE-%d] Uploading to B2 storage...\n", index)
+			_, err = database.CreateAsset(store, storage, subject, grade, fileHeader.Filename, studentVisibility, professorVisibility, file)
+
+			if err != nil {
+				fmt.Printf("❌ [FILE-%d] CreateAsset Failed: %v\n", index, err)
+				errChan <- err
+				return
+			}
+			fmt.Printf("✅ [FILE-%d] Successfully saved to B2 and BBolt\n", index)
+		}(i, f)
 	}
 
-	// After upload → re-render list
+	// Step 2: Wait for Goroutines
+	fmt.Println("⏳ [WAIT] Waiting for all goroutines to finish...")
+	wg.Wait()
+	close(errChan)
+	fmt.Println("🏁 [DONE] All goroutines finished")
+
+	if len(errChan) > 0 {
+		firstErr := <-errChan
+		fmt.Printf("❌ [FINAL] Failed with %d errors. First error: %v\n", len(errChan)+1, firstErr)
+		http.Error(w, "Failed to upload some files", http.StatusInternalServerError)
+		return
+	}
+
+	// Step 3: Re-render
+	fmt.Println("🔍 [STEP] Fetching updated asset list from BBolt...")
 	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], -1, subject, grade)
 	if err != nil {
+		fmt.Printf("❌ [ERROR] ListByPrefix: %v\n", err)
 		http.Error(w, "Error listing assets", http.StatusInternalServerError)
 		return
 	}
 
+	fmt.Println("🎨 [FINISH] Rendering AdminAssetList component")
 	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
 }
 
