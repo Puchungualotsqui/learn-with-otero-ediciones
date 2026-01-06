@@ -1,55 +1,49 @@
 package helper
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
-
-	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 )
 
 // AddWatermarkToPDF adds a random-angled “NO A LA PIRATERIA” watermark
 // diagonally across each page of the PDF and returns the temp output path.
 func AddWatermarkToPDF(input io.Reader) (string, error) {
-	fmt.Printf("⏱️ [WM-START] Beginning watermark process for new file\n")
-
-	// Save uploaded file to a temp file
-	tmpIn, err := os.CreateTemp("", "input-*.pdf")
-	if err != nil {
-		return "", err
-	}
+	// 1. Save original to temp
+	tmpIn, _ := os.CreateTemp("", "input-*.pdf")
 	defer tmpIn.Close()
+	io.Copy(tmpIn, input)
 
-	if _, err := io.Copy(tmpIn, input); err != nil {
-		return "", err
-	}
-	fmt.Printf("⏱️ [WM-STEP 1] Saved original to temp disk\n")
-
+	// 2. Define output path
 	outPath := filepath.Join(os.TempDir(), fmt.Sprintf("watermarked-%d.pdf", time.Now().UnixNano()))
 
-	onTop := true
-	update := false
-	rot := 45
-	desc := fmt.Sprintf("font:Courier, points:48, col:1 0 0, rot:%d, scale:1.5 abs, op:.35", rot)
+	// 3. Execute QPDF
+	// Order is crucial:
+	// qpdf [input] --overlay [overlay-file] --repeat=1 -- [output] --linearize
+	cmd := exec.Command("qpdf",
+		tmpIn.Name(),
+		"--overlay", "static/watermark.pdf", "--repeat=1",
+		"--", // This terminates the overlay options
+		outPath,
+		"--linearize",
+	)
 
-	wm, err := api.TextWatermark("NO A LA PIRATERIA", desc, onTop, update, types.POINTS)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	fmt.Printf("🎬 [QPDF] Executing multi-page overlay on %s\n", tmpIn.Name())
+	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("failed to create watermark: %w", err)
-	}
-	fmt.Printf("⏱️ [WM-STEP 2] Watermark object created\n")
-
-	// Apply watermark to all pages
-	fmt.Printf("⏱️ [WM-STEP 3] Calling api.AddWatermarksFile (This is the heavy part...)\n")
-
-	// IMPORTANT: Track the time for the actual PDF modification
-	heavyStart := time.Now()
-	if err := api.AddWatermarksFile(tmpIn.Name(), outPath, nil, wm, nil); err != nil {
-		return "", fmt.Errorf("failed to apply watermark: %w", err)
+		// If it fails again, we catch the exact error message
+		return "", fmt.Errorf("qpdf error: %v, stderr: %s", err, stderr.String())
 	}
 
-	fmt.Printf("⏱️ [WM-FINISHED] PDF Modification complete. (Heavy logic took %v)\n", time.Since(heavyStart))
+	// Cleanup original temp
+	os.Remove(tmpIn.Name())
+
 	return outPath, nil
 }

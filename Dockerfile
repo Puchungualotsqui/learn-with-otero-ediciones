@@ -11,7 +11,7 @@ RUN go build -o main .
 # ---- Stage 2: final image ----
 FROM alpine:latest
 WORKDIR /app
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache tzdata qpdf
 
 RUN mkdir -p /app/data
 

@@ -11,9 +11,7 @@ import (
 	"frontend/templates/components/admin/adminAssetManager"
 	"frontend/templates/components/panelsContent"
 	"frontend/templates/components/pdfViewer/pdfViewerFrame"
-	"io"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -61,9 +59,9 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 }
 
 func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("📥 [START] Async Upload request received. Length: %v\n", r.Header.Get("Content-Length"))
+	fmt.Printf("📥 [START] Synchronous Upload request received. Length: %v\n", r.Header.Get("Content-Length"))
 
-	// Step 1: Parse Form (150MB limit to be safe with overhead)
+	// Step 1: Parse Form
 	if err := r.ParseMultipartForm(150 << 20); err != nil {
 		fmt.Printf("❌ [ERROR] ParseMultipartForm: %v\n", err)
 		http.Error(w, "Error al procesar el formulario", http.StatusBadRequest)
@@ -81,63 +79,38 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 		return
 	}
 
-	// Step 2: Save to Temp Storage and Fire Background Tasks
+	// Step 2: Process files sequentially
 	for i, fHeader := range files {
-		// We open the uploaded file
-		src, err := fHeader.Open()
+		fmt.Printf("🚀 [FILE-%d] Processing: %s\n", i, fHeader.Filename)
+
+		file, err := fHeader.Open()
 		if err != nil {
-			fmt.Printf("❌ [FILE-%d] Failed to open uploaded file\n", i)
+			fmt.Printf("❌ [FILE-%d] Error opening: %v\n", i, err)
 			continue
 		}
 
-		// We create a physical temp file on the VPS disk.
-		dst, err := os.CreateTemp("", "otero-upload-*.pdf")
+		// We call CreateAsset directly (No 'go' keyword)
+		_, err = database.CreateAsset(store, storage, subject, grade, fHeader.Filename, studentVis, professorVis, file)
+		file.Close()
+
 		if err != nil {
-			fmt.Printf("❌ [FILE-%d] Failed to create temp file: %v\n", i, err)
-			src.Close()
+			fmt.Printf("❌ [FILE-%d] CreateAsset Failed: %v\n", i, err)
+			// Depending on preference, you can continue or return error
 			continue
 		}
-
-		// Copy the data to disk immediately
-		_, err = io.Copy(dst, src)
-		src.Close()
-		dst.Seek(0, 0) // Reset pointer to beginning
-		tempPath := dst.Name()
-		dst.Close()
-
-		// Launch the heavy processing in the background
-		go func(index int, path, fileName string) {
-			fmt.Printf("🌀 [BG-%d] Starting background processing for: %s\n", index, fileName)
-
-			// Re-open the temp file for the background process
-			fileToProcess, err := os.Open(path)
-			if err != nil {
-				fmt.Printf("❌ [BG-%d] Failed to reopen temp file\n", index)
-				os.Remove(path)
-				return
-			}
-			defer fileToProcess.Close()
-			defer os.Remove(path) // Cleanup disk when finished
-
-			_, err = database.CreateAsset(store, storage, subject, grade, fileName, studentVis, professorVis, fileToProcess)
-			if err != nil {
-				fmt.Printf("❌ [BG-%d] Processing failed: %v\n", index, err)
-				return
-			}
-			fmt.Printf("✅ [BG-%d] Successfully finished: %s\n", index, fileName)
-		}(i, tempPath, fHeader.Filename)
 	}
 
-	// Since this is HTMX, we return a "success" message that replaces the form area.
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`
-        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-200 animate-pulse">
-            <div class="flex items-center">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <span><strong>Procesando archivos...</strong> Se están aplicando las marcas de agua y subiendo a B2 en segundo plano. Refresca la página en un minuto para ver los cambios.</span>
-            </div>
-        </div>
-    `))
+	// Step 3: Fetch updated list and Re-render
+	// This allows HTMX to replace the UI with the actual new data
+	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], -1, subject, grade)
+	if err != nil {
+		fmt.Printf("❌ [ERROR] Failed to list assets: %v\n", err)
+		http.Error(w, "Error al listar recursos", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("🎨 [FINISH] Rendering AdminAssetList component")
+	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
 }
 
 func HandleAdminAssetManageDelete(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {

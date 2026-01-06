@@ -20,7 +20,7 @@ import (
 )
 
 func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, studentVisibility, ProfessorVisibility bool, file io.Reader) (*models.Asset, error) {
-	// Step 1. Apply watermark (Slow part)
+	// Step 1. Apply watermark (Now fast with QPDF)
 	fmt.Printf("🔍 [PROCESS] Applying watermark to %s...\n", fileName)
 	watermarkedPath, err := helper.AddWatermarkToPDF(file)
 	if err != nil {
@@ -28,55 +28,46 @@ func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName 
 	}
 	defer os.Remove(watermarkedPath)
 
-	// Step 2. Reopen and check size
+	// Step 2. Reopen
 	f, err := os.Open(watermarkedPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open watermarked PDF: %w", err)
 	}
 	defer f.Close()
 
-	// Step 3. Clean filename and handle collisions
+	// Step 3. Clean filename
 	safeName := helper.NormalizeFilename(fileName)
 	if !strings.HasSuffix(strings.ToLower(safeName), ".pdf") {
 		safeName += ".pdf"
 	}
 
-	// Add a small timestamp to the storageKey to prevent B2 overwriting
-	// or browser caching issues if you re-upload the same file.
+	// Step 4. Compose keys
 	timestamp := time.Now().Format("20060102150405")
 	storageKey := fmt.Sprintf("recursos/%s/%s/%s-%s", subject, grade, timestamp, safeName)
-
-	// The dbKey remains standard so we can find it easily
 	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, strings.TrimSuffix(safeName, ".pdf"))
 
-	// Step 5. Upload to B2 (Slow network part)
+	// Step 5. Upload to B2
 	fmt.Printf("☁️ [UPLOAD] Sending %s to B2...\n", safeName)
 	url, err := storage.UploadPrivateFile(context.Background(), storageKey, f)
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload asset to storage: %w", err)
 	}
 
-	// Step 6. Save metadata (Fast part)
+	// Step 6. Save metadata
 	asset := &models.Asset{
 		Name:                strings.TrimSuffix(safeName, ".pdf"),
-		OriginalName:        storageKey, // Using the unique storage path
+		OriginalName:        storageKey,
 		Url:                 url,
 		StudentVisibility:   studentVisibility,
 		ProfessorVisibility: ProfessorVisibility,
 	}
 
-	// Optimization: Open the transaction for as little time as possible
 	err = s.db.Update(func(tx *bbolt.Tx) error {
-		// We assume the bucket was created at startup in New()
 		b := tx.Bucket(Buckets["assets"])
 		if b == nil {
 			return fmt.Errorf("bucket 'assets' not initialized")
 		}
-
-		data, err := json.Marshal(asset)
-		if err != nil {
-			return err
-		}
+		data, _ := json.Marshal(asset)
 		return b.Put([]byte(dbKey), data)
 	})
 
