@@ -11,9 +11,9 @@ import (
 	"frontend/templates/components/admin/adminAssetManager"
 	"frontend/templates/components/panelsContent"
 	"frontend/templates/components/pdfViewer/pdfViewerFrame"
-	"mime/multipart"
+	"io"
 	"net/http"
-	"sync"
+	"os"
 	"time"
 )
 
@@ -61,85 +61,83 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 }
 
 func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("📥 [START] Upload request received. Total Content-Length: %v\n", r.Header.Get("Content-Length"))
+	fmt.Printf("📥 [START] Async Upload request received. Length: %v\n", r.Header.Get("Content-Length"))
 
-	// Step 1: Parse Form
-	if err := r.ParseMultipartForm(100 << 20); err != nil {
+	// Step 1: Parse Form (150MB limit to be safe with overhead)
+	if err := r.ParseMultipartForm(150 << 20); err != nil {
 		fmt.Printf("❌ [ERROR] ParseMultipartForm: %v\n", err)
-		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		http.Error(w, "Error al procesar el formulario", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("✅ [STEP] Form parsed successfully")
 
 	subject := r.FormValue("subject")
 	grade := r.FormValue("grade")
-	studentVisibility := r.FormValue("studentVisibility") == "on" || r.FormValue("studentVisibility") == "true"
-	professorVisibility := r.FormValue("professorVisibility") == "on" || r.FormValue("professorVisibility") == "true"
+	studentVis := r.FormValue("studentVisibility") == "on" || r.FormValue("studentVisibility") == "true"
+	professorVis := r.FormValue("professorVisibility") == "on" || r.FormValue("professorVisibility") == "true"
 	files := r.MultipartForm.File["uploads"]
 
-	fmt.Printf("📋 [INFO] Metadata: Subject=%s, Grade=%s, Files Count=%d\n", subject, grade, len(files))
-
 	if subject == "" || grade == "" {
-		fmt.Printf("❌ [ERROR] Missing subject or grade\n")
-		http.Error(w, "Missing subject or grade", http.StatusBadRequest)
+		http.Error(w, "Faltan datos (materia o grado)", http.StatusBadRequest)
 		return
 	}
 
-	errChan := make(chan error, len(files))
-	var wg sync.WaitGroup
+	// Step 2: Save to Temp Storage and Fire Background Tasks
+	for i, fHeader := range files {
+		// We open the uploaded file
+		src, err := fHeader.Open()
+		if err != nil {
+			fmt.Printf("❌ [FILE-%d] Failed to open uploaded file\n", i)
+			continue
+		}
 
-	for i, f := range files {
-		wg.Add(1)
-		fmt.Printf("🚀 [FILE-%d] Starting processing: %s (%d bytes)\n", i, f.Filename, f.Size)
+		// We create a physical temp file on the VPS disk.
+		dst, err := os.CreateTemp("", "otero-upload-*.pdf")
+		if err != nil {
+			fmt.Printf("❌ [FILE-%d] Failed to create temp file: %v\n", i, err)
+			src.Close()
+			continue
+		}
 
-		go func(index int, fileHeader *multipart.FileHeader) {
-			defer wg.Done()
+		// Copy the data to disk immediately
+		_, err = io.Copy(dst, src)
+		src.Close()
+		dst.Seek(0, 0) // Reset pointer to beginning
+		tempPath := dst.Name()
+		dst.Close()
 
-			file, err := fileHeader.Open()
+		// Launch the heavy processing in the background
+		go func(index int, path, fileName string) {
+			fmt.Printf("🌀 [BG-%d] Starting background processing for: %s\n", index, fileName)
+
+			// Re-open the temp file for the background process
+			fileToProcess, err := os.Open(path)
 			if err != nil {
-				fmt.Printf("❌ [FILE-%d] Error opening: %v\n", index, err)
-				errChan <- err
+				fmt.Printf("❌ [BG-%d] Failed to reopen temp file\n", index)
+				os.Remove(path)
 				return
 			}
-			defer file.Close()
+			defer fileToProcess.Close()
+			defer os.Remove(path) // Cleanup disk when finished
 
-			// This is the slow part (Network call to Backblaze B2)
-			fmt.Printf("☁️  [FILE-%d] Uploading to B2 storage...\n", index)
-			_, err = database.CreateAsset(store, storage, subject, grade, fileHeader.Filename, studentVisibility, professorVisibility, file)
-
+			_, err = database.CreateAsset(store, storage, subject, grade, fileName, studentVis, professorVis, fileToProcess)
 			if err != nil {
-				fmt.Printf("❌ [FILE-%d] CreateAsset Failed: %v\n", index, err)
-				errChan <- err
+				fmt.Printf("❌ [BG-%d] Processing failed: %v\n", index, err)
 				return
 			}
-			fmt.Printf("✅ [FILE-%d] Successfully saved to B2 and BBolt\n", index)
-		}(i, f)
+			fmt.Printf("✅ [BG-%d] Successfully finished: %s\n", index, fileName)
+		}(i, tempPath, fHeader.Filename)
 	}
 
-	// Step 2: Wait for Goroutines
-	fmt.Println("⏳ [WAIT] Waiting for all goroutines to finish...")
-	wg.Wait()
-	close(errChan)
-	fmt.Println("🏁 [DONE] All goroutines finished")
-
-	if len(errChan) > 0 {
-		firstErr := <-errChan
-		fmt.Printf("❌ [FINAL] Failed with %d errors. First error: %v\n", len(errChan)+1, firstErr)
-		http.Error(w, "Failed to upload some files", http.StatusInternalServerError)
-		return
-	}
-
-	// Step 3: Re-render
-	fmt.Println("🔍 [STEP] Fetching updated asset list from BBolt...")
-	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], -1, subject, grade)
-	if err != nil {
-		fmt.Printf("❌ [ERROR] ListByPrefix: %v\n", err)
-		http.Error(w, "Error listing assets", http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Println("🎨 [FINISH] Rendering AdminAssetList component")
-	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
+	// Since this is HTMX, we return a "success" message that replaces the form area.
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(`
+        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-200 animate-pulse">
+            <div class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span><strong>Procesando archivos...</strong> Se están aplicando las marcas de agua y subiendo a B2 en segundo plano. Refresca la página en un minuto para ver los cambios.</span>
+            </div>
+        </div>
+    `))
 }
 
 func HandleAdminAssetManageDelete(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {

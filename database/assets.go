@@ -14,72 +14,77 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"time"
 
 	"go.etcd.io/bbolt"
 )
 
 func CreateAsset(s *Store, storage *storage.B2Storage, subject, grade, fileName string, studentVisibility, ProfessorVisibility bool, file io.Reader) (*models.Asset, error) {
-	// Step 1. Apply watermark
-	fmt.Printf("Applying watermark\n")
+	// Step 1. Apply watermark (Slow part)
+	fmt.Printf("🔍 [PROCESS] Applying watermark to %s...\n", fileName)
 	watermarkedPath, err := helper.AddWatermarkToPDF(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to watermark PDF: %w", err)
 	}
-	fmt.Printf("Watermark applied\n")
 	defer os.Remove(watermarkedPath)
 
-	// Step 2. Reopen the processed (watermarked) file
+	// Step 2. Reopen and check size
 	f, err := os.Open(watermarkedPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open watermarked PDF: %w", err)
 	}
 	defer f.Close()
 
-	// Step 3. Normalize and ensure correct naming
+	// Step 3. Clean filename and handle collisions
 	safeName := helper.NormalizeFilename(fileName)
-	if slash := strings.LastIndex(safeName, "/"); slash != -1 {
-		safeName = safeName[slash+1:]
-	}
 	if !strings.HasSuffix(strings.ToLower(safeName), ".pdf") {
 		safeName += ".pdf"
 	}
 
-	// Step 4. Compose storage and database keys
-	storageKey := fmt.Sprintf("recursos/%s/%s/%s", subject, grade, safeName)
-	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, strings.TrimSuffix(safeName, ".pdf"))
-	originalName := storageKey // keep path for future temporary links
+	// Add a small timestamp to the storageKey to prevent B2 overwriting
+	// or browser caching issues if you re-upload the same file.
+	timestamp := time.Now().Format("20060102150405")
+	storageKey := fmt.Sprintf("recursos/%s/%s/%s-%s", subject, grade, timestamp, safeName)
 
-	// ✅ Step 5. Upload the *watermarked* file, not the original
+	// The dbKey remains standard so we can find it easily
+	dbKey := fmt.Sprintf("%s:%s:%s", subject, grade, strings.TrimSuffix(safeName, ".pdf"))
+
+	// Step 5. Upload to B2 (Slow network part)
+	fmt.Printf("☁️ [UPLOAD] Sending %s to B2...\n", safeName)
 	url, err := storage.UploadPrivateFile(context.Background(), storageKey, f)
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload asset to storage: %w", err)
 	}
 
-	// Step 6. Save metadata
+	// Step 6. Save metadata (Fast part)
 	asset := &models.Asset{
 		Name:                strings.TrimSuffix(safeName, ".pdf"),
-		OriginalName:        originalName,
+		OriginalName:        storageKey, // Using the unique storage path
 		Url:                 url,
 		StudentVisibility:   studentVisibility,
 		ProfessorVisibility: ProfessorVisibility,
 	}
 
+	// Optimization: Open the transaction for as little time as possible
 	err = s.db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists(Buckets["assets"])
-		if err != nil {
-			return err
+		// We assume the bucket was created at startup in New()
+		b := tx.Bucket(Buckets["assets"])
+		if b == nil {
+			return fmt.Errorf("bucket 'assets' not initialized")
 		}
+
 		data, err := json.Marshal(asset)
 		if err != nil {
 			return err
 		}
 		return b.Put([]byte(dbKey), data)
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to save asset metadata: %w", err)
 	}
 
-	fmt.Printf("✅ Asset uploaded and registered: %s (%s/%s)\n", asset.OriginalName, subject, grade)
+	fmt.Printf("✅ [FINISH] Asset ready: %s\n", safeName)
 	return asset, nil
 }
 
