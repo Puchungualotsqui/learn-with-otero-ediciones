@@ -133,9 +133,12 @@ templ AdminUserModifyForm(user *models.User, classes []*models.Class) {
 				<div class="border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto">
 					<template x-for="(name, id) in classes" :key="id">
 						<div class="flex justify-between items-center border-b border-gray-100 py-2 text-sm">
-							<span class="text-black">
+							<a
+								:href="`/admin/class/modify?class_id=${id}`"
+								class="text-black hover:text-red-600 hover:underline transition-colors"
+							>
 								<b x-text="id"></b> — <span x-text="name" class="text-gray-700"></span>
-							</span>
+							</a>
 							<button
 								type="button"
 								class="btn btn-xs"

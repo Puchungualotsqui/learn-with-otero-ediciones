@@ -291,14 +291,14 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, ">Administrador</option></select></div><!-- Clases --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Clases asignadas</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><span class=\"text-black\"><b x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-700\"></span></span> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"md:col-span-2 flex flex-col mt-4\" x-data=\"{ visible: false }\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Contraseña</label><div class=\"flex flex-wrap items-center gap-2\"><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none\"> <button type=\"button\" class=\"btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button> <button type=\"button\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, ">Administrador</option></select></div><!-- Clases --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Clases asignadas</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"(name, id) in classes\" :key=\"id\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><a :href=\"`/admin/class/modify?class_id=${id}`\" class=\"text-black hover:text-red-600 hover:underline transition-colors\"><b x-text=\"id\"></b> — <span x-text=\"name\" class=\"text-gray-700\"></span></a> <button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[id] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[id] ? restore(id) : markForDeletion(id)\"></button></div></template><template x-if=\"Object.keys(classes).length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin clases</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"number\" x-ref=\"newId\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"ID\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addClass($refs.newId.value)\">Agregar</button></div></div><!-- Contraseña --><div class=\"md:col-span-2 flex flex-col mt-4\" x-data=\"{ visible: false }\"><label class=\"text-sm font-medium text-gray-700 mb-1\">Contraseña</label><div class=\"flex flex-wrap items-center gap-2\"><input type=\"password\" id=\"password-field\" name=\"password\" value=\"********\" readonly :type=\"visible ? 'text' : 'password'\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none\"> <button type=\"button\" class=\"btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100\" @click=\"visible = !visible\" x-text=\"visible ? 'Ocultar' : 'Mostrar'\"></button> <button type=\"button\" class=\"btn btn-xs bg-red-600 hover:bg-red-700 text-white\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/reveal-password?username=" + user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 190, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 193, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -311,7 +311,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/send-remember-email?username=" + user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 201, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 204, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -324,7 +324,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`{"username":"%s"}`, user.Username))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 215, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 218, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
