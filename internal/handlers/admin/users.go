@@ -257,7 +257,7 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 	phone := strings.TrimSpace(r.URL.Query().Get("phone"))
 	classID := r.URL.Query().Get("class")
 
-	users, err := database.List[models.User](store, database.Buckets["users"], 200)
+	users, err := database.List[models.User](store, database.Buckets["users"], -1)
 	if err != nil {
 		http.Error(w, "Error fetching users", http.StatusInternalServerError)
 		return
@@ -269,10 +269,13 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 	for _, u := range users {
 		// Fuzzy match: name or username
 		if query != "" {
-			q := strings.ToLower(query)
+			q := strings.ToLower(strings.TrimSpace(query))
+			fullName := strings.ToLower(strings.TrimSpace(u.FirstName + " " + u.LastName))
+
 			if !strings.Contains(strings.ToLower(u.Username), q) &&
 				!strings.Contains(strings.ToLower(u.FirstName), q) &&
-				!strings.Contains(strings.ToLower(u.LastName), q) {
+				!strings.Contains(strings.ToLower(u.LastName), q) &&
+				!strings.Contains(fullName, q) {
 				continue
 			}
 		}
@@ -307,7 +310,11 @@ func HandleAdminUserSearchLookUp(store *database.Store, w http.ResponseWriter, r
 
 		// Class ID filter
 		if classID != "" {
-			id, _ := strconv.Atoi(classID)
+			id, err := strconv.Atoi(strings.TrimSpace(classID))
+			if err != nil {
+				http.Error(w, "Invalid class id", http.StatusBadRequest)
+				return
+			}
 			if !slices.Contains(u.Classes, id) {
 				continue
 			}
