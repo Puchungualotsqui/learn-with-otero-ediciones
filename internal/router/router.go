@@ -347,6 +347,11 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 						fmt.Printf("📌 Routed to HandleAdminClassModifyUpdate")
 						admin.HandleAdminClassModifyUpdate(store, w, r)
 						return
+
+					case "delete":
+						fmt.Printf("📌 Routed to HandleAdminClassModifyDelete")
+						admin.HandleAdminClassModifyDelete(store, w, r)
+						return
 					}
 				}
 

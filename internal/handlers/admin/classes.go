@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"frontend/database"
@@ -14,6 +15,7 @@ import (
 	"frontend/templates/components/admin/adminClassSearchResults"
 	"frontend/templates/components/admin/adminMessage"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -181,6 +183,54 @@ func HandleAdminClassModifyUpdate(store *database.Store, w http.ResponseWriter, 
 	message := fmt.Sprintf("Class: %s . Was modified", classId)
 
 	adminMessage.AdminMessage("Clase actualizada", message, "", "").Render(r.Context(), w)
+}
+
+func HandleAdminClassModifyDelete(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("🧾 HandleAdminClassModifyDelete triggered")
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	classID := strings.TrimSpace(r.FormValue("class_id"))
+	if classID == "" {
+		classID = strings.TrimSpace(r.URL.Query().Get("class_id"))
+	}
+	if classID == "" {
+		http.Error(w, "Clase no especificada", http.StatusBadRequest)
+		return
+	}
+
+	enteredPassword := r.Header.Get("HX-Prompt")
+	expectedPassword := os.Getenv("ADMIN_PASSWORD")
+
+	if expectedPassword == "" {
+		http.Error(w, "ADMIN_PASSWORD no configurado", http.StatusInternalServerError)
+		return
+	}
+
+	if subtle.ConstantTimeCompare([]byte(enteredPassword), []byte(expectedPassword)) != 1 {
+		http.Error(w, "Contraseña de administrador incorrecta", http.StatusForbidden)
+		return
+	}
+
+	classIDInt, err := strconv.Atoi(classID)
+	if err != nil {
+		http.Error(w, "ID de clase inválido", http.StatusBadRequest)
+		return
+	}
+
+	if err := database.DeleteClass(store, classIDInt); err != nil {
+		fmt.Printf("❌ Error deleting class %s: %v\n", classID, err)
+		http.Error(w, "Error eliminando clase", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("✅ Class deleted: %s\n", classID)
+
+	w.Header().Set("HX-Redirect", "/admin/class/search")
+	w.WriteHeader(http.StatusOK)
 }
 
 func HandleAdminClassSearchDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
