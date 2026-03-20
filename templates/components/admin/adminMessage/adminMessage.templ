@@ -1,8 +1,18 @@
 package adminMessage
 
-templ AdminMessage(message string) {
-    <div class="bg-green-50 text-green-700 p-3 rounded-md text-sm animate-fade-in">
-        <p class="font-semibold mb-1">✅ Usuario creado correctamente</p>
-        <p>{ message }</p>
-    </div>
+templ AdminMessage(title string, message string, link string, linkLabel string) {
+	<div class="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md text-sm animate-fade-in space-y-2">
+		<p class="font-semibold">{ title }</p>
+		<p>{ message }</p>
+		if link != "" && linkLabel != "" {
+			<div>
+				<a
+					href={ link }
+					class="inline-flex items-center text-sm font-medium text-red-600 hover:text-red-700 hover:underline"
+				>
+					{ linkLabel }
+				</a>
+			</div>
+		}
+	</div>
 }

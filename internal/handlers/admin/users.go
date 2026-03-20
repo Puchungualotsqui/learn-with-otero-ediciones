@@ -78,10 +78,17 @@ func HandleAdminUserCreatePost(store *database.Store, w http.ResponseWriter, r *
 			fmt.Printf("❌ Error enviando email de bienvenida a %s: %v\n", user.Email, err)
 		}
 	}()
-	message := fmt.Sprintf("Nombre de usuario: %s Contraseña: %s",
+	message := fmt.Sprintf("Nombre de usuario: %s | Contraseña: %s",
 		user.Username, user.PasswordNotHashed)
 
-	adminMessage.AdminMessage(message).Render(r.Context(), w)
+	modifyURL := fmt.Sprintf("/admin/user/modify?username=%s", user.Username)
+
+	adminMessage.AdminMessage(
+		"✅ Usuario creado correctamente",
+		message,
+		modifyURL,
+		"Ir a modificar este usuario",
+	).Render(r.Context(), w)
 
 	fmt.Println("  ✔ Render complete")
 }
@@ -176,7 +183,12 @@ func HandleAdminUserModifyUpdate(store *database.Store, w http.ResponseWriter, r
 
 	message := fmt.Sprintf("User: %s . Was modified", username)
 
-	adminMessage.AdminMessage(message).Render(r.Context(), w)
+	adminMessage.AdminMessage(
+		"✅ Usuario actualizado",
+		message,
+		"",
+		"",
+	).Render(r.Context(), w)
 }
 
 func HandleAdminUserRevealPassword(store *database.Store, w http.ResponseWriter, r *http.Request) {
@@ -239,7 +251,12 @@ func HandleAdminUserRememberPassword(store *database.Store, w http.ResponseWrite
 		}
 	}()
 
-	adminMessage.AdminMessage("Se ha enviado un correo con tu contraseña.").Render(r.Context(), w)
+	adminMessage.AdminMessage(
+		"✅ Recordatorio enviado",
+		"Se ha enviado un correo con la contraseña del usuario.",
+		"",
+		"",
+	).Render(r.Context(), w)
 }
 
 func HandleAdminUserDelete(store *database.Store, w http.ResponseWriter, r *http.Request) {

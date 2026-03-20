@@ -64,7 +64,7 @@ func HandleAdminClassCreatePost(store *database.Store, w http.ResponseWriter, r 
 	}
 
 	message := fmt.Sprintf("Clase creada con éxito (ID: %d) — %s (%s)", class.Id, name, subject)
-	adminMessage.AdminMessage(message).Render(r.Context(), w)
+	adminMessage.AdminMessage("Clase Creade", message, "", "").Render(r.Context(), w)
 	fmt.Printf("✅ [AdminClassCreatePost] Class created — ID=%d | Name=%s\n", class.Id, name)
 }
 
@@ -165,7 +165,7 @@ func HandleAdminClassModifyUpdate(store *database.Store, w http.ResponseWriter, 
 
 	message := fmt.Sprintf("Class: %s . Was modified", classId)
 
-	adminMessage.AdminMessage(message).Render(r.Context(), w)
+	adminMessage.AdminMessage("Clase actualizada", message, "", "").Render(r.Context(), w)
 }
 
 func HandleAdminClassSearchDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {

@@ -88,7 +88,7 @@ func HandleAdminSubjectManagerUpdate(store *database.Store, w http.ResponseWrite
 		names[i] = s.Name
 	}
 
-	adminMessage.AdminMessage("✅ Materias actualizadas correctamente.").Render(r.Context(), w)
+	adminMessage.AdminMessage("✅ Materias actualizadas", "La materia fue actualizada", "", "").Render(r.Context(), w)
 	adminSubjectManager.AdminSubjectManager(names, false).Render(r.Context(), w)
 }
 
