@@ -64,14 +64,24 @@ func HandleAdminClassCreatePost(store *database.Store, w http.ResponseWriter, r 
 	}
 
 	message := fmt.Sprintf("Clase creada con éxito (ID: %d) — %s (%s)", class.Id, name, subject)
-	adminMessage.AdminMessage("Clase Creade", message, "", "").Render(r.Context(), w)
+	modifyURL := fmt.Sprintf("/admin/class/modify?class_id=%d", class.Id)
+
+	adminMessage.AdminMessage(
+		"✅ Clase creada correctamente",
+		message,
+		modifyURL,
+		"Ir a modificar esta clase",
+	).Render(r.Context(), w)
+
 	fmt.Printf("✅ [AdminClassCreatePost] Class created — ID=%d | Name=%s\n", class.Id, name)
 }
 
 func HandleAdminClassModifyDefault(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassModifyDefault] Request received")
 
-	render.RenderWithLayout(w, r, adminClassModify.AdminClassModify(), body.Home)
+	classId := r.URL.Query().Get("class_id")
+
+	render.RenderWithLayout(w, r, adminClassModify.AdminClassModify(classId), body.Home)
 	fmt.Println("  ✔ Render complete")
 }
 
@@ -87,6 +97,11 @@ func HandleAdminClassModifySearch(store *database.Store, w http.ResponseWriter, 
 	}
 
 	users, err := database.GetManyWithPrefix[models.User](store, database.Buckets["users"], class.Users)
+	if err != nil {
+		fmt.Printf("Error getting users: %v\n", err)
+		http.Error(w, "Error getting users", http.StatusNotFound)
+		return
+	}
 
 	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 150)
 	if err != nil {
@@ -196,7 +211,7 @@ func HandleAdminClassSearchLookUp(store *database.Store, w http.ResponseWriter, 
 	grade := r.URL.Query().Get("grade")
 	subject := strings.TrimSpace(r.URL.Query().Get("subject"))
 
-	classes, err := database.List[models.Class](store, database.Buckets["classes"], 200)
+	classes, err := database.List[models.Class](store, database.Buckets["classes"], -1)
 	if err != nil {
 		http.Error(w, "Error fetching classes", http.StatusInternalServerError)
 		return

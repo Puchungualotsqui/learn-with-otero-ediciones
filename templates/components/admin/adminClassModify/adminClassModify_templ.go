@@ -8,7 +8,7 @@ package adminClassModify
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func AdminClassModify() templ.Component {
+func AdminClassModify(autoSearchClassId string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +29,89 @@ func AdminClassModify() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"bg-white rounded-lg shadow-md border border-gray-200 p-6 space-y-6 animate-fade-in\"><!-- Header --><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-semibold text-black tracking-tight\">Modificar clase</h2><span class=\"text-sm text-gray-500 italic\">Panel de administración</span></div><!-- Description --><p class=\"text-gray-600 text-sm\">Busca una clase por su ID o nombre para editar su información o gestionar usuarios.</p><!-- Search form --><form hx-get=\"/admin/class/modify/search\" hx-target=\"#class-edit-form\" hx-swap=\"innerHTML\" hx-trigger=\"submit\" class=\"flex flex-wrap items-end gap-4 border border-gray-200 bg-gray-50 rounded-lg px-5 py-4\"><!-- Class input --><div class=\"flex flex-col flex-grow min-w-[220px]\"><input type=\"text\" name=\"class_id\" placeholder=\"Ej. 12\" class=\"input input-bordered bg-white border-gray-300 text-sm text-black focus:border-red-600 focus:ring-0\" required></div><!-- Submit --><div class=\"flex items-end\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white text-sm px-8 shadow-sm border-none\">Buscar</button></div></form><!-- Dynamic class form container --><div id=\"class-edit-form\"><p class=\"text-gray-400 italic text-center\">Sin clase seleccionada</p></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"bg-white rounded-lg shadow-md border border-gray-200 p-6 space-y-6 animate-fade-in\"><div class=\"flex items-center justify-between\"><h2 class=\"text-2xl font-semibold text-black tracking-tight\">Modificar clase</h2><span class=\"text-sm text-gray-500 italic\">Panel de administración</span></div><p class=\"text-gray-600 text-sm\">Busca una clase por su ID para editar su información o gestionar usuarios.</p><form hx-get=\"/admin/class/modify/search\" hx-target=\"#class-edit-form\" hx-swap=\"innerHTML\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if autoSearchClassId != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " hx-trigger=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("load, submit")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModify/adminClassModify.templ`, Line: 19, Col: 31}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " hx-trigger=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("submit")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModify/adminClassModify.templ`, Line: 21, Col: 25}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " class=\"flex flex-wrap items-end gap-4 border border-gray-200 bg-gray-50 rounded-lg px-5 py-4\"><div class=\"flex flex-col flex-grow min-w-[220px]\"><input type=\"text\" name=\"class_id\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(autoSearchClassId)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModify/adminClassModify.templ`, Line: 29, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" placeholder=\"Ej. 12\" class=\"input input-bordered bg-white border-gray-300 text-sm text-black focus:border-red-600 focus:ring-0\" required></div><div class=\"flex items-end\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white text-sm px-8 shadow-sm border-none\">Buscar</button></div></form><div id=\"class-edit-form\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if autoSearchClassId != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex flex-col items-center justify-center py-6\"><span class=\"loading loading-spinner loading-md text-red-600\"></span><p class=\"text-gray-400 italic mt-2\">Cargando datos de la clase ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(autoSearchClassId)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModify/adminClassModify.templ`, Line: 48, Col: 88}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "...</p></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<p class=\"text-gray-400 italic text-center\">Sin clase seleccionada</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
