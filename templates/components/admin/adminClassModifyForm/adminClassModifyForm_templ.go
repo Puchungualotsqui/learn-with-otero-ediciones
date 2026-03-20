@@ -44,7 +44,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`initExisting(%s)`, usersJSON))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 15, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 15, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -57,7 +57,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(class.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 23, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 23, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -70,7 +70,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(class.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 36, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 35, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -83,7 +83,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(class.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 43, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 42, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -101,7 +101,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(s)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 56, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 57, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -124,7 +124,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(s)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 56, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 57, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -142,7 +142,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(class.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 67, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminClassModifyForm/adminClassModifyForm.templ`, Line: 69, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -268,7 +268,7 @@ func AdminClassModifyForm(class *models.Class, users []*models.User, subjects []
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, ">6° de Secundaria</option></optgroup></select></div><!-- Usuarios asignados --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Usuarios asignados</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"u in userList()\" :key=\"u.username\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><div class=\"flex flex-col\"><span class=\"text-black font-medium\" x-text=\"u.username\"></span> <span class=\"text-gray-500 text-xs italic\" x-text=\"'Rol: ' + (u.role || 'Desconocido')\"></span></div><button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[u.username] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[u.username] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[u.username] ? restore(u.username) : markForDeletion(u.username)\"></button></div></template><template x-if=\"userList().length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin usuarios</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"text\" x-ref=\"newUsername\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"Nombre de usuario\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addUser($refs.newUsername.value)\">Agregar</button></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"class-edit-feedback\" class=\"text-sm text-gray-700\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, ">6° de Secundaria</option></optgroup></select></div><!-- Usuarios asignados --><div class=\"md:col-span-2 flex flex-col space-y-2 mt-2\"><label class=\"text-sm font-medium text-gray-700\">Usuarios asignados</label><div class=\"border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto\"><template x-for=\"u in userList()\" :key=\"u.username\"><div class=\"flex justify-between items-center border-b border-gray-100 py-2 text-sm\"><div class=\"flex flex-col\"><a :href=\"`/admin/user/modify?username=${encodeURIComponent(u.username)}`\" class=\"text-black font-medium hover:text-red-600 hover:underline transition-colors\" x-text=\"u.username\"></a> <span class=\"text-gray-500 text-xs italic\" x-text=\"'Rol: ' + (u.role || 'Desconocido')\"></span></div><button type=\"button\" class=\"btn btn-xs\" :class=\"toDelete[u.username] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'\" x-text=\"toDelete[u.username] ? 'Restaurar' : 'Eliminar'\" @click=\"toDelete[u.username] ? restore(u.username) : markForDeletion(u.username)\"></button></div></template><template x-if=\"userList().length === 0\"><p class=\"text-gray-400 italic text-center py-2\">Sin usuarios</p></template></div><div class=\"flex items-center gap-3 pt-2\"><input type=\"text\" x-ref=\"newUsername\" class=\"input input-bordered bg-white border-gray-300 text-black text-sm w-44 focus:border-red-600 focus:ring-0 placeholder-gray-400\" placeholder=\"Nombre de usuario\"> <button type=\"button\" class=\"btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm\" @click=\"addUser($refs.newUsername.value)\">Agregar</button></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-red-600 hover:bg-red-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"class-edit-feedback\" class=\"text-sm text-gray-700\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
