@@ -3,7 +3,7 @@ package models
 type User struct {
 	Username          string `json:"username"`
 	PasswordHashed    string `json:"password_hashed"`
-	PasswordNotHashed string `json:"password_now_hashed"`
+	PasswordNotHashed string `json:"password_now_hashed"` // type, to avoid migration keep it
 	FirstName         string `json:"first_name"`
 	LastName          string `json:"last_name"`
 	School            string `json:"school"`

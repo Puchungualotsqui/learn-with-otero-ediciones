@@ -9,207 +9,225 @@ import (
 templ AdminUserModifyForm(user *models.User, classes []*models.Class) {
 	{{ classesJSONBytes, _ := json.Marshal(classes) }}
 	{{ classesJSON := string(classesJSONBytes) }}
-
-	<div id="user-edit-wrapper"
-	     x-data="classManager()"
-	     x-init={ fmt.Sprintf(`initExisting(%s)`, classesJSON) }
-	     class="bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-6 animate-fade-in max-w-5xl mx-auto">
-
-	  <!-- Header -->
-	  <div class="flex items-center justify-between">
-	    <h3 class="text-2xl font-semibold text-black tracking-tight">
-	      Editando usuario
-	    </h3>
-	    <span class="text-sm text-gray-500 italic">Usuario: { user.Username }</span>
-	  </div>
-
-	  <!-- Form -->
-	  <form
-	    id="user-edit-form"
-	    hx-post="/admin/user/modify/update"
-	    hx-target="#create-user-feedback"
-	    hx-swap="innerHTML"
-	    hx-trigger="submit"
-	    @submit="handleSubmit"
-	    class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
-	  >
-	    <input type="hidden" name="username" value={ user.Username } />
-
-	    <!-- Nombre -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Nombre</label>
-	      <input type="text"
-	             name="first_name"
-	             value={ user.FirstName }
-	             required
-	             class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0" />
-	    </div>
-
-	    <!-- Apellido -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Apellido</label>
-	      <input type="text"
-	             name="last_name"
-	             value={ user.LastName }
-	             required
-	             class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0" />
-	    </div>
-
-	    <!-- Email -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
-	      <input type="email"
-	             name="email"
-	             value={ user.Email }
-	             required
-	             class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400" />
-	    </div>
-
-	    <!-- Teléfono -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-	      <input type="number"
-	             name="phone"
-	             value={ user.PhoneNumber }
-	             required
-	             class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400" />
-	    </div>
-
-	    <!-- Colegio -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Colegio</label>
-	      <input type="text"
-	             name="school"
-	             value={ user.School }
-	             class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0" />
-	    </div>
-
-	    <!-- Grado -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Grado</label>
-	      <select name="grade"
-	              required
-	              class="select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0">
-	        <option disabled selected>Seleccionar grado...</option>
-	        <optgroup label="Primaria">
-	          <option value="1primaria" selected?={ user.Grade == "1primaria" }>1° de Primaria</option>
-	          <option value="2primaria" selected?={ user.Grade == "2primaria" }>2° de Primaria</option>
-	          <option value="3primaria" selected?={ user.Grade == "3primaria" }>3° de Primaria</option>
-	          <option value="4primaria" selected?={ user.Grade == "4primaria" }>4° de Primaria</option>
-	          <option value="5primaria" selected?={ user.Grade == "5primaria" }>5° de Primaria</option>
-	          <option value="6primaria" selected?={ user.Grade == "6primaria" }>6° de Primaria</option>
-	        </optgroup>
-	        <optgroup label="Secundaria">
-	          <option value="1secundaria" selected?={ user.Grade == "1secundaria" }>1° de Secundaria</option>
-	          <option value="2secundaria" selected?={ user.Grade == "2secundaria" }>2° de Secundaria</option>
-	          <option value="3secundaria" selected?={ user.Grade == "3secundaria" }>3° de Secundaria</option>
-	          <option value="4secundaria" selected?={ user.Grade == "4secundaria" }>4° de Secundaria</option>
-	          <option value="5secundaria" selected?={ user.Grade == "5secundaria" }>5° de Secundaria</option>
-	          <option value="6secundaria" selected?={ user.Grade == "6secundaria" }>6° de Secundaria</option>
-	        </optgroup>
-	      </select>
-	    </div>
-
-	    <!-- Rol -->
-	    <div class="flex flex-col">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Rol</label>
-	      <select name="role"
-	              required
-	              class="select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0">
-	        <option value="student" selected?={ user.Role == "student" }>Estudiante</option>
-	        <option value="professor" selected?={ user.Role == "professor" }>Profesor</option>
-	        <option value="admin" selected?={ user.Role == "admin" }>Administrador</option>
-	      </select>
-	    </div>
-
-	    <!-- Clases -->
-	    <div class="md:col-span-2 flex flex-col space-y-2 mt-2">
-	      <label class="text-sm font-medium text-gray-700">Clases asignadas</label>
-
-	      <div class="border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto">
-	        <template x-for="(name, id) in classes" :key="id">
-	          <div class="flex justify-between items-center border-b border-gray-100 py-2 text-sm">
-	            <span class="text-black">
-	              <b x-text="id"></b> — <span x-text="name" class="text-gray-700"></span>
-	            </span>
-
-	            <button type="button"
-	                    class="btn btn-xs"
-	                    :class="toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'"
-	                    x-text="toDelete[id] ? 'Restaurar' : 'Eliminar'"
-	                    @click="toDelete[id] ? restore(id) : markForDeletion(id)">
-	            </button>
-	          </div>
-	        </template>
-
-	        <template x-if="Object.keys(classes).length === 0">
-	          <p class="text-gray-400 italic text-center py-2">Sin clases</p>
-	        </template>
-	      </div>
-
-	      <div class="flex items-center gap-3 pt-2">
-			  <input
-			    type="number"
-			    x-ref="newId"
-			    class="input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400"
-			    placeholder="ID" />
-
-			  <button
-			    type="button"
-			    class="btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm"
-			    @click="addClass($refs.newId.value)">
-			    Agregar
-			  </button>
+	<div
+		id="user-edit-wrapper"
+		x-data="classManager()"
+		x-init={ fmt.Sprintf(`initExisting(%s)`, classesJSON) }
+		class="bg-white border border-gray-200 rounded-lg shadow-md p-6 space-y-6 animate-fade-in max-w-5xl mx-auto"
+	>
+		<!-- Header -->
+		<div class="flex items-center justify-between">
+			<h3 class="text-2xl font-semibold text-black tracking-tight">
+				Editando usuario
+			</h3>
+			<span class="text-sm text-gray-500 italic">Usuario: { user.Username }</span>
+		</div>
+		<!-- Form -->
+		<form
+			id="user-edit-form"
+			hx-post="/admin/user/modify/update"
+			hx-target="#create-user-feedback"
+			hx-swap="innerHTML"
+			hx-trigger="submit"
+			@submit="handleSubmit"
+			class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
+		>
+			<input type="hidden" name="username" value={ user.Username }/>
+			<!-- Nombre -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Nombre</label>
+				<input
+					type="text"
+					name="first_name"
+					value={ user.FirstName }
+					required
+					class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0"
+				/>
 			</div>
-	    </div>
-
-	    <!-- Contraseña -->
-	    <div class="md:col-span-2 flex flex-col mt-4" x-data="{ visible: false }">
-	      <label class="text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-	      <div class="flex flex-wrap items-center gap-2">
-	        <input type="password"
-	               id="password-field"
-	               name="password"
-	               value="********"
-	               readonly
-	               :type="visible ? 'text' : 'password'"
-	               class="input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none" />
-
-	        <button type="button"
-	                class="btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100"
-	                @click="visible = !visible"
-	                x-text="visible ? 'Ocultar' : 'Mostrar'">
-	        </button>
-
-	        <button type="button"
-	                class="btn btn-xs bg-red-600 hover:bg-red-700 text-white"
-	                hx-get={"/admin/user/modify/reveal-password?username=" + user.Username}
-	                hx-prompt="Ingrese la clave de desencriptación:"
-	                hx-target="#password-field"
-	                hx-swap="outerHTML"
-	                hx-indicator="#decrypt-spinner">
-	          Desencriptar
-	        </button>
-
-			<button type="button"
-			        class="btn btn-xs bg-blue-600 hover:bg-blue-700 text-white"
-			        hx-post={ "/admin/user/modify/send-remember-email?username=" + user.Username }
-				    hx-target="#create-user-feedback"
-				    hx-swap="innerHTML">
-			    Enviar Recordatorio
-			</button>
-	      </div>
-	    </div>
-
-	    <!-- Submit -->
-	    <div class="md:col-span-2 flex justify-end mt-6">
-	      <button type="submit"
-	              class="btn bg-green-600 hover:bg-green-700 text-white text-sm px-8">
-	        Guardar Cambios
-	      </button>
-	    </div>
-	  </form>
-
-	  <div id="create-user-feedback" class="text-sm text-gray-700"></div>
+			<!-- Apellido -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Apellido</label>
+				<input
+					type="text"
+					name="last_name"
+					value={ user.LastName }
+					required
+					class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0"
+				/>
+			</div>
+			<!-- Email -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+				<input
+					type="email"
+					name="email"
+					value={ user.Email }
+					required
+					class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400"
+				/>
+			</div>
+			<!-- Teléfono -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+				<input
+					type="number"
+					name="phone"
+					value={ user.PhoneNumber }
+					required
+					class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0 placeholder-gray-400"
+				/>
+			</div>
+			<!-- Colegio -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Colegio</label>
+				<input
+					type="text"
+					name="school"
+					value={ user.School }
+					class="input input-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0"
+				/>
+			</div>
+			<!-- Grado -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Grado</label>
+				<select
+					name="grade"
+					required
+					class="select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0"
+				>
+					<option disabled selected>Seleccionar grado...</option>
+					<optgroup label="Primaria">
+						<option value="1primaria" selected?={ user.Grade == "1primaria" }>1° de Primaria</option>
+						<option value="2primaria" selected?={ user.Grade == "2primaria" }>2° de Primaria</option>
+						<option value="3primaria" selected?={ user.Grade == "3primaria" }>3° de Primaria</option>
+						<option value="4primaria" selected?={ user.Grade == "4primaria" }>4° de Primaria</option>
+						<option value="5primaria" selected?={ user.Grade == "5primaria" }>5° de Primaria</option>
+						<option value="6primaria" selected?={ user.Grade == "6primaria" }>6° de Primaria</option>
+					</optgroup>
+					<optgroup label="Secundaria">
+						<option value="1secundaria" selected?={ user.Grade == "1secundaria" }>1° de Secundaria</option>
+						<option value="2secundaria" selected?={ user.Grade == "2secundaria" }>2° de Secundaria</option>
+						<option value="3secundaria" selected?={ user.Grade == "3secundaria" }>3° de Secundaria</option>
+						<option value="4secundaria" selected?={ user.Grade == "4secundaria" }>4° de Secundaria</option>
+						<option value="5secundaria" selected?={ user.Grade == "5secundaria" }>5° de Secundaria</option>
+						<option value="6secundaria" selected?={ user.Grade == "6secundaria" }>6° de Secundaria</option>
+					</optgroup>
+				</select>
+			</div>
+			<!-- Rol -->
+			<div class="flex flex-col">
+				<label class="text-sm font-medium text-gray-700 mb-1">Rol</label>
+				<select
+					name="role"
+					required
+					class="select select-bordered bg-white border-gray-300 text-black text-sm focus:border-red-600 focus:ring-0"
+				>
+					<option value="student" selected?={ user.Role == "student" }>Estudiante</option>
+					<option value="professor" selected?={ user.Role == "professor" }>Profesor</option>
+					<option value="admin" selected?={ user.Role == "admin" }>Administrador</option>
+				</select>
+			</div>
+			<!-- Clases -->
+			<div class="md:col-span-2 flex flex-col space-y-2 mt-2">
+				<label class="text-sm font-medium text-gray-700">Clases asignadas</label>
+				<div class="border border-gray-300 rounded-lg bg-white p-3 max-h-52 overflow-y-auto">
+					<template x-for="(name, id) in classes" :key="id">
+						<div class="flex justify-between items-center border-b border-gray-100 py-2 text-sm">
+							<span class="text-black">
+								<b x-text="id"></b> — <span x-text="name" class="text-gray-700"></span>
+							</span>
+							<button
+								type="button"
+								class="btn btn-xs"
+								:class="toDelete[id] ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white hover:bg-red-700'"
+								x-text="toDelete[id] ? 'Restaurar' : 'Eliminar'"
+								@click="toDelete[id] ? restore(id) : markForDeletion(id)"
+							></button>
+						</div>
+					</template>
+					<template x-if="Object.keys(classes).length === 0">
+						<p class="text-gray-400 italic text-center py-2">Sin clases</p>
+					</template>
+				</div>
+				<div class="flex items-center gap-3 pt-2">
+					<input
+						type="number"
+						x-ref="newId"
+						class="input input-bordered bg-white border-gray-300 text-black text-sm w-24 focus:border-red-600 focus:ring-0 placeholder-gray-400"
+						placeholder="ID"
+					/>
+					<button
+						type="button"
+						class="btn btn-sm bg-red-600 hover:bg-red-700 text-white text-sm"
+						@click="addClass($refs.newId.value)"
+					>
+						Agregar
+					</button>
+				</div>
+			</div>
+			<!-- Contraseña -->
+			<div class="md:col-span-2 flex flex-col mt-4" x-data="{ visible: false }">
+				<label class="text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+				<div class="flex flex-wrap items-center gap-2">
+					<input
+						type="password"
+						id="password-field"
+						name="password"
+						value="********"
+						readonly
+						:type="visible ? 'text' : 'password'"
+						class="input input-bordered bg-white border-gray-300 text-black text-sm w-44 cursor-not-allowed select-none"
+					/>
+					<button
+						type="button"
+						class="btn btn-xs border border-gray-300 text-gray-700 hover:bg-gray-100"
+						@click="visible = !visible"
+						x-text="visible ? 'Ocultar' : 'Mostrar'"
+					></button>
+					<button
+						type="button"
+						class="btn btn-xs bg-red-600 hover:bg-red-700 text-white"
+						hx-get={ "/admin/user/modify/reveal-password?username=" + user.Username }
+						hx-prompt="Ingrese la clave de desencriptación:"
+						hx-target="#password-field"
+						hx-swap="outerHTML"
+						hx-indicator="#decrypt-spinner"
+					>
+						Desencriptar
+					</button>
+					<button
+						type="button"
+						class="btn btn-xs bg-blue-600 hover:bg-blue-700 text-white"
+						hx-post={ "/admin/user/modify/send-remember-email?username=" + user.Username }
+						hx-target="#create-user-feedback"
+						hx-swap="innerHTML"
+					>
+						Enviar Recordatorio
+					</button>
+				</div>
+			</div>
+			<!-- Actions -->
+			<div class="md:col-span-2 flex justify-between items-center mt-6 gap-3 flex-wrap">
+				<button
+					type="button"
+					class="btn bg-red-700 hover:bg-red-800 text-white text-sm px-6 border-none"
+					hx-post="/admin/user/modify/delete"
+					hx-vals={ fmt.Sprintf(`{"username":"%s"}`, user.Username) }
+					hx-target="#create-user-feedback"
+					hx-swap="innerHTML"
+					hx-prompt="Ingrese la contraseña de administrador para confirmar la eliminación"
+					hx-confirm="¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer."
+				>
+					Eliminar usuario
+				</button>
+				<button
+					type="submit"
+					class="btn bg-green-600 hover:bg-green-700 text-white text-sm px-8"
+				>
+					Guardar Cambios
+				</button>
+			</div>
+		</form>
+		<div id="create-user-feedback" class="text-sm text-gray-700"></div>
 	</div>
 }

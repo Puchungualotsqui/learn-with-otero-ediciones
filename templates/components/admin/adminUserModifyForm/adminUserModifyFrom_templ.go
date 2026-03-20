@@ -44,7 +44,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`initExisting(%s)`, classesJSON))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 15, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 15, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -57,7 +57,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 23, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 23, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -70,7 +70,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 36, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 35, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -83,7 +83,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 43, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 42, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -96,7 +96,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(user.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 53, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 53, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -109,7 +109,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 63, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 64, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -122,7 +122,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(user.PhoneNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 73, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 75, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -135,7 +135,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(user.School)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 83, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 86, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -298,7 +298,7 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/reveal-password?username=" + user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 186, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 190, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -311,13 +311,26 @@ func AdminUserModifyForm(user *models.User, classes []*models.Class) templ.Compo
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("/admin/user/modify/send-remember-email?username=" + user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 196, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 201, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\">Enviar Recordatorio</button></div></div><!-- Submit --><div class=\"md:col-span-2 flex justify-end mt-6\"><button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\">Enviar Recordatorio</button></div></div><!-- Actions --><div class=\"md:col-span-2 flex justify-between items-center mt-6 gap-3 flex-wrap\"><button type=\"button\" class=\"btn bg-red-700 hover:bg-red-800 text-white text-sm px-6 border-none\" hx-post=\"/admin/user/modify/delete\" hx-vals=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf(`{"username":"%s"}`, user.Username))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/admin/adminUserModifyForm/adminUserModifyFrom.templ`, Line: 215, Col: 62}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" hx-target=\"#create-user-feedback\" hx-swap=\"innerHTML\" hx-prompt=\"Ingrese la contraseña de administrador para confirmar la eliminación\" hx-confirm=\"¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.\">Eliminar usuario</button> <button type=\"submit\" class=\"btn bg-green-600 hover:bg-green-700 text-white text-sm px-8\">Guardar Cambios</button></div></form><div id=\"create-user-feedback\" class=\"text-sm text-gray-700\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

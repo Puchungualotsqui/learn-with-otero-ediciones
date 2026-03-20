@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"frontend/auth"
@@ -239,6 +240,53 @@ func HandleAdminUserRememberPassword(store *database.Store, w http.ResponseWrite
 	}()
 
 	adminMessage.AdminMessage("Se ha enviado un correo con tu contraseña.").Render(r.Context(), w)
+}
+
+func HandleAdminUserDelete(store *database.Store, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("🧾 HandleAdminUserDelete triggered")
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	username := strings.TrimSpace(r.FormValue("username"))
+	if username == "" {
+		username = strings.TrimSpace(r.URL.Query().Get("username"))
+	}
+	if username == "" {
+		http.Error(w, "Usuario no especificado", http.StatusBadRequest)
+		return
+	}
+
+	enteredPassword := r.Header.Get("HX-Prompt")
+	expectedPassword := os.Getenv("ADMIN_PASSWORD")
+
+	if expectedPassword == "" {
+		http.Error(w, "ADMIN_PASSWORD no configurado", http.StatusInternalServerError)
+		return
+	}
+
+	if subtle.ConstantTimeCompare([]byte(enteredPassword), []byte(expectedPassword)) != 1 {
+		http.Error(w, "Contraseña de administrador incorrecta", http.StatusForbidden)
+		return
+	}
+
+	if username == "admin" {
+		http.Error(w, "No se puede eliminar el usuario admin", http.StatusForbidden)
+		return
+	}
+
+	if err := database.DeleteUser(store, username); err != nil {
+		fmt.Printf("❌ Error deleting user %s: %v\n", username, err)
+		http.Error(w, "Error eliminando usuario", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("✅ User deleted: %s\n", username)
+
+	w.Header().Set("HX-Redirect", "/admin/user/search")
+	w.WriteHeader(http.StatusOK)
 }
 
 func HandleAdminUserSearchDefault(w http.ResponseWriter, r *http.Request) {
