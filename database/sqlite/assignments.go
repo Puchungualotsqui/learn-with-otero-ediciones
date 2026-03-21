@@ -96,17 +96,26 @@ func (s *Store) ListAssignmentsOfClass(classID int) ([]*models.Assignment, error
 	if err != nil {
 		return nil, fmt.Errorf("list assignments: %w", err)
 	}
-	defer rows.Close()
 
 	assignments := make([]*models.Assignment, 0)
 
 	for rows.Next() {
 		var a models.Assignment
 		if err := rows.Scan(&a.Id, &a.Title, &a.Description, &a.DueDate); err != nil {
+			rows.Close()
 			return nil, fmt.Errorf("scan assignment: %w", err)
 		}
+		a.Content = []string{}
+		assignments = append(assignments, &a)
+	}
 
-		// Load content
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, fmt.Errorf("iterate assignments: %w", err)
+	}
+	rows.Close()
+
+	for _, a := range assignments {
 		contentRows, err := s.DB.Query(`
 			SELECT value
 			FROM assignment_content
@@ -117,7 +126,6 @@ func (s *Store) ListAssignmentsOfClass(classID int) ([]*models.Assignment, error
 			return nil, fmt.Errorf("query assignment content: %w", err)
 		}
 
-		a.Content = []string{}
 		for contentRows.Next() {
 			var value string
 			if err := contentRows.Scan(&value); err != nil {
@@ -126,13 +134,12 @@ func (s *Store) ListAssignmentsOfClass(classID int) ([]*models.Assignment, error
 			}
 			a.Content = append(a.Content, value)
 		}
+
+		if err := contentRows.Err(); err != nil {
+			contentRows.Close()
+			return nil, fmt.Errorf("iterate assignment content: %w", err)
+		}
 		contentRows.Close()
-
-		assignments = append(assignments, &a)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate assignments: %w", err)
 	}
 
 	return assignments, nil

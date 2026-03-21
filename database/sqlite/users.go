@@ -366,7 +366,6 @@ func (s *Store) SearchUsers(query, role, grade, school, email, phone string, cla
 	if err != nil {
 		return nil, fmt.Errorf("search users: %w", err)
 	}
-	defer rows.Close()
 
 	results := make([]*models.User, 0)
 	for rows.Next() {
@@ -383,9 +382,20 @@ func (s *Store) SearchUsers(query, role, grade, school, email, phone string, cla
 			&u.PhoneNumber,
 			&u.Email,
 		); err != nil {
+			rows.Close()
 			return nil, fmt.Errorf("scan user: %w", err)
 		}
+		u.Classes = []int{}
+		results = append(results, &u)
+	}
 
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, fmt.Errorf("iterate users: %w", err)
+	}
+	rows.Close()
+
+	for _, u := range results {
 		classRows, err := s.DB.Query(`
 			SELECT class_id
 			FROM class_users
@@ -396,7 +406,6 @@ func (s *Store) SearchUsers(query, role, grade, school, email, phone string, cla
 			return nil, fmt.Errorf("load user classes: %w", err)
 		}
 
-		u.Classes = []int{}
 		for classRows.Next() {
 			var id int
 			if err := classRows.Scan(&id); err != nil {
@@ -410,12 +419,6 @@ func (s *Store) SearchUsers(query, role, grade, school, email, phone string, cla
 			return nil, fmt.Errorf("iterate user classes: %w", err)
 		}
 		classRows.Close()
-
-		results = append(results, &u)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate users: %w", err)
 	}
 
 	return results, nil
