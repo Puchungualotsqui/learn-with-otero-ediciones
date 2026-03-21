@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"frontend/database"
+	"frontend/database/sqlite"
 	"frontend/internal/router"
 	"frontend/storage"
 	"log"
@@ -22,13 +22,13 @@ func main() {
 	}
 	fmt.Println("B2 Storage ready:", storage.BaseUrl)
 
-	store, err := database.Init("data/school.db")
+	store, err := sqlite.Init("data/school.sqlite")
 	if err != nil {
 		log.Fatal("failed to init database:", err)
 	}
 	defer store.Close()
 
-	//database.RefreshAssets(store, storage)
+	// store.RefreshAssets(storage)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		router.Router(store, storage, w, r)

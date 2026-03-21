@@ -4,8 +4,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"fmt"
-	"frontend/database"
-	"frontend/database/models"
+	"frontend/database/sqlite"
 	"frontend/internal/render"
 	"frontend/templates/body"
 	"frontend/templates/components/admin/adminClassCreate"
@@ -20,10 +19,10 @@ import (
 	"strings"
 )
 
-func HandleAdminClassCreateDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassCreateDefault(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassCreate] Request received")
 
-	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 150)
+	subjects, err := store.ListSubjects()
 	if err != nil {
 		fmt.Printf("Materias no encontradas: %v\n", err)
 		http.Error(w, "Materias no encontradas", http.StatusNotFound)
@@ -39,7 +38,7 @@ func HandleAdminClassCreateDefault(store *database.Store, w http.ResponseWriter,
 	fmt.Println("  ✔ Render complete")
 }
 
-func HandleAdminClassCreatePost(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassCreatePost(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassCreatePost] Request received")
 
 	if err := r.ParseForm(); err != nil {
@@ -58,7 +57,7 @@ func HandleAdminClassCreatePost(store *database.Store, w http.ResponseWriter, r 
 		return
 	}
 
-	class, err := database.CreateClass(store, name, description, subject, grade)
+	class, err := store.CreateClass(name, description, subject, grade)
 	if err != nil {
 		fmt.Printf("Error creating the class %v\n", err)
 		http.Error(w, "Error creating the class", http.StatusBadRequest)
@@ -87,25 +86,30 @@ func HandleAdminClassModifyDefault(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("  ✔ Render complete")
 }
 
-func HandleAdminClassModifySearch(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassModifySearch(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassModifySearch] Request received")
 
-	classId := r.URL.Query().Get("class_id")
-	class, err := database.Get[models.Class](store, database.Buckets["classes"], classId)
+	classId, err := strconv.Atoi(r.URL.Query().Get("class_id"))
+	if err != nil {
+		http.Error(w, "Class inválida", http.StatusBadRequest)
+		return
+	}
+
+	class, err := store.GetClass(classId)
 	if err != nil {
 		fmt.Printf("Class no encontrado: %v\n", err)
 		http.Error(w, "Class no encontrado", http.StatusNotFound)
 		return
 	}
 
-	users, err := database.GetManyWithPrefix[models.User](store, database.Buckets["users"], class.Users)
+	users, err := store.GetUsersByClassID(classId)
 	if err != nil {
 		fmt.Printf("Error getting users: %v\n", err)
 		http.Error(w, "Error getting users", http.StatusNotFound)
 		return
 	}
 
-	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 150)
+	subjects, err := store.ListSubjects()
 	if err != nil {
 		fmt.Printf("Materias no encontradas: %v\n", err)
 		http.Error(w, "Materias no encontradas", http.StatusNotFound)
@@ -121,7 +125,7 @@ func HandleAdminClassModifySearch(store *database.Store, w http.ResponseWriter, 
 	fmt.Println("  ✔ Render complete")
 }
 
-func HandleAdminClassModifyUpdate(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassModifyUpdate(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("🧾 HandleAdminClassModifyUpdate triggered")
 
 	r.ParseForm()
@@ -159,33 +163,41 @@ func HandleAdminClassModifyUpdate(store *database.Store, w http.ResponseWriter, 
 		return
 	}
 
-	database.UpdateWithPrefix(store, database.Buckets["classes"], func(t *models.Class) error {
-		t.Id = classIdInt
-		t.Description = description
-		t.Grade = grade
-		t.Name = name
-		t.Subject = subject
-		return nil
-	}, classId)
-
-	for _, id := range payload.Add {
-		database.AddUserToClass(store, classIdInt, id)
+	if err := store.UpdateClass(classIdInt, name, description, grade, subject); err != nil {
+		fmt.Printf("❌ Error updating class: %v\n", err)
+		http.Error(w, "Error updating class", http.StatusInternalServerError)
+		return
 	}
 
-	for _, id := range payload.Keep {
-		database.AddUserToClass(store, classIdInt, id)
+	for _, username := range payload.Add {
+		if err := store.AddUserToClass(classIdInt, username); err != nil {
+			fmt.Printf("❌ Error adding user %s to class %d: %v\n", username, classIdInt, err)
+			http.Error(w, "Error updating class users", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	for _, id := range payload.Del {
-		database.RemoveUserFromClass(store, classIdInt, id)
+	for _, username := range payload.Keep {
+		if err := store.AddUserToClass(classIdInt, username); err != nil {
+			fmt.Printf("❌ Error keeping user %s in class %d: %v\n", username, classIdInt, err)
+			http.Error(w, "Error updating class users", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	for _, username := range payload.Del {
+		if err := store.RemoveUserFromClass(classIdInt, username); err != nil {
+			fmt.Printf("❌ Error removing user %s from class %d: %v\n", username, classIdInt, err)
+			http.Error(w, "Error updating class users", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	message := fmt.Sprintf("Class: %s . Was modified", classId)
-
 	adminMessage.AdminMessage("Clase actualizada", message, "", "").Render(r.Context(), w)
 }
 
-func HandleAdminClassModifyDelete(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassModifyDelete(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("🧾 HandleAdminClassModifyDelete triggered")
 
 	if r.Method != http.MethodPost {
@@ -221,7 +233,7 @@ func HandleAdminClassModifyDelete(store *database.Store, w http.ResponseWriter, 
 		return
 	}
 
-	if err := database.DeleteClass(store, classIDInt); err != nil {
+	if err := store.DeleteClass(classIDInt); err != nil {
 		fmt.Printf("❌ Error deleting class %s: %v\n", classID, err)
 		http.Error(w, "Error eliminando clase", http.StatusInternalServerError)
 		return
@@ -233,10 +245,10 @@ func HandleAdminClassModifyDelete(store *database.Store, w http.ResponseWriter, 
 	w.WriteHeader(http.StatusOK)
 }
 
-func HandleAdminClassSearchDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassSearchDefault(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassSearchDefault] Request received")
 
-	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 150)
+	subjects, err := store.ListSubjects()
 	if err != nil {
 		fmt.Printf("Materias no encontradas: %v\n", err)
 		http.Error(w, "Materias no encontradas", http.StatusNotFound)
@@ -252,55 +264,22 @@ func HandleAdminClassSearchDefault(store *database.Store, w http.ResponseWriter,
 	fmt.Println("  ✔ Render complete")
 }
 
-func HandleAdminClassSearchLookUp(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminClassSearchLookUp(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminClassSearchLookUp] Request received")
 
 	idQuery := strings.TrimSpace(r.URL.Query().Get("id"))
 	nameQuery := strings.TrimSpace(r.URL.Query().Get("name"))
 	descQuery := strings.TrimSpace(r.URL.Query().Get("description"))
-	grade := r.URL.Query().Get("grade")
+	grade := strings.TrimSpace(r.URL.Query().Get("grade"))
 	subject := strings.TrimSpace(r.URL.Query().Get("subject"))
 
-	classes, err := database.List[models.Class](store, database.Buckets["classes"], -1)
+	results, err := store.SearchClasses(idQuery, nameQuery, descQuery, grade, subject)
 	if err != nil {
+		fmt.Printf("❌ Error searching classes: %v\n", err)
 		http.Error(w, "Error fetching classes", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("classes found were: ", len(classes))
-
-	var results []*models.Class
-	for _, c := range classes {
-		// ID fuzzy search
-		if idQuery != "" {
-			idStr := strconv.Itoa(c.Id)
-			if !strings.Contains(idStr, idQuery) {
-				continue
-			}
-		}
-
-		// Name fuzzy search
-		if nameQuery != "" && !strings.Contains(strings.ToLower(c.Name), strings.ToLower(nameQuery)) {
-			continue
-		}
-
-		// Description fuzzy search
-		if descQuery != "" && !strings.Contains(strings.ToLower(c.Description), strings.ToLower(descQuery)) {
-			continue
-		}
-
-		// Grade exact
-		if grade != "" && c.Grade != grade {
-			continue
-		}
-
-		// Subject fuzzy
-		if subject != "" && !strings.Contains(strings.ToLower(c.Subject), strings.ToLower(subject)) {
-			continue
-		}
-
-		results = append(results, c)
-	}
-
+	fmt.Println("classes found were:", len(results))
 	adminClassSearchResults.AdminClassSearchResults(results).Render(r.Context(), w)
 }

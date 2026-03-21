@@ -13,6 +13,18 @@ type Store struct {
 	db *bbolt.DB
 }
 
+func (s *Store) DB() *bbolt.DB {
+	return s.db
+}
+
+func OpenExisting(path string) (*Store, error) {
+	db, err := bbolt.Open(path, 0600, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &Store{db: db}, nil
+}
+
 func New(path, bucketName string) (*Store, error) {
 	db, err := bbolt.Open(path, 0600, nil)
 	if err != nil {

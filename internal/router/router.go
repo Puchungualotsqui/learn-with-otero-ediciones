@@ -3,8 +3,8 @@ package router
 import (
 	"fmt"
 	"frontend/auth"
-	"frontend/database"
 	"frontend/database/models"
+	"frontend/database/sqlite"
 	"frontend/helper"
 	"frontend/internal/handlers/admin"
 	"frontend/internal/handlers/commonUsers"
@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
+func Router(store *sqlite.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 
@@ -33,7 +33,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			return
 		}
 
-		username, err = database.GetUserFromSession(store, cookie.Value)
+		username, err = store.GetUserFromSession(cookie.Value)
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
@@ -47,10 +47,10 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 			render.RenderWithLayout(w, r, body.Auth())
 
 		case http.MethodPost:
-			username := r.FormValue("username")
+			username := strings.TrimSpace(r.FormValue("username"))
 			password := r.FormValue("password")
 
-			user, err := database.Get[models.User](store, database.Buckets["users"], username)
+			user, err := store.GetUser(username)
 			if err != nil {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte("Usuario no encontrado"))
@@ -63,7 +63,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 				return
 			}
 
-			sessionID, err := database.GenerateSession(store, username)
+			sessionID, err := store.GenerateSession(username)
 			if err != nil {
 				http.Error(w, "Error creando sesión", http.StatusInternalServerError)
 				return
@@ -89,7 +89,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 	case parts[0] == "logout":
 		cookie, err := r.Cookie("session_id")
 		if err == nil {
-			err = database.DeleteSession(store, cookie.Value)
+			err = store.DeleteSession(cookie.Value)
 		}
 		// Clear cookie
 		http.SetCookie(w, &http.Cookie{
@@ -108,12 +108,13 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		return
 
 	case parts[0] == "":
-		user, err := database.Get[models.User](store, database.Buckets["users"], username)
+		user, err := store.GetUser(username)
 		if err != nil {
 			log.Printf("panic: user %s info not loaded: %v", username, err)
 			return
 		}
-		classes, err := database.GetManyWithPrefix[models.Class](store, database.Buckets["classes"], helper.IntsToStrings(user.Classes...))
+
+		classes, err := store.GetClassesByUsername(username)
 		if err != nil {
 			log.Printf("fallback: user %s classes not loaded: %v", username, err)
 			classes = []*models.Class{}
@@ -245,7 +246,7 @@ func Router(store *database.Store, storage *storage.B2Storage, w http.ResponseWr
 		return
 
 	case parts[0] == "admin":
-		user, err := database.Get[models.User](store, database.Buckets["users"], username)
+		user, err := store.GetUser(username)
 		if err != nil {
 			log.Printf("panic: user %s info not loaded: %v", username, err)
 			return

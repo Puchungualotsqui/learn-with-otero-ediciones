@@ -2,33 +2,29 @@ package router
 
 import (
 	"fmt"
-	"frontend/database"
-	"frontend/database/models"
+	"frontend/database/sqlite"
 	"slices"
 	"strconv"
 )
 
-func isProfessor(store *database.Store, username string) (bool, error) {
-	user, err := database.Get[models.User](store, []byte("Users"), username)
+func isProfessor(store *sqlite.Store, username string) (bool, error) {
+	user, err := store.GetUser(username)
 	if err != nil {
 		return false, err
 	}
-	if user.Role == "professor" {
-		return true, nil
-	}
-	return false, nil
+	return user.Role == "professor", nil
 }
 
-func isClassValid(store *database.Store, username, class string) bool {
-	user, err := database.Get[models.User](store, database.Buckets["users"], username)
+func isClassValid(store *sqlite.Store, username, class string) bool {
+	user, err := store.GetUser(username)
 	if err != nil {
-		fmt.Println("Error getting user")
+		fmt.Println("Error getting user:", err)
 		return false
 	}
 
 	classId, err := strconv.Atoi(class)
 	if err != nil {
-		fmt.Println("Invalid class Id")
+		fmt.Println("Invalid class Id:", err)
 		return false
 	}
 

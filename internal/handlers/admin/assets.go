@@ -2,8 +2,7 @@ package admin
 
 import (
 	"fmt"
-	"frontend/database"
-	"frontend/database/models"
+	"frontend/database/sqlite"
 	"frontend/internal/render"
 	"frontend/storage"
 	"frontend/templates/body"
@@ -15,10 +14,10 @@ import (
 	"time"
 )
 
-func HandleAdminAssetManagerDefault(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetManagerDefault(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminAssetManagerDefault] Request received")
 
-	subjects, err := database.List[models.Subject](store, database.Buckets["subjects"], 200)
+	subjects, err := store.ListSubjects()
 	if err != nil {
 		http.Error(w, "Error fetching subjects", http.StatusInternalServerError)
 		return
@@ -33,7 +32,7 @@ func HandleAdminAssetManagerDefault(store *database.Store, w http.ResponseWriter
 	fmt.Println("  ✔ Render complete")
 }
 
-func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetList(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminAssetList]")
 
 	subject := r.URL.Query().Get("subject")
@@ -44,8 +43,9 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 		return
 	}
 
-	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], -1, subject, grade)
+	assets, err := store.ListAssets(subject, grade)
 	if err != nil {
+		fmt.Printf("❌ Error listing assets: %v\n", err)
 		http.Error(w, "Error listing assets", http.StatusInternalServerError)
 		return
 	}
@@ -58,10 +58,9 @@ func HandleAdminAssetList(store *database.Store, w http.ResponseWriter, r *http.
 	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
 }
 
-func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetManageUpload(store *sqlite.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("📥 [START] Synchronous Upload request received. Length: %v\n", r.Header.Get("Content-Length"))
 
-	// Step 1: Parse Form
 	if err := r.ParseMultipartForm(150 << 20); err != nil {
 		fmt.Printf("❌ [ERROR] ParseMultipartForm: %v\n", err)
 		http.Error(w, "Error al procesar el formulario", http.StatusBadRequest)
@@ -79,7 +78,6 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 		return
 	}
 
-	// Step 2: Process files sequentially
 	for i, fHeader := range files {
 		fmt.Printf("🚀 [FILE-%d] Processing: %s\n", i, fHeader.Filename)
 
@@ -89,20 +87,16 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 			continue
 		}
 
-		// We call CreateAsset directly (No 'go' keyword)
-		_, err = database.CreateAsset(store, storage, subject, grade, fHeader.Filename, studentVis, professorVis, file)
-		file.Close()
+		_, err = store.CreateAsset(storage, subject, grade, fHeader.Filename, studentVis, professorVis, file)
+		_ = file.Close()
 
 		if err != nil {
 			fmt.Printf("❌ [FILE-%d] CreateAsset Failed: %v\n", i, err)
-			// Depending on preference, you can continue or return error
 			continue
 		}
 	}
 
-	// Step 3: Fetch updated list and Re-render
-	// This allows HTMX to replace the UI with the actual new data
-	assets, err := database.ListByPrefix[models.Asset](store, database.Buckets["assets"], -1, subject, grade)
+	assets, err := store.ListAssets(subject, grade)
 	if err != nil {
 		fmt.Printf("❌ [ERROR] Failed to list assets: %v\n", err)
 		http.Error(w, "Error al listar recursos", http.StatusInternalServerError)
@@ -113,7 +107,7 @@ func HandleAdminAssetManageUpload(store *database.Store, storage *storage.B2Stor
 	adminAssetList.AdminAssetList(assets, subject, grade).Render(r.Context(), w)
 }
 
-func HandleAdminAssetManageDelete(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetManageDelete(store *sqlite.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	subject := r.FormValue("subject")
 	grade := r.FormValue("grade")
 	name := r.FormValue("name")
@@ -123,16 +117,27 @@ func HandleAdminAssetManageDelete(store *database.Store, storage *storage.B2Stor
 		return
 	}
 
-	key := fmt.Sprintf("%s:%s:%s", subject, grade, name)
-	filePath := fmt.Sprintf("assets/%s/%s/%s.pdf", subject, grade, name)
+	asset, err := store.GetAsset(subject, grade, name)
+	if err != nil {
+		fmt.Printf("❌ Error getting asset to delete: %v\n", err)
+		http.Error(w, "Asset not found", http.StatusNotFound)
+		return
+	}
 
-	_ = storage.DeleteFile(r.Context(), filePath)
-	_ = database.Delete(store, database.Buckets["assets"], key)
+	if err := storage.DeleteFile(r.Context(), asset.OriginalName); err != nil {
+		fmt.Printf("⚠️ Failed deleting file from storage: %v\n", err)
+	}
+
+	if err := store.DeleteAsset(subject, grade, name); err != nil {
+		fmt.Printf("❌ Error deleting asset from DB: %v\n", err)
+		http.Error(w, "Failed to delete asset", http.StatusInternalServerError)
+		return
+	}
 
 	HandleAdminAssetList(store, w, r)
 }
 
-func HandleAdminAssetManageVisibility(store *database.Store, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetManageVisibility(store *sqlite.Store, w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	subject := r.URL.Query().Get("subject")
 	grade := r.URL.Query().Get("grade")
@@ -143,7 +148,7 @@ func HandleAdminAssetManageVisibility(store *database.Store, w http.ResponseWrit
 
 	fmt.Printf("📥 Visibility Update: Name=%s, Target=%s, Visible=%t\n", name, target, isVisible)
 
-	err := database.UpdateAssetVisibility(store, subject, grade, name, target, isVisible)
+	err := store.UpdateAssetVisibility(subject, grade, name, target, isVisible)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -151,7 +156,7 @@ func HandleAdminAssetManageVisibility(store *database.Store, w http.ResponseWrit
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func HandleAdminAssetView(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetView(store *sqlite.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminAssetView] Request received")
 
 	subject := r.URL.Query().Get("subject")
@@ -167,31 +172,31 @@ func HandleAdminAssetView(store *database.Store, storage *storage.B2Storage, w h
 		return
 	}
 
-	asset, err := database.GetWithPrefix[models.Asset](store, database.Buckets["assets"], name, subject, grade)
+	asset, err := store.GetAsset(subject, grade, name)
 	if err != nil || asset == nil {
 		fmt.Printf("❌ Error getting asset: %v\n", err)
 		http.Error(w, "Asset not found", http.StatusNotFound)
 		return
 	}
 
-	fmt.Println("original name: ", asset.OriginalName)
+	fmt.Println("original name:", asset.OriginalName)
 
 	temporaryLink, err := storage.GetTemporaryLink(r.Context(), asset.OriginalName, 3*time.Minute)
 	if err != nil {
-		fmt.Printf("Error generating temporary link: %v\n", err)
+		fmt.Printf("❌ Error generating temporary link: %v\n", err)
 		http.Error(w, "Error generating temporary link", http.StatusInternalServerError)
 		return
 	}
 
 	fmt.Printf("✅ Temporary link generated: %s\n", temporaryLink)
-
 	pdfViewerFrame.PdfViewerFrame(temporaryLink).Render(r.Context(), w)
 }
 
-func HandleAdminAssetRefresh(store *database.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
+func HandleAdminAssetRefresh(store *sqlite.Store, storage *storage.B2Storage, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("📥 [HandleAdminAssetRefresh] Request received")
 
-	go database.RefreshAssets(store, storage)
+	go store.RefreshAssets(storage)
 
 	fmt.Printf("Assets refreshed\n")
+	w.WriteHeader(http.StatusNoContent)
 }
