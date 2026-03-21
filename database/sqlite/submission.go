@@ -115,7 +115,6 @@ func (s *Store) ListSubmissionsByAssignment(classID, assignmentID int) ([]*model
 	if err != nil {
 		return nil, fmt.Errorf("list submissions by assignment: %w", err)
 	}
-	defer rows.Close()
 
 	submissions := make([]*models.Submission, 0)
 	for rows.Next() {
@@ -126,9 +125,20 @@ func (s *Store) ListSubmissionsByAssignment(classID, assignmentID int) ([]*model
 			&sub.SubmittedAt,
 			&sub.Grade,
 		); err != nil {
+			rows.Close()
 			return nil, fmt.Errorf("scan submission: %w", err)
 		}
+		sub.Content = []string{}
+		submissions = append(submissions, &sub)
+	}
 
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, fmt.Errorf("iterate submissions: %w", err)
+	}
+	rows.Close()
+
+	for _, sub := range submissions {
 		contentRows, err := s.DB.Query(`
 			SELECT value
 			FROM submission_content
@@ -139,7 +149,6 @@ func (s *Store) ListSubmissionsByAssignment(classID, assignmentID int) ([]*model
 			return nil, fmt.Errorf("query submission content: %w", err)
 		}
 
-		sub.Content = []string{}
 		for contentRows.Next() {
 			var value string
 			if err := contentRows.Scan(&value); err != nil {
@@ -153,12 +162,6 @@ func (s *Store) ListSubmissionsByAssignment(classID, assignmentID int) ([]*model
 			return nil, fmt.Errorf("iterate submission content: %w", err)
 		}
 		contentRows.Close()
-
-		submissions = append(submissions, &sub)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate submissions: %w", err)
 	}
 
 	return submissions, nil

@@ -48,21 +48,23 @@ func (s *Store) CreateAssignment(classId int, title, description, dueDate string
 		fmt.Printf("X Error getting class users: %v\n", err)
 		return nil, err
 	}
-	defer rows.Close()
 
 	var usernames []string
 	for rows.Next() {
 		var username string
 		if err := rows.Scan(&username); err != nil {
+			rows.Close()
 			fmt.Printf("X Error scanning class user: %v\n", err)
 			return nil, err
 		}
 		usernames = append(usernames, username)
 	}
 	if err := rows.Err(); err != nil {
+		rows.Close()
 		fmt.Printf("X Error iterating class users: %v\n", err)
 		return nil, err
 	}
+	rows.Close()
 
 	for _, username := range usernames {
 		_, err := tx.Exec(`
@@ -72,8 +74,6 @@ func (s *Store) CreateAssignment(classId int, title, description, dueDate string
 		`, classId, int(id64), username, "", "", "")
 		if err != nil {
 			fmt.Printf("X Error creating user submission for %s: %v\n", username, err)
-			// match old behavior: continue on per-user submission failure
-			err = nil
 			continue
 		}
 	}
