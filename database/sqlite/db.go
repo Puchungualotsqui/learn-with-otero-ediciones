@@ -69,6 +69,11 @@ func Init(path string) (*Store, error) {
 		return nil, err
 	}
 
+	newDB := false
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		newDB = true
+	}
+
 	store, err := Open(path)
 	if err != nil {
 		return nil, err
@@ -79,8 +84,103 @@ func Init(path string) (*Store, error) {
 		return nil, fmt.Errorf("migrate schema: %w", err)
 	}
 
+	if newDB {
+		log.Println("🌱 Seeding database with test data...")
+
+		adminPassword := os.Getenv("ADMIN_PASSWORD")
+		if adminPassword == "" {
+			_ = store.Close()
+			return nil, fmt.Errorf("missing ADMIN_PASSWORD env var")
+		}
+
+		if _, err := store.CreateUser(
+			"admin",
+			adminPassword,
+			"",
+			"",
+			"admin",
+			"",
+			"",
+			"otero_ediciones@gmail.com",
+			"70832284",
+		); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create admin user: %w", err)
+		}
+
+		if _, err := store.CreateUser(
+			"prof1",
+			"password",
+			"Alice",
+			"Smith",
+			"professor",
+			"Otero Ediciones",
+			"1primaria",
+			"example@email.com",
+			"0000000",
+		); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create professor user: %w", err)
+		}
+
+		if _, err := store.CreateUser(
+			"student1",
+			"password",
+			"Bob",
+			"Perez",
+			"student",
+			"Otero Ediciones",
+			"1primaria",
+			"example1@email.com",
+			"00000",
+		); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create student user: %w", err)
+		}
+
+		if err := store.CreateInitialSubjects(); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create initial subjects: %w", err)
+		}
+
+		class, err := store.CreateClass(
+			"Literatura",
+			"Clase con el profe Hugo",
+			"1primaria",
+			"literatura",
+		)
+		if err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create sample class: %w", err)
+		}
+
+		if err := store.AddUserToClass(class.Id, "prof1"); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("add professor to class: %w", err)
+		}
+
+		if err := store.AddUserToClass(class.Id, "student1"); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("add student to class: %w", err)
+		}
+
+		if _, err := store.CreateAssignment(
+			class.Id,
+			"Álgebra I",
+			"Resolver los ejercicios de la página 42",
+			time.Now().AddDate(0, 0, 7).Format("02/01/2006"),
+		); err != nil {
+			_ = store.Close()
+			return nil, fmt.Errorf("create sample assignment: %w", err)
+		}
+	}
+
 	log.Println("✅ Database ready at", path)
 	return store, nil
+}
+
+func (s *Store) CreateInitialSubjects() error {
+	return s.CreateSubjects(SubjectsNames)
 }
 
 func (s *Store) CountTable(table string) (int, error) {

@@ -57,7 +57,7 @@ func HandleAdminClassCreatePost(store *sqlite.Store, w http.ResponseWriter, r *h
 		return
 	}
 
-	class, err := store.CreateClass(name, description, subject, grade)
+	class, err := store.CreateClass(name, description, grade, subject)
 	if err != nil {
 		fmt.Printf("Error creating the class %v\n", err)
 		http.Error(w, "Error creating the class", http.StatusBadRequest)
